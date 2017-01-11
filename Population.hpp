@@ -432,6 +432,24 @@ namespace mas {
 
         out << "Population " << pi.natal_population->id << "\n";
         out << "Area " << pi.area->id << "\n";
+        out << "Total Immigrants \n";
+        if (pi.male_chohorts) {
+            out << "Males\n";
+        } else {
+            out << "Females\n";
+        }
+        for (int a = 0; a < pi.ages.size(); a++) {
+            for (int y = 0; y < pi.years; y++) {
+                for (int s = 0; s < pi.seasons; s++) {
+                    out << pi.imigrants[y * pi.seasons * pi.ages.size() + s * pi.ages.size() + a] << " ";
+                }
+            }
+            out << "\n";
+        }
+        out << "\n\n";
+
+        out << "Population " << pi.natal_population->id << "\n";
+        out << "Area " << pi.area->id << "\n";
         out << "Total Emigrants \n";
         if (pi.male_chohorts) {
             out << "Males\n";
