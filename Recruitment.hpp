@@ -111,8 +111,10 @@ namespace mas {
     struct BevertonHoltAlt : RecruitmentBase<REAL_T> {
         typedef typename VariableTrait<REAL_T>::variable variable;
         variable R0; //unfished equilibrium recruitment
+        variable S0;
         variable phi0; //unfished spawning biomass or abundance per recruit
         variable h; //steepness
+        variable sigma_r;
 
         /**
          * Alternative Beverton-Holt S-R relationship
@@ -121,10 +123,15 @@ namespace mas {
          * @return 
          */
         const variable Evaluate(const variable& s) {
-            return (static_cast<REAL_T> (4.0) * R0 * h * s) /
-                    ((phi0 * R0 * (static_cast<REAL_T> (1.0) - h)) +
-                    (s * (static_cast<REAL_T> (5.0) * h
-                    - static_cast<REAL_T> (1.0))));
+//            std::cout << "spawing biomass = " << s << " --> ";
+            //            variable r= (static_cast<REAL_T> (4.0) * R0 * h * s) /
+            //                    ((phi0 * R0 * (static_cast<REAL_T> (1.0) - h)) +
+            //                    (s * (static_cast<REAL_T> (5.0) * h
+            //                    - static_cast<REAL_T> (1.0))));
+            variable rr;// = (sigma_r*4.0 * R0 * h * s) / ((S0 * (1.0 - h)) + (s * (5.0 * h - 1.0)));
+            rr =sigma_r*4.0*h*R0*s/(S0*(1.0-h)+s*(5.0*h-1.0));
+//            std::cout << rr << "\n";
+            return rr;
         }
 
         virtual const std::string Name() {

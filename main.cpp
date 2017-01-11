@@ -186,23 +186,26 @@ int main(int argc, char** argv) {
     typename std::unordered_map<int, std::shared_ptr<mas::Population<double> > >::iterator it;
     std::unordered_map<int, std::shared_ptr<mas::Population<double> > >& pops =
             info1.GetPopulations();
+    for (int i = 0; i < 1; i++) {
+        for (it = pops.begin(); it != pops.end(); ++it) {
+            (*it).second->Prepare();
+        }
 
-    for (it = pops.begin(); it != pops.end(); ++it) {
-        (*it).second->Prepare();
+
+        atl::Variable<double>::gradient_structure_g.Reset();
+        std::cout << "Iteration: " << i << "\n";
+        for (it = pops.begin(); it != pops.end(); ++it) {
+            (*it).second->Evaluate();
+        }
+
     }
-
-
-    for (it = pops.begin(); it != pops.end(); ++it) {
-        (*it).second->Evaluate();
-    }
-    
     for (it = pops.begin(); it != pops.end(); ++it) {
         (*it).second->Show();
     }
 
-    std::cout <<atl::Variable<double>::gradient_structure_g.stack_current<<"\n";
-    
-   
+    std::cout << atl::Variable<double>::gradient_structure_g.stack_current << "\n";
+
+
     exit(0);
     //    
     ////    create();

@@ -3248,6 +3248,13 @@ namespace mas {
                 ss << "beverton_holt_alt_h_" << model_id;
                 VariableTrait<REAL_T>::SetName(bh->h, ss.str());
 
+                ss.str("");
+                ss << "beverton_holt_alt_sigma_r_" << model_id;
+                VariableTrait<REAL_T>::SetName(bh->sigma_r, ss.str());
+
+                ss.str("");
+                ss << "beverton_holt_alt_S0_" << model_id;
+                VariableTrait<REAL_T>::SetName(bh->S0, ss.str());
 
                 if (pit == (*recruitment_model).value.MemberEnd()) {
                     std::cout << "Configuration Error: Recruitment model \"Beverton-Holt\" has no parameter definitions.\n";
@@ -3356,6 +3363,113 @@ namespace mas {
                             }
                             //register phi0
                             bh->Register(bh->phi0, phase);
+
+                        }
+
+                    }
+
+                    ppit = (*pit).value.FindMember("sigma_r");
+                    if (ppit == (*pit).value.MemberEnd()) {
+                        std::cout << "Configuration Warning: Recruitment model \"Beverton-Holt Alt\" " <<
+                                "does not define \"sigma_r\". Model will use the default value of 0 and \"sigma_r\" will not be estimated.\n";
+                        mas::mas_log << "Configuration Warning: Recruitment model \"Beverton-Holt\" " <<
+                                "does not define \"sigma_r\". Model will use the default value of 0 and \"sigma_r\" will not be estimated.\n";
+                    } else {
+
+                        bool estimated = false;
+                        int phase = 1;
+                        //1. Get initial value if there is one.
+                        rapidjson::Document::MemberIterator pm = (*ppit).value.FindMember("value");
+
+                        if (pm == (*ppit).value.MemberEnd()) {
+                            std::cout << "Configuration Warning: Recruitment model \"Beverton-Holt Alt\" does not provide a initial value for \"sigma_r\".\n";
+                            mas::mas_log << "Configuration Warning: Recruitment model \"Beverton-Holt Alt\" does not provide a initial value for \"sigma_r\".\n";
+                        } else {
+                            VariableTrait<REAL_T>::SetValue(bh->sigma_r, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                        }
+
+                        //2. Get min boundary if there is one.
+                        pm = (*ppit).value.FindMember("min");
+                        if (pm != (*ppit).value.MemberEnd()) {
+                            VariableTrait<REAL_T>::SetMinBoundary(bh->sigma_r, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                        }
+
+                        //3. Get max boundary if there is one.
+                        pm = (*ppit).value.FindMember("max");
+                        if (pm != (*ppit).value.MemberEnd()) {
+                            VariableTrait<REAL_T>::SetMaxBoundary(bh->sigma_r, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                        }
+
+                        pm = (*ppit).value.FindMember("estimated");
+                        if (pm != (*ppit).value.MemberEnd()) {
+                            std::string e = std::string((*pm).value.GetString());
+                            if (e == "true") {
+                                estimated = true;
+                            }
+                        }
+
+                        if (estimated) {
+                            phase = 1;
+                            pm = (*ppit).value.FindMember("phase");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                phase = (*pm).value.GetInt();
+                            }
+                            //register phi0
+                            bh->Register(bh->sigma_r, phase);
+
+                        }
+
+                    }
+
+
+                    ppit = (*pit).value.FindMember("S0");
+                    if (ppit == (*pit).value.MemberEnd()) {
+                        std::cout << "Configuration Warning: Recruitment model \"Beverton-Holt Alt\" " <<
+                                "does not define \"S0\". Model will use the default value of 0 and \"S0\" will not be estimated.\n";
+                        mas::mas_log << "Configuration Warning: Recruitment model \"Beverton-Holt\" " <<
+                                "does not define \"S0\". Model will use the default value of 0 and \"S0\" will not be estimated.\n";
+                    } else {
+
+                        bool estimated = false;
+                        int phase = 1;
+                        //1. Get initial value if there is one.
+                        rapidjson::Document::MemberIterator pm = (*ppit).value.FindMember("value");
+
+                        if (pm == (*ppit).value.MemberEnd()) {
+                            std::cout << "Configuration Warning: Recruitment model \"Beverton-Holt Alt\" does not provide a initial value for \"S0\".\n";
+                            mas::mas_log << "Configuration Warning: Recruitment model \"Beverton-Holt Alt\" does not provide a initial value for \"S0\".\n";
+                        } else {
+                            VariableTrait<REAL_T>::SetValue(bh->S0, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                        }
+
+                        //2. Get min boundary if there is one.
+                        pm = (*ppit).value.FindMember("min");
+                        if (pm != (*ppit).value.MemberEnd()) {
+                            VariableTrait<REAL_T>::SetMinBoundary(bh->S0, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                        }
+
+                        //3. Get max boundary if there is one.
+                        pm = (*ppit).value.FindMember("max");
+                        if (pm != (*ppit).value.MemberEnd()) {
+                            VariableTrait<REAL_T>::SetMaxBoundary(bh->S0, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                        }
+
+                        pm = (*ppit).value.FindMember("estimated");
+                        if (pm != (*ppit).value.MemberEnd()) {
+                            std::string e = std::string((*pm).value.GetString());
+                            if (e == "true") {
+                                estimated = true;
+                            }
+                        }
+
+                        if (estimated) {
+                            phase = 1;
+                            pm = (*ppit).value.FindMember("phase");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                phase = (*pm).value.GetInt();
+                            }
+                            //register phi0
+                            bh->Register(bh->S0, phase);
 
                         }
 
@@ -4686,7 +4800,7 @@ namespace mas {
 
                 for (ait = this->areas.begin(); ait != this->areas.end(); ++ait) {
                     population->areas_list.push_back((*ait).second);
-                    mas::PopulationInfo<REAL_T>& male_pop_info = population->male_cohorts[(*ait).second->id];
+                    mas::AreaPopulationInfo<REAL_T>& male_pop_info = population->male_cohorts[(*ait).second->id];
                     male_pop_info.natal_area = population->natal_area;
                     male_pop_info.natal_population = population;
                     male_pop_info.area = (*ait).second;
@@ -4726,7 +4840,7 @@ namespace mas {
                             typename std::map<int, int>::iterator sit = seasonal_recruitment.find((s + 1));
                             if (sit != seasonal_recruitment.end()) {
                                 male_pop_info.recruitment_model[(*sit).first] = this->recruitment_models[(*sit).second];
-                            }else {
+                            } else {
                                 std::cout << "Recruitment model not defined for " << population->id << " season " << (s + 1) << ", area " << male_pop_info.area->id << "\n";
                                 mas_log << "Recruitment model not defined for " << population->id << " season " << (s + 1) << ", area " << male_pop_info.area->id << "\n";
                                 this->valid_configuration = false;
@@ -4748,7 +4862,7 @@ namespace mas {
                     male_pop_info.male_chohorts = true;
                     male_pop_info.Initialize();
 
-                    mas::PopulationInfo<REAL_T>& female_pop_info = population->female_cohorts[(*ait).second->id];
+                    mas::AreaPopulationInfo<REAL_T>& female_pop_info = population->female_cohorts[(*ait).second->id];
                     female_pop_info.natal_area = population->natal_area;
                     female_pop_info.natal_population = population;
                     female_pop_info.area = (*ait).second;

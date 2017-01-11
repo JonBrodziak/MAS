@@ -43,8 +43,14 @@ namespace mas {
         variable a_min;
         variable a_max;
 
+        variable alpha_f, alpha_m;
+        variable beta_f, beta_m;
 
         virtual const variable Evaluate(const variable& age) = 0;
+
+        const variable getWeight(const int sex, const variable& length) {
+            return sex == 1 ? alpha_f * pow(length, beta_f) : alpha_m * pow(length, beta_m);
+        }
 
         virtual const std::string Name() {
             return "GrowthBase";
@@ -77,7 +83,7 @@ namespace mas {
 
         const variable Evaluate(const variable& age) {
             return lmin + (lmax - lmin)*((static_cast<REAL_T> (1.0) -
-                    (atl::pow(c, age - this->a_min))) / (static_cast<REAL_T> (1.0) - atl::pow(c,this->a_max - this->a_min)));
+                    (atl::pow(c, age - this->a_min))) / (static_cast<REAL_T> (1.0) - atl::pow(c, this->a_max - this->a_min)));
         }
 
         virtual const std::string Name() {
