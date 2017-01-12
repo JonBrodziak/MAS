@@ -22,7 +22,7 @@
 #include <unordered_map>
 #include "Area.hpp"
 
-#include "../AutoDiff_Standalone/AutoDiff/AutoDiff.hpp"
+//#include "../AutoDiff_Standalone/AutoDiff/AutoDiff.hpp"
 #include "Movement.hpp"
 #include "Recruitment.hpp"
 
@@ -213,7 +213,6 @@ namespace mas {
 
                 length_at_survey_time[a - 1] = (static_cast<REAL_T> (1.0) - this->survey_fraction_of_year) *
                         length_at_season_start[a - 1] + this->survey_fraction_of_year * length_at_season_start[a];
-
 
                 weight_at_spawning[a - 1] = this->A * atl::exp(this->B * atl::log(length_at_spawning[a - 1]));
                 weight_at_catch_time[a - 1] = this->A * atl::exp(this->B * atl::log(length_at_catch_time[a - 1]));

@@ -4948,13 +4948,13 @@ namespace mas {
 
             //            this->nseasons = this->seasons.size();
 
-            mas_log << "Estimated Parameters\t\t\t\t\t\tPhase\n";
+            mas_log << "\n\nEstimated Parameters\t\t\t\t\t\tInitial Value\t\t\t\t\t\tPhase\n";
             mas_log << "\nRecruitment:\n";
             recruitment_model_iterator rit;
             for (rit = this->recruitment_models.begin(); rit != this->recruitment_models.end(); ++rit) {
                 typename mas::ModelObject<REAL_T>::estimable_parameter_iterator it;
                 for (it = (*rit).second->estimated_parameters_map.begin(); it != (*rit).second->estimated_parameters_map.end(); ++it) {
-                    mas_log << (*it).first->GetName() << "\t\t\t\t\t\t" << (*it).second << "\n";
+                    mas_log << (*it).first->GetName() << "\t\t\t\t\t\t" << (*it).first->GetValue() << "\t\t\t\t\t\t" << (*it).second << "\n";
                     this->Register(*(*it).first, (*it).second);
                 }
 
@@ -4964,7 +4964,7 @@ namespace mas {
             for (git = this->growth_models.begin(); git != this->growth_models.end(); ++git) {
                 typename mas::ModelObject<REAL_T>::estimable_parameter_iterator it;
                 for (it = (*git).second->estimated_parameters_map.begin(); it != (*git).second->estimated_parameters_map.end(); ++it) {
-                    mas_log << (*it).first->GetName() << "\t\t\t\t\t\t" << (*it).second << "\n";
+                    mas_log << (*it).first->GetName() << "\t\t\t\t\t\t" << (*it).first->GetValue() << "\t\t\t\t\t\t" << (*it).second << "\n";
                     this->Register(*(*it).first, (*it).second);
                 }
 
@@ -4975,7 +4975,7 @@ namespace mas {
             for (sit = this->selectivity_models.begin(); sit != this->selectivity_models.end(); ++sit) {
                 typename mas::ModelObject<REAL_T>::estimable_parameter_iterator it;
                 for (it = (*sit).second->estimated_parameters_map.begin(); it != (*sit).second->estimated_parameters_map.end(); ++it) {
-                    mas_log << (*it).first->GetName() << "\t\t\t\t\t\t" << (*it).second << "\n";
+                    mas_log << (*it).first->GetName() << "\t\t\t\t\t\t" << (*it).first->GetValue() << "\t\t\t\t\t\t" << (*it).second << "\n";
                     this->Register(*(*it).first, (*it).second);
 
                 }
@@ -4987,7 +4987,7 @@ namespace mas {
             for (mit = this->movement_models.begin(); mit != this->movement_models.end(); ++mit) {
                 typename mas::ModelObject<REAL_T>::estimable_parameter_iterator it;
                 for (it = (*mit).second->estimated_parameters_map.begin(); it != (*mit).second->estimated_parameters_map.end(); ++it) {
-                    mas_log << (*it).first->GetName() << "\t\t\t\t\t\t" << (*it).second << "\n";
+                    mas_log << (*it).first->GetName() << "\t\t\t\t\t\t" << (*it).first->GetValue() << "\t\t\t\t\t\t" << (*it).second << "\n";
                     this->Register(*(*it).first, (*it).second);
                 }
 
@@ -5003,7 +5003,7 @@ namespace mas {
                 }
                 typename mas::ModelObject<REAL_T>::estimable_parameter_iterator it;
                 for (it = (*mmit).second->estimated_parameters_map.begin(); it != (*mmit).second->estimated_parameters_map.end(); ++it) {
-                    mas_log << (*it).first->GetName() << "\t\t\t\t\t\t" << (*it).second << "\n";
+                    mas_log << (*it).first->GetName() << "\t\t\t\t\t\t" << (*it).first->GetValue() << "\t\t\t\t\t\t" << (*it).second << "\n";
                     this->Register(*(*it).first, (*it).second);
                 }
 
