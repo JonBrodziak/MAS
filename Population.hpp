@@ -166,11 +166,9 @@ namespace mas {
                 this->recruitment[year * seasons + (season - 1)] = this->initial_numbers[0];
                 //                                }
             } else {
-                this->DecrementTime(y, s);
+//                this->DecrementTime(y, s);
                 variable a;
-                for (int i = 1; i < this->ages.size(); i++) {
-                    a += this->N[y * this->seasons * this->ages.size() + (s - 1) * this->ages.size() + i] * this->spawning_biomass[y * seasons + (s - 1)];
-                }
+                    a =  this->spawning_biomass[y * seasons + (s - 1)];
                 recruitment_model_iterator rit = this->recruitment_model.find(season);
                 if (rit != this->recruitment_model.end()) {
                     this->recruitment[year * seasons + (season - 1)] =
@@ -182,7 +180,6 @@ namespace mas {
                 this->N[year * this->seasons * this->ages.size() + (season - 1) * this->ages.size()] = this->recruitment[year * seasons + (season - 1)];
             }
 
-            //            std::cout << "Recruitment :" << y << ":" << s << ", " << year << "-" << season << " = " << this->recruitment[year * seasons + (season - 1)] << "\n";
         }
 
         /**
@@ -591,6 +588,25 @@ namespace mas {
 
         }
         out << "\n";
+        
+         out << "\n\n";
+        out << std::fixed;
+        out << "Redistributed Recruits " << pi.natal_population->id << "\n";
+        out << "Area " << pi.area->id << "\n";
+        out << "Recruitment \n";
+        if (pi.male_chohorts) {
+            out << "Males\n";
+        } else {
+            out << "Females\n";
+        }
+        //        for (int y = 0; y < pi.years; y++) {
+        for (int s = 0; s < pi.redistributed_recruits.size(); s++) {
+            out << pi.redistributed_recruits[ s] << " ";
+            //            }
+            out << "\n";
+
+        }
+        out << "\n";
 
         return out;
     }
@@ -765,10 +781,13 @@ namespace mas {
 
 
                         if (i != j) {
-                            male_info_to.redistributed_recruits[year * this->seasons + (season - 1)] +=
-                                    rercruit_probabilities[i][j] * male_info_from.recruitment[year * this->seasons + (season - 1)];
-                            female_info_to.redistributed_recruits[year * this->seasons + (season - 1)] +=
-                                    rercruit_probabilities[i][j] * female_info_from.recruitment[year * this->seasons + (season - 1)];
+
+                            variable tempm = rercruit_probabilities[i][j] * male_info_from.recruitment[year * this->seasons + (season - 1)];
+                            variable tempf = rercruit_probabilities[i][j] * female_info_from.recruitment[year * this->seasons + (season - 1)];
+
+                            male_info_to.redistributed_recruits[year * this->seasons + (season - 1)] += tempm;
+                            female_info_to.redistributed_recruits[year * this->seasons + (season - 1)] +=tempf;
+
 
                             for (int a = 0; a < this->ages; a++) {
                                 male_info_from.emigrants[year * this->seasons * this->ages + (season - 1) * this->ages + a] +=

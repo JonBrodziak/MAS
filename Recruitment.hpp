@@ -123,7 +123,7 @@ namespace mas {
          * @return 
          */
         const variable Evaluate(const variable& s) {
-            std::cout << "spawing biomass = " << s << " --> \n";
+//            std::cout << "spawing biomass = " << s << " --> \n";
             //            variable r= (static_cast<REAL_T> (4.0) * R0 * h * s) /
             //                    ((phi0 * R0 * (static_cast<REAL_T> (1.0) - h)) +
             //                    (s * (static_cast<REAL_T> (5.0) * h

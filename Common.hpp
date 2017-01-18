@@ -145,7 +145,7 @@ namespace mas {
             } else if (str == "survey_proportion_at_age") {
                 return CATCH_PROPORTION_AT_AGE;
             } else if (str == "survey_proportion_at_length") {
-                 return CATCH_PROPORTION_AT_LENGTH;
+                return CATCH_PROPORTION_AT_LENGTH;
             } else if (str == "survey_mean_size_at_age") {
                 return CATCH_MEAN_SIZE_AT_AGE;
             } else {

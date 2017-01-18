@@ -186,7 +186,8 @@ int main(int argc, char** argv) {
     typename std::unordered_map<int, std::shared_ptr<mas::Population<double> > >::iterator it;
     std::unordered_map<int, std::shared_ptr<mas::Population<double> > >& pops =
             info1.GetPopulations();
-    for (int i = 0; i < 1; i++) {
+    atl::Variable<double>::gradient_structure_g.derivative_trace_level = atl::SECOND_ORDER_MIXED_PARTIALS;
+    for (int i = 0; i < 1000; i++) {
         for (it = pops.begin(); it != pops.end(); ++it) {
             (*it).second->Prepare();
         }
@@ -198,6 +199,8 @@ int main(int argc, char** argv) {
             (*it).second->Evaluate();
         }
 
+        atl::Variable<double>::gradient_structure_g.Accumulate();
+        
     }
     for (it = pops.begin(); it != pops.end(); ++it) {
         (*it).second->Show();
