@@ -1,2 +1,2 @@
 # Metapopulation Assessment System
-A handsome codebase for evaluating metapopulations
+Software for spatial modeling of fish populations.
