@@ -71,6 +71,14 @@ namespace mas {
         virtual const std::string Name() {
             return "Von Bertalanffy";
         }
+
+        virtual std::string ToString() {
+            std::stringstream ss;
+            ss << "Von Bertalanffy Growth:\n";
+            ss << "k = " << k << "\n";
+            ss << "l_inf = " << l_inf << "\n";
+            return ss.str();
+        }
     };
 
     template<typename REAL_T>
@@ -88,6 +96,16 @@ namespace mas {
 
         virtual const std::string Name() {
             return "Von Bertalanffy modified";
+        }
+
+        virtual std::string ToString() {
+            std::stringstream ss;
+            ss << "Modified Von Bertalanffy Growth:\n";
+            ss << "lmin = " << lmin << "\n";
+            ss << "lmax = " << lmax << "\n";
+            ss << "c = " << c << "\n";
+            ss << "l_inf = " << l_inf << "\n";
+            return ss.str();
         }
     };
 
@@ -109,6 +127,16 @@ namespace mas {
         virtual const std::string Name() {
             return "Schnute Case I";
         }
+
+        virtual std::string ToString() {
+            std::stringstream ss;
+            ss << "Scnute Case I Growth:\n";
+            ss << "alpha = " << alpha << "\n";
+            ss << "beta = " << beta << "\n";
+            ss << "lmin = " << lmin << "\n";
+            ss << "lmax = " << lmax << "\n";
+            return ss.str();
+        }
     };
 
     template<typename REAL_T>
@@ -126,6 +154,15 @@ namespace mas {
 
         virtual const std::string Name() {
             return "Schnute Case II";
+        }
+
+        virtual std::string ToString() {
+            std::stringstream ss;
+            ss << "Scnute Case II Growth:\n";
+            ss << "alpha = " << alpha << "\n";
+            ss << "lmin = " << lmin << "\n";
+            ss << "lmax = " << lmax << "\n";
+            return ss.str();
         }
     };
 
@@ -147,6 +184,16 @@ namespace mas {
         virtual const std::string Name() {
             return "Schnute Case III";
         }
+
+        virtual std::string ToString() {
+            std::stringstream ss;
+            ss << "Scnute Case III Growth:\n";
+            ss << "alpha = " << alpha << "\n";
+            ss << "beta = " << beta << "\n";
+            ss << "lmin = " << lmin << "\n";
+            ss << "lmax = " << lmax << "\n";
+            return ss.str();
+        }
     };
 
     template<typename REAL_T>
@@ -165,6 +212,16 @@ namespace mas {
 
         virtual const std::string Name() {
             return "Schnute Case IV";
+        }
+
+        virtual std::string ToString() {
+            std::stringstream ss;
+            ss << "Scnute Case IV Growth:\n";
+            ss << "alpha = " << alpha << "\n";
+            ss << "beta = " << beta << "\n";
+            ss << "lmin = " << lmin << "\n";
+            ss << "lmax = " << lmax << "\n";
+            return ss.str();
         }
     };
 

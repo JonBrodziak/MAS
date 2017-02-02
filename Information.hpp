@@ -38,6 +38,7 @@
 #include "Season.hpp"
 #include "Movement.hpp"
 #include "Selectivity.hpp"
+#include "Survey.hpp"
 #include "third_party/rapidjson/document.h"
 #include "Fleet.hpp"
 #include <ctime>
@@ -68,10 +69,11 @@ namespace mas {
         bool natal_movement = false;
         bool valid_configuration = true;
 
+
+
+    public:
         std::unordered_map<int, std::shared_ptr<mas::Area<REAL_T> > > areas;
         std::unordered_map<int, std::shared_ptr<mas::Season<REAL_T> > > seasons;
-        typedef typename std::unordered_map<int, std::shared_ptr<mas::Season<REAL_T> > >::iterator seasons_iterator;
-        typedef typename std::unordered_map<int, std::shared_ptr<mas::Area<REAL_T> > >::iterator area_iterator;
 
         //System sub model objects
         std::unordered_map<int, std::shared_ptr<mas::Population<REAL_T> > > populations;
@@ -84,7 +86,11 @@ namespace mas {
         std::unordered_map<int, std::shared_ptr<mas::SelectivityBase<REAL_T> > > selectivity_models;
         std::unordered_map<int, std::shared_ptr<mas::Fleet<REAL_T> > > fleets;
 
+        std::vector<std::shared_ptr<mas::Survey<REAL_T> > > survey_models;
+
         //System sub model iterators
+        typedef typename std::unordered_map<int, std::shared_ptr<mas::Season<REAL_T> > >::iterator seasons_iterator;
+        typedef typename std::unordered_map<int, std::shared_ptr<mas::Area<REAL_T> > >::iterator area_iterator;
         typedef typename std::unordered_map<int, std::shared_ptr<mas::Population<REAL_T> > >::iterator population_iterator;
         typedef typename std::unordered_map<int, std::shared_ptr<mas::GrowthBase<REAL_T> > >::iterator growth_model_iterator;
         typedef typename std::unordered_map<int, std::shared_ptr<mas::RecruitmentBase<REAL_T> > >::iterator recruitment_model_iterator;
@@ -94,8 +100,7 @@ namespace mas {
         typedef typename std::unordered_map<int, std::shared_ptr<mas::Movement<REAL_T> > >::iterator movement_model_iterator;
         typedef typename std::unordered_map<int, std::shared_ptr<mas::SelectivityBase<REAL_T> > >::iterator selectivity_model_iterator;
         typedef typename std::unordered_map<int, std::shared_ptr<mas::Fleet<REAL_T> > >::iterator fleet_iterator;
-
-    public:
+        typedef typename std::vector<std::shared_ptr<mas::Survey<REAL_T> > >::iterator survey_model_iterator;
 
         Information() {
         }
@@ -214,9 +219,94 @@ namespace mas {
                 if (std::string((*mit).name.GetString()) == "fishing_mortality") {
                     HandleFishingMortalityModel(mit);
                 }
+                if (std::string((*mit).name.GetString()) == "survey") {
+                    HandleSurveyModel(mit);
+                }
             }
 
 
+        }
+
+        void HandleSurveyModel(rapidjson::Document::MemberIterator& survey_model) {
+            std::shared_ptr<mas::Survey<REAL_T> > model(new mas::Survey<REAL_T>());
+
+
+            rapidjson::Document::MemberIterator rit = (*survey_model).value.FindMember("id");
+            int model_id = 0;
+            if (rit == (*survey_model).value.MemberEnd()) {
+                std::cout << "Configuration Error: Survey is required to have a unique identifier\n";
+                mas::mas_log << "Configuration Error: Survey is required to have a unique identifier\n";
+                this->valid_configuration = false;
+            } else {
+                model_id = (*rit).value.GetInt();
+            }
+
+            model->id = model_id;
+
+            rit = (*survey_model).value.FindMember("name");
+            if (rit != (*survey_model).value.MemberEnd()) {
+                model->name = std::string((*rit).value.GetString());
+            }
+
+            rit = (*survey_model).value.FindMember("population");
+            if (rit == (*survey_model).value.MemberEnd()) {
+                std::cout << "Configuration Error: Survey is required to have a population identifier\n";
+                mas::mas_log << "Configuration Error: Survey is required to have a population identifier\n";
+                this->valid_configuration = false;
+            } else {
+                model->population = (*rit).value.GetInt();
+            }
+
+            rit = (*survey_model).value.FindMember("selectivity");
+
+            if (rit != (*survey_model).value.MemberEnd()) {
+                if (!(*rit).value.IsArray()) {
+                    std::cout << "Configuration Error: Fleets are required to have selectivity definitions in a vector\n";
+                    std::cout << "Configuration Error: Fleets are required to have selectivity definitions in a vector\n";
+                    this->valid_configuration = false;
+
+                } else {
+                    for (int i = 0; i < (*rit).value.Size(); i++) {
+                        rapidjson::Value& m = (*rit).value[i];
+
+                        int sid = 0;
+                        int sarea = 0;
+                        int sseason = 0;
+                        rapidjson::Document::MemberIterator mit = m.FindMember("id");
+                        if (mit == m.MemberEnd()) {
+                            std::cout << "Configuration Error: Fleets selectivity has no model identifier\n";
+                            std::cout << "Configuration Error: Fleets selectivity has no model identifier\n";
+                            this->valid_configuration = false;
+
+                        } else {
+                            sid = (*mit).value.GetInt();
+                        }
+
+                        mit = m.FindMember("season");
+                        if (mit == m.MemberEnd()) {
+                            std::cout << "Configuration Error: Fleets selectivity season has no identifier\n";
+                            std::cout << "Configuration Error: Fleets selectivity season has no identifier\n";
+                            this->valid_configuration = false;
+
+                        } else {
+                            sseason = (*mit).value.GetInt();
+                        }
+
+                        mit = m.FindMember("area");
+                        if (mit == m.MemberEnd()) {
+                            std::cout << "Configuration Error: Fleets selectivity area has no identifier\n";
+                            std::cout << "Configuration Error: Fleets selectivity area has no identifier\n";
+                            this->valid_configuration = false;
+
+                        } else {
+                            sarea = (*mit).value.GetInt();
+                        }
+                        model->season_area_selectivity_ids[sseason][sarea] = sid;
+                        model->area_season_selectivity_ids[sarea][sseason] = sid;
+                    }
+                }
+            }
+            this->survey_models.push_back(model);
         }
 
         void HandleFishingMortalityModel(rapidjson::Document::MemberIterator& mortality_model) {
@@ -4571,6 +4661,8 @@ namespace mas {
 
 
         }
+
+
         //
         //        void HandleSeason(rapidjson::Document::MemberIterator & season) {
         //
@@ -4729,6 +4821,7 @@ namespace mas {
 
                 data_dictionary[data.area_id][data.name] = data;
                 this->areas[data.area_id]->data.push_back(data);
+                std::cout << data << "\n\n";
             }
         }
 
@@ -4738,6 +4831,9 @@ namespace mas {
             for (it = this->areas.begin(); it != this->areas.end(); ++it) {
 
                 mas::Area<REAL_T>* area = (*it).second.get();
+
+                area->Initialize(nyears, nseasons, ages.size());
+
                 growth_model_iterator git = this->growth_models.find(area->growth_model_id);
                 if (git == this->growth_models.end()) {
                     std::cout << "Configuration Error: Growth model " << area->growth_model_id << " has not been defined.\n";
@@ -4855,7 +4951,7 @@ namespace mas {
                     }
 
 
-
+                    male_pop_info.id = population->id;
                     male_pop_info.years = this->nyears;
                     male_pop_info.seasons = this->nseasons;
                     male_pop_info.ages = this->ages;
@@ -4910,6 +5006,7 @@ namespace mas {
                         }
                     }
 
+                    female_pop_info.id = population->id;
                     female_pop_info.years = this->nyears;
                     female_pop_info.seasons = this->nseasons;
                     female_pop_info.ages = this->ages;
@@ -5033,6 +5130,7 @@ namespace mas {
                     }
                 }
 
+
                 for (sit = (*fit).second->season_area_fishing_mortality_ids.begin(); sit != (*fit).second->season_area_fishing_mortality_ids.end(); ++sit) {
                     typename Fleet<REAL_T>::area_id_iteraor ait;
                     int season = (*sit).first;
@@ -5046,6 +5144,30 @@ namespace mas {
                     }
                 }
 
+            }
+
+            survey_model_iterator ssit;
+            for (ssit = this->survey_models.begin(); ssit != this->survey_models.end(); ++ssit) {
+                typename Survey<REAL_T>::season_area_id_iterator sit;
+                for (sit = (*ssit)->season_area_selectivity_ids.begin(); sit != (*ssit)->season_area_selectivity_ids.end(); ++sit) {
+                    typename Survey<REAL_T>::area_id_iteraor ait;
+                    int season = (*sit).first;
+                    for (ait = (*sit).second.begin(); ait != (*sit).second.end(); ++ait) {
+                        int area = (*ait).first;
+                        int id = (*ait).second;
+                        (*ssit)->area_season_selectivity[area][season] = this->selectivity_models[id];
+                        (*ssit)->season_area_selectivity[season][area] = this->selectivity_models[id];
+                        //                        std::cout << "setting survey " << id << ""
+
+                        //find area
+                        area_iterator ait = this->areas.find(area);
+                        if (ait != this->areas.end()) {
+                            (*ait).second->survey_models[(*ssit)->population][season] = (*ssit);
+                        }
+                        //add population by season
+
+                    }
+                }
             }
             // exit(0);
 
@@ -5079,6 +5201,32 @@ namespace mas {
             //            }
 
 
+
+            //            for (int i = 0; i < this->survey_models.size(); i++) {
+            //                std::cout << *this->survey_models[i] << "\n";
+            //
+            //                selectivity_model_iterator sit = this->selectivity_models.find(this->survey_models[i]->selectivity_model_id);
+            //                if (sit != this->selectivity_models.end()) {
+            //                    this->survey_models[i]->selectivity = (*sit).second;
+            //                } else {
+            //                    std::cout << "Configuration Error:  Survey lists a selectivity model that does not exist.\n";
+            //                    mas_log << "Configuration Error:  Survey lists a selectivity model that does not exist.\n";
+            //                    this->valid_configuration = false;
+            //                }
+            //
+            //                for (int j = 0; j < this->survey_models[i]->area_ids.size(); j++) {
+            //                    area_iterator it = this->areas.find(survey_models[i]->area_ids[j]);
+            //
+            //                    if (it != this->areas.end()) {
+            //                        (*it).second->survey_models[survey_models[i]->population][survey_models[i]->id] = survey_models[i];
+            //
+            //                    } else {
+            //                        std::cout << "Configuration Error:  Survey lists an area identifier that does not exist.\n";
+            //                        mas_log << "Configuration Error:  Survey lists an area identifier that does not exist.\n";
+            //                        this->valid_configuration = false;
+            //                    }
+            //                }
+            //            }
 
             if (!this->valid_configuration) {
                 std::cout << "Configuration Error:  Invalid model configuration. See mas.log for errors.\n";

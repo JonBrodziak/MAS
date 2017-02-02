@@ -151,6 +151,70 @@
             }
         }
     },
+    "selectivity": {
+        "id": 3,
+        "model": "logistic",
+        "base": "age",
+        "parameters": {
+            "a50": {
+                "value": 3.0,
+                "estimated": "true"
+            },
+            "s": {
+                "value": 0.25,
+                "estimated": "true"
+            }
+        }
+    },
+    "selectivity": {
+        "id": 4,
+        "model": "logistic",
+        "base": "age",
+        "parameters": {
+            "a50": {
+                "value": 2.75,
+                "estimated": "true"
+            },
+            "s": {
+                "value": 0.5,
+                "estimated": "true"
+            }
+        }
+    },
+    "survey": {
+        "id": 1,
+        "name": "survey_1",
+        "population": 1,
+        "selectivity": [
+            {
+                "id": 3,
+                "season": 1,
+                "area": 1
+            },
+            {
+                "id": 3,
+                "season": 1,
+                "area": 2
+            }
+        ]
+    },
+    "survey": {
+        "id": 2,
+        "name": "survey_2",
+        "population": 2,
+        "selectivity": [
+            {
+                "id": 4,
+                "season": 1,
+                "area": 1
+            },
+            {
+                "id": 4,
+                "season": 1,
+                "area": 2
+            }
+        ]
+    },
     "movement":
             {
                 "id": 1,
@@ -278,6 +342,7 @@
         "growth_model": 1,
         "mortality_model": 1,
         "fecundity_model": 1
+
     },
     "area": {
         "id": 2,
@@ -470,7 +535,7 @@
                 "sex": "female",
                 "area": 2,
                 "values": [
-                   0.00,
+                    0.00,
                     0.02,
                     0.12,
                     0.50,

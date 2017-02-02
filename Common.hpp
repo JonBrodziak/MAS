@@ -58,7 +58,17 @@ namespace mas {
             this->estimated_parameters.push_back(&var);
             this->estimated_phase.push_back(phase);
         }
+
+        virtual std::string ToString() {
+            return "ModelBase";
+        }
     };
+
+    template<typename T>
+    std::ostream& operator<<(std::ostream& out, const ModelObject<T>& model) {
+        out << model.ToString();
+        return out;
+    }
 
     enum DataUnits {
         MT = 0,
@@ -74,7 +84,7 @@ namespace mas {
         CATCH_PROPORTION_AT_AGE,
         CATCH_PROPORTION_AT_LENGTH,
         CATCH_MEAN_SIZE_AT_AGE,
-        SURVEY_BIOMASS = 0,
+        SURVEY_BIOMASS,
         SURVEY_PROPORTION_AT_AGE,
         SURVEY_PROPORTION_AT_LENGTH,
         SURVEY_MEAN_SIZE_AT_AGE,
@@ -158,7 +168,67 @@ namespace mas {
 
 
 
+
     };
+
+    template<typename T>
+    std::ostream& operator<<(std::ostream& out, const mas::DataObject<T>& data_object) {
+        //        CATCH_BIOMASS = 0,
+        //        CATCH_PROPORTION_AT_AGE,
+        //        CATCH_PROPORTION_AT_LENGTH,
+        //        CATCH_MEAN_SIZE_AT_AGE,
+        //        SURVEY_BIOMASS = 0,
+        //        SURVEY_PROPORTION_AT_AGE,
+        //        SURVEY_PROPORTION_AT_LENGTH,
+        //        SURVEY_MEAN_SIZE_AT_AGE,
+        //        UNKNOWN
+        switch (data_object.type) {
+            case CATCH_BIOMASS:
+                out << "Catch Biomass:";
+                break;
+            case CATCH_PROPORTION_AT_AGE:
+                out << "Catch Proportion at Age:";
+                break;
+            case CATCH_PROPORTION_AT_LENGTH:
+                out << "Catch Proportion at Length:";
+                break;
+            case CATCH_MEAN_SIZE_AT_AGE:
+                out << "Catch Mean Size at Age:";
+                break;
+            case SURVEY_BIOMASS:
+                out << "Survey Biomass";
+                break;
+            case SURVEY_PROPORTION_AT_AGE:
+                out << "Survey Proportion at Age:";
+                break;
+            case SURVEY_PROPORTION_AT_LENGTH:
+                out << "Survey Proportion at Length:";
+                break;
+            case SURVEY_MEAN_SIZE_AT_AGE:
+                out << "Survey Mean Size at Age:";
+                break;
+        }
+
+        out << "Area: " << data_object.area_id << "\n";
+        out << "Population: " << data_object.population_id << "\n";
+        switch (data_object.sex_type) {
+            case MALE:
+                out << "Male\n";
+                break;
+            case FEMALE:
+                out << "Female\n";
+                break;
+            case UNDIFFERENTIATED:
+                out << "Undifferentiated\n";
+                break;
+            
+        }
+        out <<"Dimensions: "<<data_object.dimensions<<"\n";
+        
+        
+
+        return out;
+    }
 
     template <typename T>
     T StringToNumber(const std::string &Text) {

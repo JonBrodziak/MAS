@@ -174,6 +174,57 @@ void create() {
 
 }
 
+/**
+ * Handles the gradient based minimization for the MAS model fit.
+ */
+template<typename REAL_T>
+class MASModelFit {
+    mas::Information<double> info;
+    std::string config_file;
+    std::string data_file;
+    typedef typename mas::VariableTrait<REAL_T>::variable variable;
+public:
+
+    /**
+     * Constructor.
+     * 
+     * @param config_file
+     * @param data_file
+     */
+    MASModelFit(std::string config_file, std::string data_file) :
+    config_file(config_file), data_file(data_file) {
+        info.ParseConfig(config_file);
+        info.ParseData(data_file);
+        info.CreateModel();
+    }
+
+    /**
+     * Objective function called by the function minimizer.
+     * 
+     * @param f
+     */
+    void ObjectiveFunction(variable& f) {
+
+        typename std::unordered_map<int, std::shared_ptr<mas::Population<double> > >::iterator it;
+        std::unordered_map<int, std::shared_ptr<mas::Population<double> > >& pops =
+                info.GetPopulations();
+
+        for (it = pops.begin(); it != pops.end(); ++it) {
+            (*it).second->Prepare();
+        }
+
+        for (it = pops.begin(); it != pops.end(); ++it) {
+            (*it).second->Evaluate();
+        }
+
+
+    }
+
+
+
+
+};
+
 /*
  * 
  */
@@ -186,29 +237,44 @@ int main(int argc, char** argv) {
     typename std::unordered_map<int, std::shared_ptr<mas::Population<double> > >::iterator it;
     std::unordered_map<int, std::shared_ptr<mas::Population<double> > >& pops =
             info1.GetPopulations();
-    atl::Variable<double>::gradient_structure_g.derivative_trace_level = atl::SECOND_ORDER_MIXED_PARTIALS;
-    for (int i = 0; i < 1000; i++) {
-        for (it = pops.begin(); it != pops.end(); ++it) {
-            (*it).second->Prepare();
-        }
 
-
-        atl::Variable<double>::gradient_structure_g.Reset();
-        std::cout << "Iteration: " << i << "\n";
-        for (it = pops.begin(); it != pops.end(); ++it) {
-            (*it).second->Evaluate();
-        }
-
-        atl::Variable<double>::gradient_structure_g.Accumulate();
-        
+    atl::Variable<double>::gradient_structure_g.Reset();
+    //    atl::Variable<double>::gradient_structure_g.derivative_trace_level = atl:;
+    //    for (int i = 0; i < 1; i++) {
+    for (it = pops.begin(); it != pops.end(); ++it) {
+        (*it).second->Prepare();
     }
+
+
+    //        std::cout << "Iteration: " << i << "\n";
+    for (it = pops.begin(); it != pops.end(); ++it) {
+        (*it).second->Evaluate();
+    }
+
+    atl::Variable<double>::gradient_structure_g.Accumulate();
+
+
+
+
+    //    }
     for (it = pops.begin(); it != pops.end(); ++it) {
         (*it).second->Show();
     }
 
+    std::cout << "Name\t\tGradient \n";
+    for (int i = 0; i < info1.estimated_parameters.size(); i++) {
+        std::cout << info1.estimated_parameters[i]->name_m << "\t\t" << atl::Variable<double>::gradient_structure_g.Value(info1.estimated_parameters[i]->info->id) << "\n";
+    }
+
+
     std::cout << atl::Variable<double>::gradient_structure_g.stack_current << "\n";
+    mas::Information<double>::area_iterator ait;
 
-
+    for(ait = info1.areas.begin(); ait != info1.areas.end(); ait++){
+        (*ait).second->ComputeProportions();
+        std::cout<<*(*ait).second<<"\n\n";
+    }
+    
     exit(0);
     //    
     ////    create();
