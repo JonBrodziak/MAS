@@ -42,9 +42,20 @@ namespace mas {
         typedef typename VariableTrait<REAL_T>::variable variable;
         std::unordered_map<int, mas::Population<REAL_T> > populations;
 
+        mas::Information< REAL_T> info;
+
+        std::string data_file;
+        std::string config_file;
+
         //totals 
         std::vector<variable> N;
+        std::vector<variable> N_Proportions;
         std::vector<variable> C;
+        std::vector<variable> C_Biomass;
+        std::vector<variable> C_Proportions;
+        std::vector<variable> SurveyNumbers;
+        std::vector<variable> Survey_Biomass;
+        std::vector<variable> Survey_Proportions;
     public:
 
         MAS() {
@@ -56,7 +67,59 @@ namespace mas {
         virtual ~MAS() {
         }
 
-        void Run() {
+        void Initialize(const std::string& config_file, const std::string& data_file) {
+            info.ParseConfig(config_file);
+            info.ParseData(data_file);
+            info.CreateModel();
+        }
+
+        inline void Run(variable& f) {
+            f = 0.0;
+            typename std::unordered_map<int, std::shared_ptr<mas::Population<double> > >::iterator it;
+            std::unordered_map<int, std::shared_ptr<mas::Population<double> > >& pops =
+                    info.GetPopulations();
+
+            /**
+             * Prepare areas for evaluation. Resets runtime information.
+             */
+            for (ait = info.areas.begin(); ait != info.areas.end(); ait++) {
+                (*ait).second->Prepare();
+            }
+            
+            /**
+             * Prepare Populations for evaluation. Resets runtime 
+             * information.
+             */
+            for (it = pops.begin(); it != pops.end(); ++it) {
+                (*it).second->Prepare();
+            }
+
+
+            /**
+             * Evaluate each population and push final numbers to 
+             * Area objects.
+             */
+            for (it = pops.begin(); it != pops.end(); ++it) {
+                (*it).second->Evaluate();
+            }
+
+            /**
+             * Loop through each area and compute proportions for catch, surveys,
+             * and numbers. 
+             */
+            mas::Information<double>::area_iterator ait;
+            for (ait = info.areas.begin(); ait != info.areas.end(); ait++) {
+                (*ait).second->ComputeProportions();
+            }
+
+            /**
+             * Evaluate the likelihood function. 
+             */
+
+            for (ait = info.areas.begin(); ait != info.areas.end(); ait++) {
+                (*ait).second->ComputeProportions();
+                f += (*ait).second->Compute();
+            }
 
         }
 

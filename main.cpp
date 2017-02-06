@@ -17,6 +17,7 @@
 #include "Recruitment.hpp"
 #include "Information.hpp"
 #include <iostream>
+#include "../../ATL_2_3/ATL___/ATL/Optimization/Optimization2/Optimization.hpp"
 using namespace std;
 
 void create() {
@@ -115,13 +116,13 @@ void create() {
     out.add_variable_attribute("catch_biomass_area_2", "area", "2");
 
     out.add_variable("survey_biomass_area_1", "float",{"years"});
-    out.add_variable_attribute("survey_biomass_area_1", "data_object_type", "catch_biomass");
+    out.add_variable_attribute("survey_biomass_area_1", "data_object_type", "survey_biomass");
     out.add_variable_attribute("survey_biomass_area_1", "sex", "undifferentiated");
     out.add_variable_attribute("survey_biomass_area_1", "units", "kg");
     out.add_variable_attribute("survey_biomass_area_1", "area", "1");
 
     out.add_variable("survey_biomass_area_2", "float",{"years"});
-    out.add_variable_attribute("survey_biomass_area_2", "data_object_type", "catch_biomass");
+    out.add_variable_attribute("survey_biomass_area_2", "data_object_type", "survey_biomass");
     out.add_variable_attribute("survey_biomass_area_2", "sex", "undifferentiated");
     out.add_variable_attribute("survey_biomass_area_2", "units", "kg");
     out.add_variable_attribute("survey_biomass_area_2", "area", "2");
@@ -139,11 +140,11 @@ void create() {
 
     out.add_variable("survey_proportions_at_age_area_1", "float",{"years", "seasons", "ages"});
     out.add_variable_attribute("survey_proportions_at_age_area_1", "units", "proportion");
-    out.add_variable_attribute("survey_proportions_at_age_area_1", "data_object_type", "catch_proportion_at_age");
+    out.add_variable_attribute("survey_proportions_at_age_area_1", "data_object_type", "survey_proportion_at_age");
     out.add_variable_attribute("survey_proportions_at_age_area_1", "area", "1");
 
     out.add_variable("survey_proportions_at_age_area_2", "float",{"years", "seasons", "ages"});
-    out.add_variable_attribute("survey_proportions_at_age_area_2", "data_object_type", "catch_proportion_at_age");
+    out.add_variable_attribute("survey_proportions_at_age_area_2", "data_object_type", "survey_proportion_at_age");
     out.add_variable_attribute("survey_proportions_at_age_area_2", "units", "proportion");
     out.add_variable_attribute("survey_proportions_at_age_area_2", "area", "2");
 
@@ -225,6 +226,137 @@ public:
 
 };
 
+/**
+ *Quick little table to format output into a table.
+ */
+template<typename T>
+class Table {
+    size_t default_align;
+    std::vector<std::vector<int> > align;
+    size_t default_width;
+    std::vector<int > width;
+    char default_fill;
+    std::vector<std::vector<char> > fill;
+
+    std::vector<std::string> column_header;
+    std::vector<std::string> row_header;
+
+    std::vector<std::vector<T> > data;
+
+    size_t rows;
+    size_t columns;
+
+    /*! Center-aligns string within a field of width w. Pads with blank spaces
+    to enforce alignment. */
+    std::string center(const std::string s, const int w) {
+        std::stringstream ss, spaces;
+        int padding = w - s.size(); // count excess room to pad
+        for (int i = 0; i < padding / 2; ++i)
+            spaces << " ";
+        ss << spaces.str() << s << spaces.str(); // format with padding
+        if (padding > 0 && padding % 2 != 0) // if odd #, add 1 space
+            ss << " ";
+        return ss.str();
+    }
+
+    /* Right-aligns string within a field of width w. Pads with blank spaces
+   to enforce alignment. */
+    std::string right(const std::string s, const int w) {
+        std::stringstream ss, spaces;
+        int padding = w - s.size(); // count excess room to pad
+        for (int i = 0; i < padding; ++i)
+            spaces << " ";
+        ss << spaces.str() << s; // format with padding
+        return ss.str();
+    }
+
+    /*! Left-aligns string within a field of width w. Pads with blank spaces
+        to enforce alignment. */
+    std::string left(const std::string s, const int w) {
+        std::stringstream ss, spaces;
+        int padding = w - s.size(); // count excess room to pad
+        for (int i = 0; i < padding; ++i)
+            spaces << " ";
+        ss << s << spaces.str(); // format with padding
+        return ss.str();
+    }
+
+    size_t max_row_name_size;
+    size_t max_col_name_size;
+
+public:
+
+    enum Align {
+        LEFT = 0,
+        RIGHT,
+        CENTER
+    };
+
+    Table(int rows, int columns, int default_align = LEFT, int default_width = 20, char default_fill = ' ') :
+    rows(rows + 1), columns(columns), default_align(default_align), default_width(default_width), default_fill(default_fill), max_row_name_size(default_width), max_col_name_size(default_width) {
+        this->column_header.resize(columns);
+        this->row_header.resize(this->rows);
+        this->data.resize(this->rows, std::vector<T>(columns));
+
+    }
+
+    void SetRowName(const std::string& name, int row) {
+        int r = row + 1;
+        assert(r<this->max_row_name_size);
+        this->max_row_name_size = std::max(this->max_row_name_size, name.size()) + 2;
+        this->row_header[r] = name;
+    }
+
+    void SetColumnName(const std::string& name, int col) {
+        assert(col<this->max_col_name_size);
+        if (this->max_col_name_size < name.size()) {
+            this->max_col_name_size = name.size() + 2;
+        }
+        this->column_header[col] = name;
+    }
+
+    void SetElement(const T& value, int row, int col) {
+        assert(row<this->rows);
+        assert(col<this->columns);
+        this->data[row][col] = value;
+
+    }
+
+    std::string ToString() {
+        std::stringstream out;
+        out << std::left << std::setw(this->max_row_name_size) << std::setfill(this->default_fill) << this->row_header[0];
+        for (int i = 0; i < this->column_header.size(); i++) {
+            out << std::left << std::setw(this->max_col_name_size) << std::setfill(this->default_fill) << this->column_header[i];
+        }
+        out << "\n";
+        out.precision(this->max_col_name_size - 2);
+        for (int i = 1; i < rows; i++) {
+            out << std::left << std::setw(this->max_row_name_size) << std::setfill(this->default_fill) << this->row_header[i];
+            for (int j = 0; j < columns; j++) {
+                out << std::left << std::setw(this->max_col_name_size) << std::setfill(this->default_fill) << this->data[i][j];
+            }
+            out << "\n";
+        }
+
+
+        return out.str();
+    }
+
+
+};
+
+template<typename REAL_T>
+class MASObjectiveFunction : public atl::ObjectiveFunction<REAL_T> {
+    
+    
+    public:
+        
+        virtual void ObjectiveFunction(){
+            
+        }
+    
+};
+
 /*
  * 
  */
@@ -261,20 +393,38 @@ int main(int argc, char** argv) {
         (*it).second->Show();
     }
 
-    std::cout << "Name\t\tGradient \n";
-    for (int i = 0; i < info1.estimated_parameters.size(); i++) {
-        std::cout << info1.estimated_parameters[i]->name_m << "\t\t" << atl::Variable<double>::gradient_structure_g.Value(info1.estimated_parameters[i]->info->id) << "\n";
-    }
+
 
 
     std::cout << atl::Variable<double>::gradient_structure_g.stack_current << "\n";
     mas::Information<double>::area_iterator ait;
-
-    for(ait = info1.areas.begin(); ait != info1.areas.end(); ait++){
+    atl::Variable<double> of;
+    for (ait = info1.areas.begin(); ait != info1.areas.end(); ait++) {
         (*ait).second->ComputeProportions();
-        std::cout<<*(*ait).second<<"\n\n";
+
+        std::cout << *(*ait).second << "\n\n";
     }
-    
+    for (ait = info1.areas.begin(); ait != info1.areas.end(); ait++) {
+        (*ait).second->ComputeProportions();
+        atl::Variable<double> temp = (*ait).second->Compute();
+        std::cout << temp.info->vvalue << "\n";
+        of += temp;
+    }
+    std::cout << "Objective Function value = " << of << "\n";
+
+    Table<double> table(info1.estimated_parameters.size(), 1);
+
+    //    std::cout << "Name\t\tGradient \n";
+    table.SetColumnName("Gradient", 0);
+    table.SetRowName("Parameter", -1);
+    for (int i = 0; i < info1.estimated_parameters.size(); i++) {
+
+        table.SetRowName(info1.estimated_parameters[i]->name_m, i);
+        table.SetElement(atl::Variable<double>::gradient_structure_g.Value(info1.estimated_parameters[i]->info->id), i, 0);
+        //        std::cout << info1.estimated_parameters[i]->name_m << std::setw(20) << " " << atl::Variable<double>::gradient_structure_g.Value(info1.estimated_parameters[i]->info->id) << "\n";
+    }
+
+    std::cout << table.ToString() << "\n";
     exit(0);
     //    
     ////    create();

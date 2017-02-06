@@ -151,13 +151,13 @@ namespace mas {
             } else if (str == "catch_mean_size_at_age") {
                 return CATCH_MEAN_SIZE_AT_AGE;
             } else if (str == "survey_biomass") {
-                return CATCH_BIOMASS;
+                return SURVEY_BIOMASS;
             } else if (str == "survey_proportion_at_age") {
-                return CATCH_PROPORTION_AT_AGE;
+                return SURVEY_PROPORTION_AT_AGE;
             } else if (str == "survey_proportion_at_length") {
-                return CATCH_PROPORTION_AT_LENGTH;
+                return SURVEY_PROPORTION_AT_LENGTH;
             } else if (str == "survey_mean_size_at_age") {
-                return CATCH_MEAN_SIZE_AT_AGE;
+                return SURVEY_MEAN_SIZE_AT_AGE;
             } else {
                 std::cout << "Data Error: unknown data_object_type \"" << str << "\"";
             }
@@ -173,15 +173,7 @@ namespace mas {
 
     template<typename T>
     std::ostream& operator<<(std::ostream& out, const mas::DataObject<T>& data_object) {
-        //        CATCH_BIOMASS = 0,
-        //        CATCH_PROPORTION_AT_AGE,
-        //        CATCH_PROPORTION_AT_LENGTH,
-        //        CATCH_MEAN_SIZE_AT_AGE,
-        //        SURVEY_BIOMASS = 0,
-        //        SURVEY_PROPORTION_AT_AGE,
-        //        SURVEY_PROPORTION_AT_LENGTH,
-        //        SURVEY_MEAN_SIZE_AT_AGE,
-        //        UNKNOWN
+
         switch (data_object.type) {
             case CATCH_BIOMASS:
                 out << "Catch Biomass:";

@@ -53,8 +53,8 @@ namespace mas {
         typedef typename VariableTrait<REAL_T>::variable variable;
 
 
-        std::map<int, std::map<std::string, DataObject<REAL_T> > > data_dictionary;
-
+        std::map<int, std::vector<std::shared_ptr<DataObject<REAL_T> > > > data_dictionary;
+        typedef typename std::map<int, std::vector<std::shared_ptr<DataObject<REAL_T> > > >::iterator data_iterator;
 
         std::string analyst = "NA";
         std::string study_name = "NA";
@@ -4716,79 +4716,79 @@ namespace mas {
             std::multimap<std::string, NcVar>::iterator it;
 
             for (it = variables.begin(); it != variables.end(); ++it) {
-                DataObject<REAL_T> data;
-                data.dimensions = (*it).second.getDimCount();
+                std::shared_ptr<DataObject<REAL_T> > data(new DataObject<REAL_T>());
+                data->dimensions = (*it).second.getDimCount();
 
                 std::string type;
                 (*it).second.getAtt("data_object_type").getValues(type);
-
+                std::cout <<"Data object type = "<<type<<"\n";
                 std::string area;
                 (*it).second.getAtt("area").getValues(area);
-                data.area_id = StringToNumber<uint32_t>(area);
-                data.type = DataObject<REAL_T>::GetType(type);
+                data->area_id = StringToNumber<uint32_t>(area);
+                data->type = DataObject<REAL_T>::GetType(type);
                 std::vector<NcDim> dims = (*it).second.getDims();
                 int i, j, k, l, m, n;
-                switch (data.dimensions) {
+                switch (data->dimensions) {
                     case 1:
-                        data.imax = dims[0].getSize();
-                        data.data.resize(data.imax);
-                        for (i = 0; i < data.imax; i++) {
-                            data.get(i) = in.read_float((*it).first, i);
+                        data->imax = dims[0].getSize();
+                        data->data.resize(data->imax);
+                        for (i = 0; i < data->imax; i++) {
+                            data->get(i) = in.read_float((*it).first, i);
                         }
                         break;
                     case 2:
-                        data.imax = dims[0].getSize();
-                        data.jmax = dims[1].getSize();
+                        data->imax = dims[0].getSize();
+                        data->jmax = dims[1].getSize();
 
-                        data.data.resize(data.imax * data.jmax);
-                        for (i = 0; i < data.imax; i++) {
-                            for (j = 0; j < data.jmax; j++) {
-                                data.get(i, j) = in.read_float((*it).first, i, j);
+                        data->data.resize(data->imax * data->jmax);
+                        for (i = 0; i < data->imax; i++) {
+                            for (j = 0; j < data->jmax; j++) {
+                                data->get(i, j) = in.read_float((*it).first, i, j);
                             }
                         }
                         break;
                     case 3:
-                        data.imax = dims[0].getSize();
-                        data.jmax = dims[1].getSize();
-                        data.kmax = dims[2].getSize();
-                        data.data.resize(data.imax * data.jmax * data.kmax);
-                        for (i = 0; i < data.imax; i++) {
-                            for (j = 0; j < data.jmax; j++) {
-                                for (k = 0; k < data.kmax; k++) {
-                                    data.get(i, j, k) = in.read_float((*it).first, i, j, k);
+                        data->imax = dims[0].getSize();
+                        data->jmax = dims[1].getSize();
+                        data->kmax = dims[2].getSize();
+                        data->data.resize(data->imax * data->jmax * data->kmax);
+                        for (i = 0; i < data->imax; i++) {
+                            for (j = 0; j < data->jmax; j++) {
+                                for (k = 0; k < data->kmax; k++) {
+                                    data->get(i, j, k) = in.read_float((*it).first, i, j, k);
                                 }
                             }
                         }
                         break;
                     case 4:
-                        data.imax = dims[0].getSize();
-                        data.jmax = dims[1].getSize();
-                        data.kmax = dims[2].getSize();
-                        data.lmax = dims[3].getSize();
-                        data.data.resize(data.imax * data.jmax * data.kmax * data.lmax);
-                        for (i = 0; i < data.imax; i++) {
-                            for (j = 0; j < data.jmax; j++) {
-                                for (k = 0; k < data.kmax; k++) {
-                                    for (l = 0; l < data.lmax; l++) {
-                                        data.get(i, j, k, l) = in.read_float((*it).first, i, j, k, l);
+                        data->imax = dims[0].getSize();
+                        data->jmax = dims[1].getSize();
+                        data->kmax = dims[2].getSize();
+                        data->lmax = dims[3].getSize();
+                        data->data.resize(data->imax * data->jmax * data->kmax * data->lmax);
+                        for (i = 0; i < data->imax; i++) {
+                            for (j = 0; j < data->jmax; j++) {
+                                for (k = 0; k < data->kmax; k++) {
+                                    for (l = 0; l < data->lmax; l++) {
+                                        data->get(i, j, k, l) = in.read_float((*it).first, i, j, k, l);
                                     }
                                 }
                             }
                         }
                         break;
                     case 5:
-                        data.imax = dims[0].getSize();
-                        data.jmax = dims[1].getSize();
-                        data.kmax = dims[2].getSize();
-                        data.lmax = dims[3].getSize();
-                        data.lmax = dims[4].getSize();
-                        data.data.resize(data.imax * data.jmax * data.kmax * data.lmax * data.mmax);
-                        for (i = 0; i < data.imax; i++) {
-                            for (j = 0; j < data.jmax; j++) {
-                                for (k = 0; k < data.kmax; k++) {
-                                    for (l = 0; l < data.lmax; l++) {
-                                        for (m = 0; m < data.mmax; m++) {
-                                            data.get(i, j, k, l, m) = in.read_float((*it).first, i, j, k, l, m);
+                        data->imax = dims[0].getSize();
+                        data->jmax = dims[1].getSize();
+                        data->kmax = dims[2].getSize();
+                        data->lmax = dims[3].getSize();
+                        data->lmax = dims[4].getSize();
+                        data->data.resize(data->imax * data->jmax * data->kmax * data->lmax * data->mmax);
+                        for (i = 0; i < data->imax; i++) {
+                            for (j = 0; j < data->jmax; j++) {
+                                for (k = 0; k < data->kmax; k++) {
+                                    for (l = 0; l < data->lmax; l++) {
+                                        for (m = 0; m < data->mmax; m++) {
+                                            data->get(i, j, k, l, m) = in.read_float((*it).first, i, j, k, l, m);
                                         }
                                     }
                                 }
@@ -4796,20 +4796,20 @@ namespace mas {
                         }
                         break;
                     case 6:
-                        data.imax = dims[0].getSize();
-                        data.jmax = dims[1].getSize();
-                        data.kmax = dims[2].getSize();
-                        data.lmax = dims[3].getSize();
-                        data.mmax = dims[4].getSize();
-                        data.nmax = dims[5].getSize();
-                        data.data.resize(data.imax * data.jmax * data.kmax * data.lmax * data.mmax * data.nmax);
-                        for (i = 0; i < data.imax; i++) {
-                            for (j = 0; j < data.jmax; j++) {
-                                for (k = 0; k < data.kmax; k++) {
-                                    for (l = 0; l < data.lmax; l++) {
-                                        for (m = 0; m < data.mmax; m++) {
-                                            for (n = 0; n < data.nmax; n++) {
-                                                data.get(i, j, k, l, m, n) = in.read_float((*it).first, i, j, k, l, m, n);
+                        data->imax = dims[0].getSize();
+                        data->jmax = dims[1].getSize();
+                        data->kmax = dims[2].getSize();
+                        data->lmax = dims[3].getSize();
+                        data->mmax = dims[4].getSize();
+                        data->nmax = dims[5].getSize();
+                        data->data.resize(data->imax * data->jmax * data->kmax * data->lmax * data->mmax * data->nmax);
+                        for (i = 0; i < data->imax; i++) {
+                            for (j = 0; j < data->jmax; j++) {
+                                for (k = 0; k < data->kmax; k++) {
+                                    for (l = 0; l < data->lmax; l++) {
+                                        for (m = 0; m < data->mmax; m++) {
+                                            for (n = 0; n < data->nmax; n++) {
+                                                data->get(i, j, k, l, m, n) = in.read_float((*it).first, i, j, k, l, m, n);
                                             }
                                         }
                                     }
@@ -4819,9 +4819,8 @@ namespace mas {
                         break;
                 }
 
-                data_dictionary[data.area_id][data.name] = data;
-                this->areas[data.area_id]->data.push_back(data);
-                std::cout << data << "\n\n";
+                data_dictionary[data->area_id].push_back(data);
+
             }
         }
 
@@ -5169,6 +5168,55 @@ namespace mas {
                     }
                 }
             }
+
+            data_iterator dit;
+            for (dit = this->data_dictionary.begin(); dit != this->data_dictionary.end(); ++dit) {
+                int area = (*dit).first;
+
+                area_iterator ait = this->areas.find(area);
+                if (ait == this->areas.end()) {
+                    std::cout << "Configuration Error: Data area id not found  \n";
+                    mas_log << "Configuration Error: Data area id not found  \n";
+
+                } else {
+                    for (int i = 0; i < (*dit).second.size(); i++) {
+                        
+                        switch ((*dit).second[i]->type) {
+
+                            case CATCH_BIOMASS:
+                                (*ait).second->catch_biomass_data.push_back((*dit).second[i]);
+                                break;
+                            case CATCH_PROPORTION_AT_AGE:
+                                (*ait).second->catch_proportion_data.push_back((*dit).second[i]);
+                                break;
+                            case CATCH_PROPORTION_AT_LENGTH:
+                                (*ait).second->catch_proportion_length_data.push_back((*dit).second[i]);
+                                break;
+                            case CATCH_MEAN_SIZE_AT_AGE:
+                                (*ait).second->catch_mean_size_data.push_back((*dit).second[i]);
+                                break;
+                            case SURVEY_BIOMASS:
+                                (*ait).second->survey_biomass_data.push_back((*dit).second[i]);
+                                break;
+                            case SURVEY_PROPORTION_AT_AGE:
+                                (*ait).second->survey_proportion_data.push_back((*dit).second[i]);
+                                break;
+                            case SURVEY_PROPORTION_AT_LENGTH:
+                                (*ait).second->survey_proportion_length_data.push_back((*dit).second[i]);
+                                break;
+                            case SURVEY_MEAN_SIZE_AT_AGE:
+                                (*ait).second->survey_mean_size_data.push_back((*dit).second[i]);
+                                break;
+                            default:
+                                std::cout << "Unkown data type found!\n";
+                                mas_log << "Unkown data type found!\n";
+                        }
+                    }
+                }
+
+
+            }
+
             // exit(0);
 
             //            for (fit = this->fleets.begin(); fit != this->fleets.end(); ++fit) {

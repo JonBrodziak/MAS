@@ -57,17 +57,32 @@ namespace mas {
         int mortality_model_id;
         int fecundity_model_id;
 
-        std::vector<variable> SN; //survey numbers at age
-        std::vector<variable> SN_Biomass; //survey numbers at age
-        std::vector<variable> N;
-        std::vector<variable> C;
-        std::vector<variable> C_Biomass;
 
-        std::vector<variable> SN_Proportion; //survey numbers at age
-        std::vector<variable> SN_Biomass_Proportion; //survey numbers at age
+        std::vector<variable> N;
+        std::vector<variable> N_total;
         std::vector<variable> N_Proportion;
         std::vector<variable> C_Proportion;
         std::vector<variable> C_Biomass_Proportion;
+        std::vector<variable> C;
+        std::vector<variable> C_Biomass;
+        std::vector<variable> C_Biomass_total;
+        std::vector<variable> SN; //survey numbers at age
+        std::vector<variable> SN_Biomass; //survey numbers at age
+        std::vector<variable> SN_Biomass_total; //survey numbers at age
+        std::vector<variable> SN_Proportion; //survey numbers at age
+        std::vector<variable> SN_Biomass_Proportion; //survey numbers at age
+
+
+        std::vector<variable> N_diff2;
+        std::vector<variable> N_Proportion_diff2;
+        std::vector<variable> C_Proportion_diff2;
+        std::vector<variable> C_Biomass_Proportion_diff2;
+        std::vector<variable> C_diff2;
+        std::vector<variable> C_Biomass_diff2;
+        std::vector<variable> SN_diff2; //survey numbers at age
+        std::vector<variable> SN_Biomass_diff2; //survey numbers at age
+        std::vector<variable> SN_Proportion_diff2; //survey numbers at age
+        std::vector<variable> SN_Biomass_Proportion_diff2; //survey numbers at age
 
 
         std::shared_ptr<GrowthBase<REAL_T> > growth_model;
@@ -82,31 +97,62 @@ namespace mas {
         typedef typename std::map<int, std::map<int, std::shared_ptr<mas::Survey<REAL_T> > > > ::iterator survey_model_iterator;
         typedef typename std::map<int, std::shared_ptr<mas::Survey<REAL_T> > >::iterator survey_season_iterator;
 
-        std::vector<DataObject<REAL_T> > data;
+        std::vector<std::shared_ptr<DataObject<REAL_T> > > survey_biomass_data;
+        std::vector<std::shared_ptr<DataObject<REAL_T> > > survey_proportion_data;
+        std::vector<std::shared_ptr<DataObject<REAL_T> > > survey_proportion_length_data;
+        std::vector<std::shared_ptr<DataObject<REAL_T> > > survey_mean_size_data;
+
+        std::vector<std::shared_ptr<DataObject<REAL_T> > > catch_biomass_data;
+        std::vector<std::shared_ptr<DataObject<REAL_T> > > catch_proportion_data;
+        std::vector<std::shared_ptr<DataObject<REAL_T> > > catch_proportion_length_data;
+        std::vector<std::shared_ptr<DataObject<REAL_T> > > catch_mean_size_data;
 
         void Initialize(size_t years, size_t seasons, size_t ages) {
             this->years = years;
             this->seasons = seasons;
             this->ages = ages;
 
-            SN.resize(years * seasons * ages);
-            SN_Biomass.resize(years * seasons * ages);
+
             N.resize(years * seasons * ages);
             C.resize(years * seasons * ages);
             C_Biomass.resize(years * seasons * ages);
-
-            SN_Proportion.resize(years * seasons * ages);
-            SN_Biomass_Proportion.resize(years * seasons * ages);
             N_Proportion.resize(years * seasons * ages);
             C_Proportion.resize(years * seasons * ages);
             C_Biomass_Proportion.resize(years * seasons * ages);
+            SN.resize(years * seasons * ages);
+            SN_Biomass.resize(years * seasons * ages);
+            SN_Proportion.resize(years * seasons * ages);
+            SN_Biomass_Proportion.resize(years * seasons * ages);
+
+            N_diff2.resize(years * seasons * ages);
+            C_diff2.resize(years * seasons * ages);
+            C_Biomass_diff2.resize(years * seasons * ages);
+            N_Proportion_diff2.resize(years * seasons * ages);
+            C_Proportion_diff2.resize(years * seasons * ages);
+            C_Biomass_Proportion_diff2.resize(years * seasons * ages);
+            SN_diff2.resize(years * seasons * ages);
+            SN_Biomass_diff2.resize(years * seasons * ages);
+            SN_Proportion_diff2.resize(years * seasons * ages);
+            SN_Biomass_Proportion_diff2.resize(years * seasons * ages);
+            this->C_Biomass_total.resize(years * seasons);
+            this->SN_Biomass_total.resize(years * seasons);
+        }
+        
+        void Prepare(){
+            for (int i = 0; i < this->N.size(); i++) {
+                mas::VariableTrait<REAL_T>::SetValue(SN[i],static_cast<REAL_T>(0.0));
+                mas::VariableTrait<REAL_T>::SetValue(SN_Biomass[i],static_cast<REAL_T>(0.0));
+                mas::VariableTrait<REAL_T>::SetValue(N[i],static_cast<REAL_T>(0.0));
+                mas::VariableTrait<REAL_T>::SetValue(C[i],static_cast<REAL_T>(0.0));
+                mas::VariableTrait<REAL_T>::SetValue(C_Biomass[i],static_cast<REAL_T>(0.0));
+            }
         }
 
         void PushNumbersAndBiomass(const std::vector<variable>& SN_, //survey numbers at age
                 const std::vector<variable>& SN_Biomass_, //survey numbers at age
                 const std::vector<variable>& N_,
                 const std::vector<variable>& C_,
-                const std::vector<variable>& C_Biomass_) {
+                const std::vector<variable>& C_Biomass_, int population) {
 
             for (int i = 0; i < this->N.size(); i++) {
                 SN[i] += SN_[i];
@@ -123,10 +169,12 @@ namespace mas {
                 for (int s = 0; s < this->seasons; s++) {
 
                     variable total_sn;
-                    variable total_sn_b;
+                    variable& total_sn_b = this->SN_Biomass_total[y * this->seasons + s];
+                    total_sn_b = static_cast<REAL_T> (0.0);
                     variable total_n;
                     variable total_c;
-                    variable total_c_b;
+                    variable& total_c_b = this->C_Biomass_total[y * this->seasons + s];
+                    total_c_b = static_cast<REAL_T> (0.0);
                     for (int a = 0; a <this->ages; a++) {
                         total_sn += SN[y * this->seasons * this->ages + (s) * this->ages + a];
                         total_sn_b += SN_Biomass[y * this->seasons * this->ages + (s) * this->ages + a];
@@ -134,6 +182,7 @@ namespace mas {
                         total_c += C[y * this->seasons * this->ages + (s) * this->ages + a];
                         total_c_b += C_Biomass[y * this->seasons * this->ages + (s) * this->ages + a];
                     }
+
 
                     for (int a = 0; a <this->ages; a++) {
                         SN_Proportion[y * this->seasons * this->ages + (s) * this->ages + a] = SN[y * this->seasons * this->ages + (s) * this->ages + a] / total_sn;
@@ -148,6 +197,50 @@ namespace mas {
             }
         }
 
+        const variable Compute() {
+            variable f;
+            variable c_f;
+            variable c_p_f;
+            variable s_f;
+            variable s_p_f;
+            for (int y = 0; y < this->years; y++) {
+                for (int s = 0; s < this->seasons; s++) {
+                    REAL_T temp = static_cast<REAL_T> (0.0);
+
+                    for (int i = 0; i < this->catch_biomass_data.size(); i++) {
+                        temp += catch_biomass_data[i]->get(y, s);
+                    }
+                    c_f += ((this->C_Biomass_total[y * seasons + s] - temp)*(this->C_Biomass_total[y * seasons + s] - temp));
+
+                    temp = static_cast<REAL_T> (0.0);
+                    for (int i = 0; i < this->survey_biomass_data.size(); i++) {
+                        temp += survey_biomass_data[i]->get(y, s);
+                    }
+                    s_f += ((this->C_Biomass_total[y * seasons + s] - temp)*(this->C_Biomass_total[y * seasons + s] - temp));
+
+                    temp = static_cast<REAL_T> (0.0);
+                     for (int a = 0; a <this->ages; a++) {
+                         for(int i =0; i < this->catch_proportion_data.size();i++){
+                             c_p_f += (this->C_Proportion[y * this->seasons * this->ages + (s) * this->ages + a]-this->catch_proportion_data[i]->get(y,s,a))*
+                                     (this->C_Proportion[y * this->seasons * this->ages + (s) * this->ages + a]-this->catch_proportion_data[i]->get(y,s,a));
+                         }
+                     }
+                    
+                    for (int a = 0; a <this->ages; a++) {
+                         for(int i =0; i < this->catch_proportion_data.size();i++){
+                             s_p_f += (this->SN_Proportion[y * this->seasons * this->ages + (s) * this->ages + a]-this->catch_proportion_data[i]->get(y,s,a))*
+                                     (this->SN_Proportion[y * this->seasons * this->ages + (s) * this->ages + a]-this->catch_proportion_data[i]->get(y,s,a));
+                         }
+                     }
+                    
+                }
+            }
+            f = static_cast<REAL_T> (.5) * atl::log(c_f) + static_cast<REAL_T> (.5) * atl::log(s_f)+
+                    static_cast<REAL_T> (.5) * atl::log(s_p_f) +static_cast<REAL_T> (.5) * atl::log(c_p_f);
+            
+            return f;
+        }
+
 
     };
 
@@ -160,7 +253,14 @@ namespace mas {
         out << "Growth Model: " << area.growth_model->id << "\n";
         out << "Recruitment Model: " << area.recruitment_model->id << "\n";
         out << "Mortality Model: " << area.mortality_model->id << "\n\n";
-
+        out << "Catch Biomass Objects: " << area.catch_biomass_data.size() << "\n";
+        out << "Catch Proportion Objects: " << area.catch_proportion_data.size() << "\n";
+        out << "Catch Proportion Length Objects: " << area.catch_proportion_length_data.size() << "\n";
+        out << "Catch Mean Size Objects: " << area.catch_mean_size_data.size() << "\n";
+        out << "Survey Biomass Objects: " << area.survey_biomass_data.size() << "\n";
+        out << "Survey Proportion Objects: " << area.survey_proportion_data.size() << "\n";
+        out << "Survey Proportion Length Objects: " << area.survey_proportion_length_data.size() << "\n";
+        out << "Survey Mean Size Objects: " << area.survey_mean_size_data.size() << "\n";
         out << "Area " << area.id << "\n";
         out << "Number of Fish at Age:\n";
 
@@ -247,7 +347,7 @@ namespace mas {
         out << "\n\n";
 
         out << "Survey Biomass:\n";
-
+        out << "Area " << area.id << "\n";
         for (int a = 0; a < area.ages; a++) {
             for (int y = 0; y < area.years; y++) {
                 for (int s = 0; s < area.seasons; s++) {

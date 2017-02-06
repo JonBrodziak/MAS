@@ -203,13 +203,14 @@ namespace mas {
             //                growth[year * this->seasons * this->ages.size() + (season - 1) * this->ages.size() + a] =
             //                        this->area->growth_model->Evaluate(this->ages[a]);
             //            }
+            variable fract = static_cast<REAL_T> (season) / static_cast<REAL_T> (this->seasons);
             length_at_season_start[0] = variable(.01);
             weight_at_season_start[0] = this->A * atl::exp(this->B * atl::log(length_at_season_start[0]));
             for (int a = 1; a< this->ages.size(); a++) {
                 length_at_season_start[a] =
-                        this->area->growth_model->Evaluate(this->ages[a]);
+                        this->area->growth_model->Evaluate(this->ages[a] + fract);
 
-                weight_at_season_start[a] = this->A * atl::exp(this->B * atl::log(length_at_season_start[a]));
+                weight_at_season_start[a] = this->area->growth_model->getWeight(this->male_chohorts, length_at_season_start[a]); //this->A * atl::exp(this->B * atl::log(length_at_season_start[a]));
 
                 length_at_spawning[a - 1] = (static_cast<REAL_T> (1.0) - this->spawning_season_offset) *
                         length_at_season_start[a - 1] + this->spawning_season_offset * length_at_season_start[a];
@@ -425,7 +426,8 @@ namespace mas {
                     this->SN_Biomass,
                     this->N,
                     this->C,
-                    this->C_Biomass);
+                    this->C_Biomass,
+                    this->id);
         }
 
         inline void Reset() {
@@ -1133,7 +1135,7 @@ namespace mas {
                 male_cohorts[areas_list[a]->id].PushToArea();
                 female_cohorts[areas_list[a]->id].PushToArea();
             }
-            
+
             /**
              * Compute totals for this population
              */

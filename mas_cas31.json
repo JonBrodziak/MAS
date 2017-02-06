@@ -19,27 +19,27 @@
         "parameters": {
             "R0": {
                 "value": 10000000.0,
-                "estimated": "false"
+                "estimated": "true"
             },
             "h": {
                 "value": 0.7,
-                "estimated": "false"
+                "estimated": "true"
             },
             "S0": {
                 "value": 38000.0,
-                "estimated": "false"
+                "estimated": "true"
             },
             "phi0": {
                 "value": 0.0,
-                "estimated": "false"
+                "estimated": "true"
             },
             "rho": {
                 "value": 0.0,
-                "estimated": "false"
+                "estimated": "true"
             },
             "sigma_r": {
                 "value": 0.5,
-                "estimated": "false"
+                "estimated": "true"
             },
             "recruitment_deviations": {
                 "estimated": "false",

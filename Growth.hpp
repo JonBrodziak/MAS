@@ -43,13 +43,15 @@ namespace mas {
         variable a_min;
         variable a_max;
 
-        variable alpha_f, alpha_m;
-        variable beta_f, beta_m;
+        variable alpha_f = 0.000025;
+        variable alpha_m = 0.000025;
+        variable beta_f = 3.0;
+        variable beta_m = 3.0;
 
         virtual const variable Evaluate(const variable& age) = 0;
 
         const variable getWeight(const int sex, const variable& length) {
-            return sex == 1 ? alpha_f * pow(length, beta_f) : alpha_m * pow(length, beta_m);
+            return sex == 0 ? alpha_f * pow(length, beta_f) : alpha_m * pow(length, beta_m);
         }
 
         virtual const std::string Name() {
