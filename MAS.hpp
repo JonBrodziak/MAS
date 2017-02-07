@@ -42,7 +42,7 @@ namespace mas {
         typedef typename VariableTrait<REAL_T>::variable variable;
         std::unordered_map<int, mas::Population<REAL_T> > populations;
 
-        mas::Information< REAL_T> info;
+    
 
         std::string data_file;
         std::string config_file;
@@ -56,8 +56,9 @@ namespace mas {
         std::vector<variable> SurveyNumbers;
         std::vector<variable> Survey_Biomass;
         std::vector<variable> Survey_Proportions;
+        int calls = 0;
     public:
-
+    mas::Information< REAL_T> info;
         MAS() {
         }
 
@@ -74,18 +75,19 @@ namespace mas {
         }
 
         inline void Run(variable& f) {
+//            std::cout<<"Calls "<<calls++<<std::endl;
             f = 0.0;
             typename std::unordered_map<int, std::shared_ptr<mas::Population<double> > >::iterator it;
             std::unordered_map<int, std::shared_ptr<mas::Population<double> > >& pops =
                     info.GetPopulations();
-
-            /**
-             * Prepare areas for evaluation. Resets runtime information.
-             */
+            mas::Information<double>::area_iterator ait;
+                    /**
+                     * Prepare areas for evaluation. Resets runtime information.
+                     */
             for (ait = info.areas.begin(); ait != info.areas.end(); ait++) {
                 (*ait).second->Prepare();
             }
-            
+
             /**
              * Prepare Populations for evaluation. Resets runtime 
              * information.
@@ -107,7 +109,7 @@ namespace mas {
              * Loop through each area and compute proportions for catch, surveys,
              * and numbers. 
              */
-            mas::Information<double>::area_iterator ait;
+            
             for (ait = info.areas.begin(); ait != info.areas.end(); ait++) {
                 (*ait).second->ComputeProportions();
             }

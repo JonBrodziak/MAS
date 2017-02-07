@@ -73,6 +73,35 @@ namespace mas {
         std::vector<variable> SN_Biomass_Proportion; //survey numbers at age
 
 
+        std::vector<variable> N_males;
+        std::vector<variable> N_total_males;
+        std::vector<variable> N_Proportion_males;
+        std::vector<variable> C_Proportion_males;
+        std::vector<variable> C_Biomass_Proportion_males;
+        std::vector<variable> C_males;
+        std::vector<variable> C_Biomass_males;
+        std::vector<variable> C_Biomass_total_males;
+        std::vector<variable> SN_males; //survey numbers at age
+        std::vector<variable> SN_Biomass_males; //survey numbers at age
+        std::vector<variable> SN_Biomass_total_males; //survey numbers at age
+        std::vector<variable> SN_Proportion_males; //survey numbers at age
+        std::vector<variable> SN_Biomass_Proportion_males; //survey numbers at age
+
+        std::vector<variable> N_females;
+        std::vector<variable> N_total_females;
+        std::vector<variable> N_Proportion_females;
+        std::vector<variable> C_Proportion_females;
+        std::vector<variable> C_Biomass_Proportion_females;
+        std::vector<variable> C_females;
+        std::vector<variable> C_Biomass_females;
+        std::vector<variable> C_Biomass_total_females;
+        std::vector<variable> SN_females; //survey numbers at age
+        std::vector<variable> SN_Biomass_females; //survey numbers at age
+        std::vector<variable> SN_Biomass_total_females; //survey numbers at age
+        std::vector<variable> SN_Proportion_females; //survey numbers at age
+        std::vector<variable> SN_Biomass_Proportion_females; //survey numbers at age
+
+
         std::vector<variable> N_diff2;
         std::vector<variable> N_Proportion_diff2;
         std::vector<variable> C_Proportion_diff2;
@@ -124,6 +153,31 @@ namespace mas {
             SN_Proportion.resize(years * seasons * ages);
             SN_Biomass_Proportion.resize(years * seasons * ages);
 
+
+
+            N_males.resize(years * seasons * ages);
+            C_males.resize(years * seasons * ages);
+            C_Biomass_males.resize(years * seasons * ages);
+            N_Proportion_males.resize(years * seasons * ages);
+            C_Proportion_males.resize(years * seasons * ages);
+            C_Biomass_Proportion_males.resize(years * seasons * ages);
+            SN_males.resize(years * seasons * ages);
+            SN_Biomass_males.resize(years * seasons * ages);
+            SN_Proportion_males.resize(years * seasons * ages);
+            SN_Biomass_Proportion_males.resize(years * seasons * ages);
+
+
+            N_females.resize(years * seasons * ages);
+            C_females.resize(years * seasons * ages);
+            C_Biomass_females.resize(years * seasons * ages);
+            N_Proportion_females.resize(years * seasons * ages);
+            C_Proportion_females.resize(years * seasons * ages);
+            C_Biomass_Proportion_females.resize(years * seasons * ages);
+            SN_females.resize(years * seasons * ages);
+            SN_Biomass_females.resize(years * seasons * ages);
+            SN_Proportion_females.resize(years * seasons * ages);
+            SN_Biomass_Proportion_females.resize(years * seasons * ages);
+
             N_diff2.resize(years * seasons * ages);
             C_diff2.resize(years * seasons * ages);
             C_Biomass_diff2.resize(years * seasons * ages);
@@ -137,14 +191,46 @@ namespace mas {
             this->C_Biomass_total.resize(years * seasons);
             this->SN_Biomass_total.resize(years * seasons);
         }
-        
-        void Prepare(){
+
+        void Prepare() {
             for (int i = 0; i < this->N.size(); i++) {
-                mas::VariableTrait<REAL_T>::SetValue(SN[i],static_cast<REAL_T>(0.0));
-                mas::VariableTrait<REAL_T>::SetValue(SN_Biomass[i],static_cast<REAL_T>(0.0));
-                mas::VariableTrait<REAL_T>::SetValue(N[i],static_cast<REAL_T>(0.0));
-                mas::VariableTrait<REAL_T>::SetValue(C[i],static_cast<REAL_T>(0.0));
-                mas::VariableTrait<REAL_T>::SetValue(C_Biomass[i],static_cast<REAL_T>(0.0));
+                //                mas::VariableTrait<REAL_T>::SetValue(SN[i], static_cast<REAL_T> (0.0));
+                //                mas::VariableTrait<REAL_T>::SetValue(SN_Biomass[i], static_cast<REAL_T> (0.0));
+                //                mas::VariableTrait<REAL_T>::SetValue(N[i], static_cast<REAL_T> (0.0));
+                //                mas::VariableTrait<REAL_T>::SetValue(C[i], static_cast<REAL_T> (0.0));
+                //                mas::VariableTrait<REAL_T>::SetValue(C_Biomass[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(N[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(C[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(C_Biomass[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(N_Proportion[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(C_Proportion[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(C_Biomass_Proportion[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(SN[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(SN_Biomass[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(SN_Proportion[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(SN_Biomass_Proportion[i], static_cast<REAL_T> (0.0));
+                
+                mas::VariableTrait<REAL_T>::SetValue(N_males[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(C_males[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(C_Biomass_males[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(N_Proportion_males[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(C_Proportion_males[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(C_Biomass_Proportion_males[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(SN_males[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(SN_Biomass_males[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(SN_Proportion_males[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(SN_Biomass_Proportion_males[i], static_cast<REAL_T> (0.0));
+                
+                mas::VariableTrait<REAL_T>::SetValue(N_females[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(C_females[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(C_Biomass_females[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(N_Proportion_females[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(C_Proportion_females[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(C_Biomass_Proportion_females[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(SN_females[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(SN_Biomass_females[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(SN_Proportion_females[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(SN_Biomass_Proportion_females[i], static_cast<REAL_T> (0.0));
             }
         }
 
@@ -219,25 +305,25 @@ namespace mas {
                     s_f += ((this->C_Biomass_total[y * seasons + s] - temp)*(this->C_Biomass_total[y * seasons + s] - temp));
 
                     temp = static_cast<REAL_T> (0.0);
-                     for (int a = 0; a <this->ages; a++) {
-                         for(int i =0; i < this->catch_proportion_data.size();i++){
-                             c_p_f += (this->C_Proportion[y * this->seasons * this->ages + (s) * this->ages + a]-this->catch_proportion_data[i]->get(y,s,a))*
-                                     (this->C_Proportion[y * this->seasons * this->ages + (s) * this->ages + a]-this->catch_proportion_data[i]->get(y,s,a));
-                         }
-                     }
-                    
                     for (int a = 0; a <this->ages; a++) {
-                         for(int i =0; i < this->catch_proportion_data.size();i++){
-                             s_p_f += (this->SN_Proportion[y * this->seasons * this->ages + (s) * this->ages + a]-this->catch_proportion_data[i]->get(y,s,a))*
-                                     (this->SN_Proportion[y * this->seasons * this->ages + (s) * this->ages + a]-this->catch_proportion_data[i]->get(y,s,a));
-                         }
-                     }
-                    
+                        for (int i = 0; i < this->catch_proportion_data.size(); i++) {
+                            c_p_f += (this->C_Proportion[y * this->seasons * this->ages + (s) * this->ages + a] - this->catch_proportion_data[i]->get(y, s, a))*
+                                    (this->C_Proportion[y * this->seasons * this->ages + (s) * this->ages + a] - this->catch_proportion_data[i]->get(y, s, a));
+                        }
+                    }
+
+                    for (int a = 0; a <this->ages; a++) {
+                        for (int i = 0; i < this->catch_proportion_data.size(); i++) {
+                            s_p_f += (this->SN_Proportion[y * this->seasons * this->ages + (s) * this->ages + a] - this->catch_proportion_data[i]->get(y, s, a))*
+                                    (this->SN_Proportion[y * this->seasons * this->ages + (s) * this->ages + a] - this->catch_proportion_data[i]->get(y, s, a));
+                        }
+                    }
+
                 }
             }
-            f = static_cast<REAL_T> (.5) * atl::log(c_f) + static_cast<REAL_T> (.5) * atl::log(s_f)+
-                    static_cast<REAL_T> (.5) * atl::log(s_p_f) +static_cast<REAL_T> (.5) * atl::log(c_p_f);
-            
+            f = static_cast<REAL_T> (.5) * atl::log(c_f) + static_cast<REAL_T> (.5) * atl::log(s_f) +
+                    static_cast<REAL_T> (.5) * atl::log(s_p_f) + static_cast<REAL_T> (.5) * atl::log(c_p_f);
+
             return f;
         }
 

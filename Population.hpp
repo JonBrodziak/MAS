@@ -40,6 +40,7 @@ namespace mas {
     struct AreaPopulationInfo {
         typedef typename mas::VariableTrait<REAL_T>::variable variable;
         int id;
+        int uid = -9999;
         /*These need to be defined elsewhere*/
         variable spawning_season_offset = .25;
         variable catch_fraction_of_year = .5;
@@ -102,7 +103,6 @@ namespace mas {
         //        std::vector<variable> S;
 
         void Initialize() {
-
             length_at_season_start.resize(this->ages.size() + 1);
             length_at_spawning.resize(this->ages.size());
             length_at_catch_time.resize(this->ages.size());
@@ -132,6 +132,50 @@ namespace mas {
             C.resize(years * seasons * ages.size());
             C_Biomass.resize(years * seasons * ages.size());
             predicted_N.resize(years * seasons * ages.size());
+
+        }
+
+        inline void Reset() {
+            for (int i = 0; i < N.size(); i++) {
+                mas::VariableTrait<REAL_T>::SetValue(emigrants[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(imigrants[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(growth[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(Z[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(S[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(SN[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(SN_Biomass[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(N[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(C[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(C_Biomass[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(predicted_N[i], static_cast<REAL_T> (0.0));
+
+            }
+
+            for (int i = 0; i < recruitment.size(); i++) {
+                mas::VariableTrait<REAL_T>::SetValue(recruitment[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(redistributed_recruits[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(abundance[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(initial_numbers[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(spawning_biomass[i], static_cast<REAL_T> (0.0));
+
+            }
+
+            for (int i = 0; i < this->ages.size(); i++) {
+                mas::VariableTrait<REAL_T>::SetValue(length_at_spawning[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(length_at_catch_time[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(length_at_survey_time[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(weight_at_spawning[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(weight_at_catch_time[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(weight_at_survey_time[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(equilibrium_to_survival_at_spawning[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(spawning_biomass_at_age[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(weight_at_season_start[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(length_at_season_start[i], static_cast<REAL_T> (0.0));
+
+            }
+
+            mas::VariableTrait<REAL_T>::SetValue(weight_at_season_start[this->ages.size()], static_cast<REAL_T> (0.0));
+            mas::VariableTrait<REAL_T>::SetValue(length_at_season_start[this->ages.size()], static_cast<REAL_T> (0.0));
 
         }
 
@@ -204,7 +248,8 @@ namespace mas {
             //                        this->area->growth_model->Evaluate(this->ages[a]);
             //            }
             variable fract = static_cast<REAL_T> (season) / static_cast<REAL_T> (this->seasons);
-            length_at_season_start[0] = variable(.01);
+//            std::cout<<length_at_season_start.size()<<"<<<< ---- "<<std::endl;
+            length_at_season_start[0] = .01;//variable(.01);
             weight_at_season_start[0] = this->A * atl::exp(this->B * atl::log(length_at_season_start[0]));
             for (int a = 1; a< this->ages.size(); a++) {
                 length_at_season_start[a] =
@@ -428,10 +473,6 @@ namespace mas {
                     this->C,
                     this->C_Biomass,
                     this->id);
-        }
-
-        inline void Reset() {
-
         }
 
     };
@@ -817,16 +858,16 @@ namespace mas {
         areas_list(areas) {
 
             for (int a = 0; a < areas_list.size(); a++) {
-
                 male_cohorts[areas_list[a]->id].natal_homing = this->natal_homing;
                 male_cohorts[areas_list[a]->id].area = areas_list[a];
                 male_cohorts[areas_list[a]->id].natal_area = this->natal_area;
-
+                male_cohorts[areas_list[a]->id].Initialize();
+                
                 female_cohorts[areas_list[a]->id].natal_homing = this->natal_homing;
                 female_cohorts[areas_list[a]->id].area = areas_list[a];
                 female_cohorts[areas_list[a]->id].natal_area = this->natal_area;
                 female_cohorts[areas_list[a]->id].male_chohorts = false;
-
+                female_cohorts[areas_list[a]->id].Initialize();
             }
 
 
@@ -835,27 +876,26 @@ namespace mas {
         void Prepare() {
 
 
-
             SN.resize(years * seasons * ages);
             SN_Biomass.resize(years * seasons * ages);
             C.resize(years * seasons * ages);
             C_Biomass.resize(years * seasons * ages);
 
-            for (int a = 0; a < areas_list.size(); a++) {
-                male_cohorts[a].Reset();
-                female_cohorts[a].Reset();
+            for (int a = 0; a < male_cohorts.size(); a++) {
+                male_cohorts[areas_list[a]->id].Reset();
+                female_cohorts[areas_list[a]->id].Reset();
             }
 
             for (int i = 0; i < this->initial_numbers.size(); i++) {
 
                 switch (this->initial_numbers[i].type) {
                     case MALE:
-                        std::cout << "Setting initial numbers for males in area " << this->initial_numbers[i].area_id << "\n";
+//                        std::cout << "Setting initial numbers for males in area " << this->initial_numbers[i].area_id << "\n";
                         this->male_cohorts[this->initial_numbers[i].area_id].initial_numbers = this->initial_numbers[i].values;
                         break;
 
                     case FEMALE:
-                        std::cout << "Setting initial numbers for females in area " << this->initial_numbers[i].area_id << "\n";
+//                        std::cout << "Setting initial numbers for females in area " << this->initial_numbers[i].area_id << "\n";
                         this->female_cohorts[this->initial_numbers[i].area_id].initial_numbers = this->initial_numbers[i].values;
 
                         break;
@@ -956,6 +996,18 @@ namespace mas {
 
                 male_cohorts[areas_list[a]->id].InitNumbers();
                 female_cohorts[areas_list[a]->id].InitNumbers();
+
+            }
+
+        }
+
+        void Initialize() {
+
+            for (int a = 0; a < areas_list.size(); a++) {
+
+                male_cohorts[areas_list[a]->id].Initialize();
+                female_cohorts[areas_list[a]->id].Initialize();
+
             }
 
         }

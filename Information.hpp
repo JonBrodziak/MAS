@@ -1360,10 +1360,10 @@ namespace mas {
                 mas::Logistic<REAL_T>* l = (mas::Logistic<REAL_T>*)model.get();
 
                 std::stringstream ss;
-                ss << "logistic_a50_" << model_id;
+                ss << "logistic_selectivity_a50_" << model_id;
                 VariableTrait<REAL_T>::SetName(l->a50, ss.str());
                 ss.str("");
-                ss << "logistic_s_" << model_id;
+                ss << "logistic_selectivity_s_" << model_id;
                 VariableTrait<REAL_T>::SetName(l->s, ss.str());
 
                 if (pit == (*selectivity_model).value.MemberEnd()) {
@@ -1489,19 +1489,19 @@ namespace mas {
                 mas::DoubleLogistic<REAL_T>* l = (mas::DoubleLogistic<REAL_T>*)model.get();
 
                 std::stringstream ss;
-                ss << "logistic_alpha_asc_" << model_id;
+                ss << "double_logistic_selectivity_alpha_asc_" << model_id;
                 VariableTrait<REAL_T>::SetName(l->alpha_asc, ss.str());
 
                 ss.str("");
-                ss << "logistic_beta_asc_" << model_id;
+                ss << "double_logistic_selectivity_beta_asc_" << model_id;
                 VariableTrait<REAL_T>::SetName(l->beta_asc, ss.str());
 
                 ss.str("");
-                ss << "logistic_alpha_desc_" << model_id;
+                ss << "double_logistic_selectivity_alpha_desc_" << model_id;
                 VariableTrait<REAL_T>::SetName(l->beta_desc, ss.str());
 
                 ss.str("");
-                ss << "logistic_beta_desc_" << model_id;
+                ss << "double_logistic_selectivity_beta_desc_" << model_id;
                 VariableTrait<REAL_T>::SetName(l->beta_desc, ss.str());
 
                 if (pit == (*selectivity_model).value.MemberEnd()) {
@@ -4721,7 +4721,7 @@ namespace mas {
 
                 std::string type;
                 (*it).second.getAtt("data_object_type").getValues(type);
-                std::cout <<"Data object type = "<<type<<"\n";
+                std::cout << "Data object type = " << type << "\n";
                 std::string area;
                 (*it).second.getAtt("area").getValues(area);
                 data->area_id = StringToNumber<uint32_t>(area);
@@ -4825,7 +4825,7 @@ namespace mas {
         }
 
         void CreateModel() {
-
+            int uid = 0;
             area_iterator it;
             for (it = this->areas.begin(); it != this->areas.end(); ++it) {
 
@@ -4899,7 +4899,7 @@ namespace mas {
                     male_pop_info.natal_area = population->natal_area;
                     male_pop_info.natal_population = population;
                     male_pop_info.area = (*ait).second;
-
+                    male_pop_info.uid = uid++;
                     male_pop_info.maturity_vector = population->maturity_models[male_pop_info.area->id][0];
                     if (male_pop_info.maturity_vector.size() == 0 || male_pop_info.maturity_vector.size() < this->ages.size()) {
                         std::cout << "Configuration Error: Maturity vector for population " << population->id << " has wrong size.\n";
@@ -4955,12 +4955,13 @@ namespace mas {
                     male_pop_info.seasons = this->nseasons;
                     male_pop_info.ages = this->ages;
                     male_pop_info.male_chohorts = true;
-                    male_pop_info.Initialize();
+                    //                    male_pop_info.Initialize();
 
                     mas::AreaPopulationInfo<REAL_T>& female_pop_info = population->female_cohorts[(*ait).second->id];
                     female_pop_info.natal_area = population->natal_area;
                     female_pop_info.natal_population = population;
                     female_pop_info.area = (*ait).second;
+                    female_pop_info.uid = uid++;
                     female_pop_info.maturity_vector = population->maturity_models[female_pop_info.area->id][1];
                     if (female_pop_info.maturity_vector.size() == 0 || female_pop_info.maturity_vector.size() < this->ages.size()) {
                         std::cout << "Configuration Error: Maturity vector for population " << population->id << " has wrong size.\n";
@@ -5010,7 +5011,7 @@ namespace mas {
                     female_pop_info.seasons = this->nseasons;
                     female_pop_info.ages = this->ages;
                     female_pop_info.male_chohorts = false;
-                    female_pop_info.Initialize();
+                    //                    female_pop_info.Initialize();
                 }
 
 
@@ -5040,6 +5041,10 @@ namespace mas {
 
                 }
 
+            }
+
+            for (pit = this->populations.begin(); pit != this->populations.end(); ++pit) {
+                (*pit).second->Initialize();
             }
 
             //            this->nseasons = this->seasons.size();
@@ -5103,6 +5108,8 @@ namespace mas {
                     this->Register(*(*it).first, (*it).second);
                 }
 
+            
+                
                 //            for (int a = 0; a <this->ages.size(); a++) {
                 //                (*mmit).second->male_mortality[this->ages[a]] = (*mmit).second->male_mortality_vector[a];
                 //                (*mmit).second->female_mortality[this->ages[a]] = (*mmit).second->female_mortality_vector[a];
@@ -5180,7 +5187,7 @@ namespace mas {
 
                 } else {
                     for (int i = 0; i < (*dit).second.size(); i++) {
-                        
+
                         switch ((*dit).second[i]->type) {
 
                             case CATCH_BIOMASS:
@@ -5276,6 +5283,12 @@ namespace mas {
             //                }
             //            }
 
+            
+            std::cout<<"Estimated Parameters\n";
+                for(int i  = 0; i < this->estimated_parameters.size(); i++){
+                    std::cout<<this->estimated_parameters[i]->GetName()<<" --- "<<this->estimated_parameters[i]->GetValue()<<"\n";
+                }
+            
             if (!this->valid_configuration) {
                 std::cout << "Configuration Error:  Invalid model configuration. See mas.log for errors.\n";
                 mas_log << "Configuration Error:  Invalid model configuration. See mas.log for errors.\n";

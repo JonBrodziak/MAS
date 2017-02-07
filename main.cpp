@@ -17,7 +17,8 @@
 #include "Recruitment.hpp"
 #include "Information.hpp"
 #include <iostream>
-#include "../../ATL_2_3/ATL___/ATL/Optimization/Optimization2/Optimization.hpp"
+#include "third_party/ATL/Optimization/Optimization2/Optimization.hpp"
+#include "MAS.hpp"
 using namespace std;
 
 void create() {
@@ -329,7 +330,7 @@ public:
             out << std::left << std::setw(this->max_col_name_size) << std::setfill(this->default_fill) << this->column_header[i];
         }
         out << "\n";
-        out.precision(this->max_col_name_size - 2);
+
         for (int i = 1; i < rows; i++) {
             out << std::left << std::setw(this->max_row_name_size) << std::setfill(this->default_fill) << this->row_header[i];
             for (int j = 0; j < columns; j++) {
@@ -347,20 +348,67 @@ public:
 
 template<typename REAL_T>
 class MASObjectiveFunction : public atl::ObjectiveFunction<REAL_T> {
-    
-    
+   
     public:
         
-        virtual void ObjectiveFunction(){
-            
+    mas::MAS<REAL_T> mas;
+    std::string data_path = "mas_case_1.nc";
+    std::string config_path = "mas_cas31.json";
+
+
+    typedef typename mas::VariableTrait<REAL_T>::variable variable;
+
+   virtual void Initialize() {
+        mas.Initialize(config_path, data_path);
+        for (int i = 0; i < mas.info.estimated_parameters.size(); i++) {
+            this->RegisterParameter(*mas.info.estimated_parameters[i]);
+            std::cout<<mas.info.estimated_parameters[i]->GetName()<<" "<<mas.info.estimated_parameters[i]->GetValue()<<"\n";
         }
+    }
+
+    virtual const atl::Variable<REAL_T> Evaluate() {
+        variable f;
+        mas.Run(f);
+        return f;
+    }
     
+    virtual void ObjectiveFunction(atl::Variable<REAL_T>& f) {
+        mas.Run(f);
+//        f = this->Evaluate();
+    }
+
 };
 
 /*
  * 
  */
 int main(int argc, char** argv) {
+
+    MASObjectiveFunction<double> objective_function;
+
+    //initialize the objective function
+    objective_function.Initialize();
+    atl::Variable<double> f;
+    
+    //create an instance of a L-BFGS minimizer
+    atl::PortMinimizer<double> fm;
+
+    //set the objective function
+    fm.SetObjectiveFunction(&objective_function);
+    
+    //run the minimizer
+    fm.Run();
+    
+
+    for(int i =0; i < objective_function.mas.info.estimated_parameters.size(); i++){
+            std::cout<<std::fixed;
+        std::cout<<objective_function.mas.info.estimated_parameters[i]->GetName()<<" \t"
+                <<objective_function.mas.info.estimated_parameters[i]->GetValue()<<" \t"<<std::scientific
+                <<objective_function.mas.info.estimated_parameters[i]->GetMinBoundary()<<" \t"
+                <<objective_function.mas.info.estimated_parameters[i]->GetMaxBoundary()<<"\n";
+    }
+    
+    exit(0);
 
     mas::Information<double> info1;
     info1.ParseConfig("mas_cas31.json");
@@ -369,62 +417,80 @@ int main(int argc, char** argv) {
     typename std::unordered_map<int, std::shared_ptr<mas::Population<double> > >::iterator it;
     std::unordered_map<int, std::shared_ptr<mas::Population<double> > >& pops =
             info1.GetPopulations();
-
-    atl::Variable<double>::gradient_structure_g.Reset();
-    //    atl::Variable<double>::gradient_structure_g.derivative_trace_level = atl:;
-    //    for (int i = 0; i < 1; i++) {
-    for (it = pops.begin(); it != pops.end(); ++it) {
-        (*it).second->Prepare();
-    }
-
-
-    //        std::cout << "Iteration: " << i << "\n";
-    for (it = pops.begin(); it != pops.end(); ++it) {
-        (*it).second->Evaluate();
-    }
-
-    atl::Variable<double>::gradient_structure_g.Accumulate();
-
-
-
-
-    //    }
-    for (it = pops.begin(); it != pops.end(); ++it) {
-        (*it).second->Show();
-    }
-
-
-
-
-    std::cout << atl::Variable<double>::gradient_structure_g.stack_current << "\n";
     mas::Information<double>::area_iterator ait;
-    atl::Variable<double> of;
-    for (ait = info1.areas.begin(); ait != info1.areas.end(); ait++) {
-        (*ait).second->ComputeProportions();
+    //    for (it = pops.begin(); it != pops.end(); ++it) {
+    //            (*it).second->InitializePopulationinAreas();
+    //    }
+    //        for (ait = info1.areas.begin(); ait != info1.areas.end(); ait++) {
+    //            (*ait).second->Initialize();
+    //
+    //            std::cout << *(*ait).second << "\n\n";
+    //        }
 
-        std::cout << *(*ait).second << "\n\n";
+    //    atl::Variable<double>::gradient_structure_g.derivative_trace_level = atl:;
+    for (int i = 0; i < 2; i++) {
+
+        atl::Variable<double>::gradient_structure_g.Reset();
+        for (it = pops.begin(); it != pops.end(); ++it) {
+            (*it).second->Prepare();
+        }
+        for (ait = info1.areas.begin(); ait != info1.areas.end(); ait++) {
+            (*ait).second->Prepare();
+
+            //            std::cout << *(*ait).second << "\n\n";
+        }
+
+
+        std::cout << "Iteration: " << i << "\n";
+        for (it = pops.begin(); it != pops.end(); ++it) {
+            (*it).second->Evaluate();
+        }
+
+        atl::Variable<double>::gradient_structure_g.Accumulate();
+
+
+
+
+        //    }
+        //        for (it = pops.begin(); it != pops.end(); ++it) {
+        //            (*it).second->Show();
+        //        }
+
+
+
+
+        std::cout << atl::Variable<double>::gradient_structure_g.stack_current << "\n";
+
+        atl::Variable<double> of;
+        for (ait = info1.areas.begin(); ait != info1.areas.end(); ait++) {
+            (*ait).second->ComputeProportions();
+
+            //            std::cout << *(*ait).second << "\n\n";
+        }
+        for (ait = info1.areas.begin(); ait != info1.areas.end(); ait++) {
+            (*ait).second->ComputeProportions();
+            atl::Variable<double> temp = (*ait).second->Compute();
+            //            std::cout << temp.info->vvalue << "\n";
+            of += temp;
+        }
+        std::cout << "Objective Function value = " << of << "\n";
+
+        Table<double> table(info1.estimated_parameters.size(), 2);
+
+        //    std::cout << "Name\t\tGradient \n";
+        table.SetColumnName("Value", 0);
+        table.SetColumnName("Gradient", 1);
+        table.SetRowName("Parameter", -1);
+        for (int i = 0; i < info1.estimated_parameters.size(); i++) {
+
+            table.SetRowName(info1.estimated_parameters[i]->name_m, i);
+            table.SetElement(info1.estimated_parameters[i]->GetValue(), i, 0);
+            table.SetElement(atl::Variable<double>::gradient_structure_g.Value(info1.estimated_parameters[i]->info->id), i, 1);
+            //        std::cout << info1.estimated_parameters[i]->name_m << std::setw(20) << " " << atl::Variable<double>::gradient_structure_g.Value(info1.estimated_parameters[i]->info->id) << "\n";
+        }
+
+        std::cout << table.ToString() << "\n";
     }
-    for (ait = info1.areas.begin(); ait != info1.areas.end(); ait++) {
-        (*ait).second->ComputeProportions();
-        atl::Variable<double> temp = (*ait).second->Compute();
-        std::cout << temp.info->vvalue << "\n";
-        of += temp;
-    }
-    std::cout << "Objective Function value = " << of << "\n";
-
-    Table<double> table(info1.estimated_parameters.size(), 1);
-
-    //    std::cout << "Name\t\tGradient \n";
-    table.SetColumnName("Gradient", 0);
-    table.SetRowName("Parameter", -1);
-    for (int i = 0; i < info1.estimated_parameters.size(); i++) {
-
-        table.SetRowName(info1.estimated_parameters[i]->name_m, i);
-        table.SetElement(atl::Variable<double>::gradient_structure_g.Value(info1.estimated_parameters[i]->info->id), i, 0);
-        //        std::cout << info1.estimated_parameters[i]->name_m << std::setw(20) << " " << atl::Variable<double>::gradient_structure_g.Value(info1.estimated_parameters[i]->info->id) << "\n";
-    }
-
-    std::cout << table.ToString() << "\n";
     exit(0);
     //    
     ////    create();

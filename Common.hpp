@@ -14,7 +14,7 @@
 #ifndef COMMON_HPP
 #define COMMON_HPP
 
-#include "../AutoDiff_Standalone/AutoDiff/AutoDiff.hpp"
+#include "third_party/ATL/AutoDiff/AutoDiff.hpp"
 
 #include <vector>
 #include <map>

@@ -19,7 +19,7 @@
         "parameters": {
             "R0": {
                 "value": 10000000.0,
-                "estimated": "true"
+                "estimated": "false"
             },
             "h": {
                 "value": 0.7,
@@ -27,19 +27,19 @@
             },
             "S0": {
                 "value": 38000.0,
-                "estimated": "true"
+                "estimated": "false"
             },
             "phi0": {
                 "value": 0.0,
-                "estimated": "true"
+                "estimated": "false"
             },
             "rho": {
                 "value": 0.0,
-                "estimated": "true"
+                "estimated": "false"
             },
             "sigma_r": {
                 "value": 0.5,
-                "estimated": "true"
+                "estimated": "false"
             },
             "recruitment_deviations": {
                 "estimated": "false",
@@ -75,7 +75,7 @@
                     0.2407643582,
                     -0.2871103689
                 ],
-                "estimated": "false"
+                "estimated": "true"
             }
         }
     },
@@ -84,19 +84,26 @@
         "id": 1,
         "parameters": {
             "amin": {
-                "value": 1.0
+                "value": 1.0,
+                "estimated": "true"
             },
             "amax": {
-                "value": 7.0
+                "value": 7.0,
+                "estimated": "true"
             },
             "c": {
-                "value": 0.5
+                "value": 0.5,
+                "estimated": "true",
+                "min":0.2,
+                "max":0.9
             },
             "lmin": {
-                "value": 20
+                "value": 20,
+                "estimated": "true"
             },
             "lmax": {
-                "value": 70
+                "value": 70,
+                "estimated": "true"
             }
         }
     },
@@ -111,7 +118,11 @@
                 "value": 7.0
             },
             "c": {
-                "value": 0.5
+                "value": 0.5,
+                "estimated": "true",
+                "min":0.2,
+                "max":0.9
+                
             },
             "lmin": {
                 "value": 20
@@ -218,7 +229,7 @@
     "movement":
             {
                 "id": 1,
-                "estimated": "false",
+                "estimated": "true",
                 "recruits": [
                     [[0.9, 0.1],
                         [0.1, 0.9]]
@@ -233,7 +244,7 @@
     "movement":
             {
                 "id": 2,
-                "estimated": "false",
+                "estimated": "true",
                 "recruits": [
                     [[0.75, 0.25],
                         [0.25, 0.75]]
@@ -300,7 +311,7 @@
     "fishing_mortality": {
         "id": 2,
         "parameters": {
-            "estimated": "false",
+            "estimated": "true",
             "values": [
                 [0.1],
                 [0.1],
