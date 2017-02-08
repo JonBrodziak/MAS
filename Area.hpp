@@ -382,6 +382,8 @@ namespace mas {
         }
 
         const variable Compute() {
+            
+            //this is all nonsense.
             variable f;
             variable c_f;
             variable c_p_f;
