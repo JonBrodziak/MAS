@@ -52,6 +52,7 @@ namespace mas {
         variable F = .1;
         /*==================================*/
         bool male_chohorts = true;
+        mas::FishSexType sex;
 
         Population<REAL_T>* natal_population;
 
@@ -212,6 +213,7 @@ namespace mas {
         inline void Recruitment(int year, int season) {
             int y = year;
             int s = season;
+            
 
             //#warning add compiler hint here
             if (year == 0 && season == 1) {
@@ -472,7 +474,8 @@ namespace mas {
                     this->N,
                     this->C,
                     this->C_Biomass,
-                    this->id);
+                    this->id,
+                    sex);
         }
 
     };

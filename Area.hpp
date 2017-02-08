@@ -57,49 +57,51 @@ namespace mas {
         int mortality_model_id;
         int fecundity_model_id;
 
+        std::vector<variable> catch_biomass_total;
+        std::vector<variable> survey_biomass_total; //survey numbers at age
 
-        std::vector<variable> N;
-        std::vector<variable> N_total;
-        std::vector<variable> N_Proportion;
-        std::vector<variable> C_Proportion;
-        std::vector<variable> C_Biomass_Proportion;
-        std::vector<variable> C;
-        std::vector<variable> C_Biomass;
-        std::vector<variable> C_Biomass_total;
-        std::vector<variable> SN; //survey numbers at age
-        std::vector<variable> SN_Biomass; //survey numbers at age
-        std::vector<variable> SN_Biomass_total; //survey numbers at age
-        std::vector<variable> SN_Proportion; //survey numbers at age
-        std::vector<variable> SN_Biomass_Proportion; //survey numbers at age
+        std::vector<variable> catch_biomass_total_males;
+        std::vector<variable> survey_biomass_total_males; //survey numbers at age
+
+        std::vector<variable> catch_biomass_total_females;
+        std::vector<variable> survey_biomass_total_females; //survey numbers at age
+
+        std::vector<variable> numbers_at_age;
+        std::vector<variable> numbers_total;
+        std::vector<variable> proportion_at_age;
+        std::vector<variable> catch_proportion_at_age;
+        std::vector<variable> catch_biomass_proportion_at_age;
+        std::vector<variable> catch_at_age;
+        std::vector<variable> catch_biomass_at_age;
+        std::vector<variable> survey_numbers_at_age; //survey numbers at age
+        std::vector<variable> survey_biomass_at_age; //survey numbers at age
+        std::vector<variable> survey_proportion_at_age; //survey numbers at age
+        std::vector<variable> survey_biomass_proportion_at_age; //survey numbers at age
 
 
-        std::vector<variable> N_males;
-        std::vector<variable> N_total_males;
-        std::vector<variable> N_Proportion_males;
-        std::vector<variable> C_Proportion_males;
-        std::vector<variable> C_Biomass_Proportion_males;
-        std::vector<variable> C_males;
-        std::vector<variable> C_Biomass_males;
-        std::vector<variable> C_Biomass_total_males;
-        std::vector<variable> SN_males; //survey numbers at age
-        std::vector<variable> SN_Biomass_males; //survey numbers at age
-        std::vector<variable> SN_Biomass_total_males; //survey numbers at age
-        std::vector<variable> SN_Proportion_males; //survey numbers at age
-        std::vector<variable> SN_Biomass_Proportion_males; //survey numbers at age
+        std::vector<variable> numbers_at_age_males;
+        std::vector<variable> numbers_total_males;
+        std::vector<variable> proportion_at_age_males;
+        std::vector<variable> catch_proportion_at_age_males;
+        std::vector<variable> catch_biomass_proportion_at_age_males;
+        std::vector<variable> catch_at_age_males;
+        std::vector<variable> catch_biomass_at_age_males;
+        std::vector<variable> survey_numbers_at_age_males; //survey numbers at age
+        std::vector<variable> survey_biomass_at_age_males; //survey numbers at age
+        std::vector<variable> survey_proportion_at_age_males; //survey numbers at age
+        std::vector<variable> survey_biomass_proportion_at_age_males; //survey numbers at age
 
-        std::vector<variable> N_females;
-        std::vector<variable> N_total_females;
-        std::vector<variable> N_Proportion_females;
-        std::vector<variable> C_Proportion_females;
-        std::vector<variable> C_Biomass_Proportion_females;
-        std::vector<variable> C_females;
-        std::vector<variable> C_Biomass_females;
-        std::vector<variable> C_Biomass_total_females;
-        std::vector<variable> SN_females; //survey numbers at age
-        std::vector<variable> SN_Biomass_females; //survey numbers at age
-        std::vector<variable> SN_Biomass_total_females; //survey numbers at age
-        std::vector<variable> SN_Proportion_females; //survey numbers at age
-        std::vector<variable> SN_Biomass_Proportion_females; //survey numbers at age
+        std::vector<variable> numbers_at_age_females;
+        std::vector<variable> numbers_total_females;
+        std::vector<variable> proportion_at_age_females;
+        std::vector<variable> catch_proportion_at_age_females;
+        std::vector<variable> catch_biomass_proportion_at_age_females;
+        std::vector<variable> catch_at_age_females;
+        std::vector<variable> catch_biomass_at_age_females;
+        std::vector<variable> survey_numbers_at_age_females; //survey numbers at age
+        std::vector<variable> survey_biomass_at_age_females; //survey numbers at age
+        std::vector<variable> survey_proportion_at_age_females; //survey numbers at age
+        std::vector<variable> survey_biomass_proportion_at_age_females; //survey numbers at age
 
 
         std::vector<variable> N_diff2;
@@ -142,41 +144,41 @@ namespace mas {
             this->ages = ages;
 
 
-            N.resize(years * seasons * ages);
-            C.resize(years * seasons * ages);
-            C_Biomass.resize(years * seasons * ages);
-            N_Proportion.resize(years * seasons * ages);
-            C_Proportion.resize(years * seasons * ages);
-            C_Biomass_Proportion.resize(years * seasons * ages);
-            SN.resize(years * seasons * ages);
-            SN_Biomass.resize(years * seasons * ages);
-            SN_Proportion.resize(years * seasons * ages);
-            SN_Biomass_Proportion.resize(years * seasons * ages);
+            numbers_at_age.resize(years * seasons * ages);
+            catch_at_age.resize(years * seasons * ages);
+            catch_biomass_at_age.resize(years * seasons * ages);
+            proportion_at_age.resize(years * seasons * ages);
+            catch_proportion_at_age.resize(years * seasons * ages);
+            catch_biomass_proportion_at_age.resize(years * seasons * ages);
+            survey_numbers_at_age.resize(years * seasons * ages);
+            survey_biomass_at_age.resize(years * seasons * ages);
+            survey_proportion_at_age.resize(years * seasons * ages);
+            survey_biomass_proportion_at_age.resize(years * seasons * ages);
 
 
 
-            N_males.resize(years * seasons * ages);
-            C_males.resize(years * seasons * ages);
-            C_Biomass_males.resize(years * seasons * ages);
-            N_Proportion_males.resize(years * seasons * ages);
-            C_Proportion_males.resize(years * seasons * ages);
-            C_Biomass_Proportion_males.resize(years * seasons * ages);
-            SN_males.resize(years * seasons * ages);
-            SN_Biomass_males.resize(years * seasons * ages);
-            SN_Proportion_males.resize(years * seasons * ages);
-            SN_Biomass_Proportion_males.resize(years * seasons * ages);
+            numbers_at_age_males.resize(years * seasons * ages);
+            catch_at_age_males.resize(years * seasons * ages);
+            catch_biomass_at_age_males.resize(years * seasons * ages);
+            proportion_at_age_males.resize(years * seasons * ages);
+            catch_proportion_at_age_males.resize(years * seasons * ages);
+            catch_biomass_proportion_at_age_males.resize(years * seasons * ages);
+            survey_numbers_at_age_males.resize(years * seasons * ages);
+            survey_biomass_at_age_males.resize(years * seasons * ages);
+            survey_proportion_at_age_males.resize(years * seasons * ages);
+            survey_biomass_proportion_at_age_males.resize(years * seasons * ages);
 
 
-            N_females.resize(years * seasons * ages);
-            C_females.resize(years * seasons * ages);
-            C_Biomass_females.resize(years * seasons * ages);
-            N_Proportion_females.resize(years * seasons * ages);
-            C_Proportion_females.resize(years * seasons * ages);
-            C_Biomass_Proportion_females.resize(years * seasons * ages);
-            SN_females.resize(years * seasons * ages);
-            SN_Biomass_females.resize(years * seasons * ages);
-            SN_Proportion_females.resize(years * seasons * ages);
-            SN_Biomass_Proportion_females.resize(years * seasons * ages);
+            numbers_at_age_females.resize(years * seasons * ages);
+            catch_at_age_females.resize(years * seasons * ages);
+            catch_biomass_at_age_females.resize(years * seasons * ages);
+            proportion_at_age_females.resize(years * seasons * ages);
+            catch_proportion_at_age_females.resize(years * seasons * ages);
+            catch_biomass_proportion_at_age_females.resize(years * seasons * ages);
+            survey_numbers_at_age_females.resize(years * seasons * ages);
+            survey_biomass_at_age_females.resize(years * seasons * ages);
+            survey_proportion_at_age_females.resize(years * seasons * ages);
+            survey_biomass_proportion_at_age_females.resize(years * seasons * ages);
 
             N_diff2.resize(years * seasons * ages);
             C_diff2.resize(years * seasons * ages);
@@ -188,49 +190,63 @@ namespace mas {
             SN_Biomass_diff2.resize(years * seasons * ages);
             SN_Proportion_diff2.resize(years * seasons * ages);
             SN_Biomass_Proportion_diff2.resize(years * seasons * ages);
-            this->C_Biomass_total.resize(years * seasons);
-            this->SN_Biomass_total.resize(years * seasons);
+            catch_biomass_total.resize(years * seasons);
+            survey_biomass_total.resize(years * seasons);
+            catch_biomass_total_males.resize(years * seasons);
+            survey_biomass_total_males.resize(years * seasons);
+            catch_biomass_total_females.resize(years * seasons);
+            survey_biomass_total_females.resize(years * seasons);
         }
 
         void Prepare() {
-            for (int i = 0; i < this->N.size(); i++) {
+            for (int i = 0; i < this->numbers_at_age.size(); i++) {
                 //                mas::VariableTrait<REAL_T>::SetValue(SN[i], static_cast<REAL_T> (0.0));
                 //                mas::VariableTrait<REAL_T>::SetValue(SN_Biomass[i], static_cast<REAL_T> (0.0));
                 //                mas::VariableTrait<REAL_T>::SetValue(N[i], static_cast<REAL_T> (0.0));
                 //                mas::VariableTrait<REAL_T>::SetValue(C[i], static_cast<REAL_T> (0.0));
                 //                mas::VariableTrait<REAL_T>::SetValue(C_Biomass[i], static_cast<REAL_T> (0.0));
-                mas::VariableTrait<REAL_T>::SetValue(N[i], static_cast<REAL_T> (0.0));
-                mas::VariableTrait<REAL_T>::SetValue(C[i], static_cast<REAL_T> (0.0));
-                mas::VariableTrait<REAL_T>::SetValue(C_Biomass[i], static_cast<REAL_T> (0.0));
-                mas::VariableTrait<REAL_T>::SetValue(N_Proportion[i], static_cast<REAL_T> (0.0));
-                mas::VariableTrait<REAL_T>::SetValue(C_Proportion[i], static_cast<REAL_T> (0.0));
-                mas::VariableTrait<REAL_T>::SetValue(C_Biomass_Proportion[i], static_cast<REAL_T> (0.0));
-                mas::VariableTrait<REAL_T>::SetValue(SN[i], static_cast<REAL_T> (0.0));
-                mas::VariableTrait<REAL_T>::SetValue(SN_Biomass[i], static_cast<REAL_T> (0.0));
-                mas::VariableTrait<REAL_T>::SetValue(SN_Proportion[i], static_cast<REAL_T> (0.0));
-                mas::VariableTrait<REAL_T>::SetValue(SN_Biomass_Proportion[i], static_cast<REAL_T> (0.0));
-                
-                mas::VariableTrait<REAL_T>::SetValue(N_males[i], static_cast<REAL_T> (0.0));
-                mas::VariableTrait<REAL_T>::SetValue(C_males[i], static_cast<REAL_T> (0.0));
-                mas::VariableTrait<REAL_T>::SetValue(C_Biomass_males[i], static_cast<REAL_T> (0.0));
-                mas::VariableTrait<REAL_T>::SetValue(N_Proportion_males[i], static_cast<REAL_T> (0.0));
-                mas::VariableTrait<REAL_T>::SetValue(C_Proportion_males[i], static_cast<REAL_T> (0.0));
-                mas::VariableTrait<REAL_T>::SetValue(C_Biomass_Proportion_males[i], static_cast<REAL_T> (0.0));
-                mas::VariableTrait<REAL_T>::SetValue(SN_males[i], static_cast<REAL_T> (0.0));
-                mas::VariableTrait<REAL_T>::SetValue(SN_Biomass_males[i], static_cast<REAL_T> (0.0));
-                mas::VariableTrait<REAL_T>::SetValue(SN_Proportion_males[i], static_cast<REAL_T> (0.0));
-                mas::VariableTrait<REAL_T>::SetValue(SN_Biomass_Proportion_males[i], static_cast<REAL_T> (0.0));
-                
-                mas::VariableTrait<REAL_T>::SetValue(N_females[i], static_cast<REAL_T> (0.0));
-                mas::VariableTrait<REAL_T>::SetValue(C_females[i], static_cast<REAL_T> (0.0));
-                mas::VariableTrait<REAL_T>::SetValue(C_Biomass_females[i], static_cast<REAL_T> (0.0));
-                mas::VariableTrait<REAL_T>::SetValue(N_Proportion_females[i], static_cast<REAL_T> (0.0));
-                mas::VariableTrait<REAL_T>::SetValue(C_Proportion_females[i], static_cast<REAL_T> (0.0));
-                mas::VariableTrait<REAL_T>::SetValue(C_Biomass_Proportion_females[i], static_cast<REAL_T> (0.0));
-                mas::VariableTrait<REAL_T>::SetValue(SN_females[i], static_cast<REAL_T> (0.0));
-                mas::VariableTrait<REAL_T>::SetValue(SN_Biomass_females[i], static_cast<REAL_T> (0.0));
-                mas::VariableTrait<REAL_T>::SetValue(SN_Proportion_females[i], static_cast<REAL_T> (0.0));
-                mas::VariableTrait<REAL_T>::SetValue(SN_Biomass_Proportion_females[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(numbers_at_age[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(catch_at_age[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(catch_biomass_at_age[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(proportion_at_age[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(catch_proportion_at_age[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(catch_biomass_proportion_at_age[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(survey_numbers_at_age[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(survey_biomass_at_age[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(survey_proportion_at_age[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(survey_biomass_proportion_at_age[i], static_cast<REAL_T> (0.0));
+
+                mas::VariableTrait<REAL_T>::SetValue(numbers_at_age_males[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(catch_at_age_males[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(catch_biomass_at_age_males[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(proportion_at_age_males[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(catch_proportion_at_age_males[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(catch_biomass_proportion_at_age_males[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(survey_numbers_at_age_males[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(survey_biomass_at_age_males[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(survey_proportion_at_age_males[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(survey_biomass_at_age_males[i], static_cast<REAL_T> (0.0));
+
+                mas::VariableTrait<REAL_T>::SetValue(numbers_at_age_females[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(catch_at_age_females[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(catch_biomass_at_age_females[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(proportion_at_age_females[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(catch_proportion_at_age_females[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(catch_biomass_proportion_at_age_females[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(survey_numbers_at_age_females[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(survey_biomass_at_age_females[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(survey_proportion_at_age_females[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(survey_biomass_proportion_at_age_females[i], static_cast<REAL_T> (0.0));
+            }
+
+
+            for (int i = 0; i < this->catch_biomass_total.size(); i++) {
+                mas::VariableTrait<REAL_T>::SetValue(catch_biomass_total[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(survey_biomass_total[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(catch_biomass_total_males[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(survey_biomass_total_males[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(catch_biomass_total_females[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(survey_biomass_total_females[i], static_cast<REAL_T> (0.0));
             }
         }
 
@@ -238,44 +254,126 @@ namespace mas {
                 const std::vector<variable>& SN_Biomass_, //survey numbers at age
                 const std::vector<variable>& N_,
                 const std::vector<variable>& C_,
-                const std::vector<variable>& C_Biomass_, int population) {
+                const std::vector<variable>& C_Biomass_, int population,
+                mas::FishSexType sex = mas::UNDIFFERENTIATED) {
 
-            for (int i = 0; i < this->N.size(); i++) {
-                SN[i] += SN_[i];
-                SN_Biomass[i] += SN_Biomass_[i];
-                N[i] += N_[i];
-                C[i] += C_[i];
-                C_Biomass[i] += C_Biomass_[i];
+            int i;
+            switch (sex) {
+
+                case mas::MALE:
+
+                    for (i = 0; i < this->numbers_at_age.size(); i++) {
+                        survey_numbers_at_age[i] += SN_[i];
+                        survey_biomass_at_age[i] += SN_Biomass_[i];
+                        numbers_at_age[i] += N_[i];
+                        catch_at_age[i] += C_[i];
+                        catch_biomass_at_age[i] += C_Biomass_[i];
+                        survey_numbers_at_age_males[i] += SN_[i];
+                        survey_biomass_at_age_males[i] += SN_Biomass_[i];
+                        numbers_at_age_males[i] += N_[i];
+                        catch_at_age_males[i] += C_[i];
+                        catch_biomass_at_age_males[i] += C_Biomass_[i];
+                    }
+                    break;
+
+                case mas::FEMALE:
+                    for (i = 0; i < this->numbers_at_age.size(); i++) {
+                        survey_numbers_at_age[i] += SN_[i];
+                        survey_biomass_at_age[i] += SN_Biomass_[i];
+                        numbers_at_age[i] += N_[i];
+                        catch_at_age[i] += C_[i];
+                        catch_biomass_at_age[i] += C_Biomass_[i];
+                        survey_numbers_at_age_females[i] += SN_[i];
+                        survey_biomass_at_age_females[i] += SN_Biomass_[i];
+                        numbers_at_age_females[i] += N_[i];
+                        catch_at_age_females[i] += C_[i];
+                        catch_biomass_at_age_females[i] += C_Biomass_[i];
+                    }
+
+                    break;
+
+                case mas::UNDIFFERENTIATED:
+                    //UNDIFFERENTIATED
+                    for (i = 0; i < this->numbers_at_age.size(); i++) {
+                        survey_numbers_at_age[i] += SN_[i];
+                        survey_biomass_at_age[i] += SN_Biomass_[i];
+                        numbers_at_age[i] += N_[i];
+                        catch_at_age[i] += C_[i];
+                        catch_biomass_at_age[i] += C_Biomass_[i];
+                    }
+                    break;
+
+
             }
-
         }
 
         inline void ComputeProportions() {
             for (int y = 0; y < this->years; y++) {
                 for (int s = 0; s < this->seasons; s++) {
 
-                    variable total_sn;
-                    variable& total_sn_b = this->SN_Biomass_total[y * this->seasons + s];
+                    variable total_sn_males;
+                    variable total_sn_females;
+                    variable& total_sn_b = this->survey_biomass_total[y * this->seasons + s];
+                    variable& total_sn_b_males = this->survey_biomass_total_males[y * this->seasons + s];
+                    variable& total_sn_b_females = this->survey_biomass_total_males[y * this->seasons + s];
                     total_sn_b = static_cast<REAL_T> (0.0);
                     variable total_n;
+                    variable total_n_males;
+                    variable total_n_females;
                     variable total_c;
-                    variable& total_c_b = this->C_Biomass_total[y * this->seasons + s];
+                    variable total_c_males;
+                    variable total_c_females;
+                    variable& total_c_b = this->catch_biomass_total[y * this->seasons + s];
+                    variable& total_c_b_males = this->catch_biomass_total[y * this->seasons + s];
+                    variable& total_c_b_females = this->catch_biomass_total[y * this->seasons + s];
                     total_c_b = static_cast<REAL_T> (0.0);
+                    size_t index = 0;
                     for (int a = 0; a <this->ages; a++) {
-                        total_sn += SN[y * this->seasons * this->ages + (s) * this->ages + a];
-                        total_sn_b += SN_Biomass[y * this->seasons * this->ages + (s) * this->ages + a];
-                        total_n += N[y * this->seasons * this->ages + (s) * this->ages + a];
-                        total_c += C[y * this->seasons * this->ages + (s) * this->ages + a];
-                        total_c_b += C_Biomass[y * this->seasons * this->ages + (s) * this->ages + a];
+                        index = y * this->seasons * this->ages + (s) * this->ages + a;
+                        total_sn += survey_numbers_at_age[index];
+                        total_sn_males += survey_numbers_at_age_males[index];
+                        total_sn_females += survey_numbers_at_age_females[index];
+
+                        total_sn_b += survey_biomass_at_age[index];
+                        total_sn_b_males += survey_biomass_at_age_males[index];
+                        total_sn_b_females += survey_biomass_at_age_females[index];
+
+                        total_n += numbers_at_age[index];
+                        total_n_males += numbers_at_age_males[index];
+                        total_n_females += numbers_at_age_females[index];
+
+                        total_c += catch_at_age[index];
+                        total_c_males += catch_at_age_males[index];
+                        total_c_females += catch_at_age_females[index];
+
+                        total_c_b += catch_biomass_at_age[index];
+                        total_c_b_males += catch_biomass_at_age_males[index];
+                        total_c_b_females += catch_biomass_at_age_females[index];
                     }
 
 
                     for (int a = 0; a <this->ages; a++) {
-                        SN_Proportion[y * this->seasons * this->ages + (s) * this->ages + a] = SN[y * this->seasons * this->ages + (s) * this->ages + a] / total_sn;
-                        SN_Biomass_Proportion[y * this->seasons * this->ages + (s) * this->ages + a] = SN_Biomass[y * this->seasons * this->ages + (s) * this->ages + a] / total_sn_b;
-                        N_Proportion[y * this->seasons * this->ages + (s) * this->ages + a] = N[y * this->seasons * this->ages + (s) * this->ages + a] / total_n;
-                        C_Proportion[y * this->seasons * this->ages + (s) * this->ages + a] = C[y * this->seasons * this->ages + (s) * this->ages + a] / total_c;
-                        C_Biomass_Proportion[y * this->seasons * this->ages + (s) * this->ages + a] = C_Biomass[y * this->seasons * this->ages + (s) * this->ages + a] / total_c_b;
+                        index = y * this->seasons * this->ages + (s) * this->ages + a;
+                        survey_proportion_at_age[index] = survey_numbers_at_age[index] / total_sn;
+                        survey_proportion_at_age_males[index] = survey_numbers_at_age_males[index] / total_sn_males;
+                        survey_proportion_at_age_females[index] = survey_numbers_at_age_females[index] / total_sn_females;
+
+                        survey_biomass_proportion_at_age[index] = survey_biomass_at_age[index] / total_sn_b;
+                        survey_biomass_proportion_at_age_males[index] = survey_biomass_at_age_males[index] / total_sn_b_males;
+                        survey_biomass_proportion_at_age_females[index] = survey_biomass_at_age_females[index] / total_sn_b_females;
+
+                        proportion_at_age[index] = numbers_at_age[index] / total_n;
+                        proportion_at_age_males[index] = numbers_at_age_males[index] / total_n_males;
+                        proportion_at_age_females[index] = numbers_at_age_females[index] / total_n_females;
+
+                        catch_proportion_at_age[index] = catch_at_age[index] / total_c;
+                        catch_proportion_at_age_males[index] = catch_at_age_males[index] / total_c_males;
+                        catch_proportion_at_age_females[index] = catch_at_age_females[index] / total_c_females;
+
+                        catch_biomass_proportion_at_age[index] = catch_biomass_at_age[index] / total_c_b;
+                        catch_biomass_proportion_at_age_males[index] = catch_biomass_at_age_males[index] / total_c_b_males;
+                        catch_biomass_proportion_at_age_females[index] = catch_biomass_at_age_females[index] / total_c_b_females;
+
                     }
 
 
@@ -289,33 +387,56 @@ namespace mas {
             variable c_p_f;
             variable s_f;
             variable s_p_f;
+            size_t index = 0;
             for (int y = 0; y < this->years; y++) {
                 for (int s = 0; s < this->seasons; s++) {
                     REAL_T temp = static_cast<REAL_T> (0.0);
-
+                    REAL_T temp_m = static_cast<REAL_T> (0.0);
+                    REAL_T temp_f = static_cast<REAL_T> (0.0);
                     for (int i = 0; i < this->catch_biomass_data.size(); i++) {
-                        temp += catch_biomass_data[i]->get(y, s);
+                        //                        temp += catch_biomass_data[i]->get(y, s);
+                        switch (catch_biomass_data[i]->sex_type) {
+
+                            case mas::UNDIFFERENTIATED:
+                                temp += catch_biomass_data[i]->get(y, s);
+                                break;
+
+                            case mas::MALE:
+                                temp += catch_biomass_data[i]->get(y, s);
+                                temp_m += catch_biomass_data[i]->get(y, s);
+                                break;
+
+                            case mas::FEMALE:
+                                temp += catch_biomass_data[i]->get(y, s);
+                                temp_f += catch_biomass_data[i]->get(y, s);
+                                break;
+
+                        }
                     }
-                    c_f += ((this->C_Biomass_total[y * seasons + s] - temp)*(this->C_Biomass_total[y * seasons + s] - temp));
+                    c_f += ((this->catch_biomass_total[y * seasons + s] - temp)*
+                            (this->catch_biomass_total[y * seasons + s] - temp));
 
                     temp = static_cast<REAL_T> (0.0);
                     for (int i = 0; i < this->survey_biomass_data.size(); i++) {
                         temp += survey_biomass_data[i]->get(y, s);
                     }
-                    s_f += ((this->C_Biomass_total[y * seasons + s] - temp)*(this->C_Biomass_total[y * seasons + s] - temp));
+                    s_f += ((this->survey_biomass_total[y * seasons + s] - temp)*
+                            (this->survey_biomass_total[y * seasons + s] - temp));
 
                     temp = static_cast<REAL_T> (0.0);
                     for (int a = 0; a <this->ages; a++) {
                         for (int i = 0; i < this->catch_proportion_data.size(); i++) {
-                            c_p_f += (this->C_Proportion[y * this->seasons * this->ages + (s) * this->ages + a] - this->catch_proportion_data[i]->get(y, s, a))*
-                                    (this->C_Proportion[y * this->seasons * this->ages + (s) * this->ages + a] - this->catch_proportion_data[i]->get(y, s, a));
+                            index = y * this->seasons * this->ages + (s) * this->ages + a;
+                            c_p_f += (this->catch_proportion_at_age[index] - this->catch_proportion_data[i]->get(y, s, a))*
+                                    (this->catch_proportion_at_age[index] - this->catch_proportion_data[i]->get(y, s, a));
                         }
                     }
 
                     for (int a = 0; a <this->ages; a++) {
-                        for (int i = 0; i < this->catch_proportion_data.size(); i++) {
-                            s_p_f += (this->SN_Proportion[y * this->seasons * this->ages + (s) * this->ages + a] - this->catch_proportion_data[i]->get(y, s, a))*
-                                    (this->SN_Proportion[y * this->seasons * this->ages + (s) * this->ages + a] - this->catch_proportion_data[i]->get(y, s, a));
+                        for (int i = 0; i < this->survey_proportion_data.size(); i++) {
+                            index = y * this->seasons * this->ages + (s) * this->ages + a;
+                            s_p_f += (this->survey_proportion_at_age[index] - this->survey_proportion_data[i]->get(y, s, a))*
+                                    (this->survey_proportion_at_age[index] - this->survey_proportion_data[i]->get(y, s, a));
                         }
                     }
 
@@ -353,7 +474,7 @@ namespace mas {
         for (int a = 0; a < area.ages; a++) {
             for (int y = 0; y < area.years; y++) {
                 for (int s = 0; s < area.seasons; s++) {
-                    out << area.N[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
+                    out << area.numbers_at_age[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
                 }
             }
             out << "\n";
@@ -365,7 +486,7 @@ namespace mas {
         for (int a = 0; a < area.ages; a++) {
             for (int y = 0; y < area.years; y++) {
                 for (int s = 0; s < area.seasons; s++) {
-                    out << area.N_Proportion[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
+                    out << area.proportion_at_age[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
                 }
             }
             out << "\n";
@@ -377,7 +498,7 @@ namespace mas {
         for (int a = 0; a < area.ages; a++) {
             for (int y = 0; y < area.years; y++) {
                 for (int s = 0; s < area.seasons; s++) {
-                    out << area.C[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
+                    out << area.catch_at_age[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
                 }
             }
             out << "\n";
@@ -389,7 +510,7 @@ namespace mas {
         for (int a = 0; a < area.ages; a++) {
             for (int y = 0; y < area.years; y++) {
                 for (int s = 0; s < area.seasons; s++) {
-                    out << area.C_Proportion[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
+                    out << area.catch_proportion_at_age[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
                 }
             }
             out << "\n";
@@ -401,7 +522,7 @@ namespace mas {
         for (int a = 0; a < area.ages; a++) {
             for (int y = 0; y < area.years; y++) {
                 for (int s = 0; s < area.seasons; s++) {
-                    out << area.C_Biomass[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
+                    out << area.catch_biomass_at_age[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
                 }
             }
             out << "\n";
@@ -413,7 +534,7 @@ namespace mas {
         for (int a = 0; a < area.ages; a++) {
             for (int y = 0; y < area.years; y++) {
                 for (int s = 0; s < area.seasons; s++) {
-                    out << area.SN[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
+                    out << area.survey_numbers_at_age[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
                 }
             }
             out << "\n";
@@ -425,7 +546,7 @@ namespace mas {
         for (int a = 0; a < area.ages; a++) {
             for (int y = 0; y < area.years; y++) {
                 for (int s = 0; s < area.seasons; s++) {
-                    out << area.SN_Proportion[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
+                    out << area.survey_proportion_at_age[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
                 }
             }
             out << "\n";
@@ -437,7 +558,7 @@ namespace mas {
         for (int a = 0; a < area.ages; a++) {
             for (int y = 0; y < area.years; y++) {
                 for (int s = 0; s < area.seasons; s++) {
-                    out << area.SN_Biomass[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
+                    out << area.survey_biomass_at_age[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
                 }
             }
             out << "\n";

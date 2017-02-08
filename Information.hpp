@@ -1913,7 +1913,7 @@ namespace mas {
                 ss << "von_bertalanffy_c_" << model_id;
                 VariableTrait<REAL_T>::SetName(vb->c, ss.str());
                 ss.str("");
-                ss << "von_bertalanffy_inf_" << model_id;
+                ss << "von_bertalanffy_l_inf_" << model_id;
                 VariableTrait<REAL_T>::SetName(vb->l_inf, ss.str());
 
                 ss.str("");
@@ -1991,6 +1991,9 @@ namespace mas {
                                 "does not define \"lmin\". Model will use the default value of 0 and \"lmin\" will not be estimated.\n";
                     } else {
 
+                        ss.str("");
+                        ss << "von_bertalanffy_lmin_" << model_id;
+                        VariableTrait<REAL_T>::SetName(vb->lmin, ss.str());
                         bool estimated = false;
                         int phase = 1;
                         //1. Get initial value if there is one.
@@ -2043,6 +2046,10 @@ namespace mas {
                         mas::mas_log << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" " <<
                                 "does not define \"lmax\". Model will use the default value of 0 and \"lmax\" will not be estimated.\n";
                     } else {
+
+                        ss.str("");
+                        ss << "von_bertalanffy_lmax_" << model_id;
+                        VariableTrait<REAL_T>::SetName(vb->lmax, ss.str());
 
                         bool estimated = false;
                         int phase = 1;
@@ -4896,6 +4903,7 @@ namespace mas {
                 for (ait = this->areas.begin(); ait != this->areas.end(); ++ait) {
                     population->areas_list.push_back((*ait).second);
                     mas::AreaPopulationInfo<REAL_T>& male_pop_info = population->male_cohorts[(*ait).second->id];
+                    male_pop_info.sex = mas::MALE;
                     male_pop_info.natal_area = population->natal_area;
                     male_pop_info.natal_population = population;
                     male_pop_info.area = (*ait).second;
@@ -4958,6 +4966,7 @@ namespace mas {
                     //                    male_pop_info.Initialize();
 
                     mas::AreaPopulationInfo<REAL_T>& female_pop_info = population->female_cohorts[(*ait).second->id];
+                    female_pop_info.sex = mas::FEMALE;
                     female_pop_info.natal_area = population->natal_area;
                     female_pop_info.natal_population = population;
                     female_pop_info.area = (*ait).second;
@@ -5108,8 +5117,8 @@ namespace mas {
                     this->Register(*(*it).first, (*it).second);
                 }
 
-            
-                
+
+
                 //            for (int a = 0; a <this->ages.size(); a++) {
                 //                (*mmit).second->male_mortality[this->ages[a]] = (*mmit).second->male_mortality_vector[a];
                 //                (*mmit).second->female_mortality[this->ages[a]] = (*mmit).second->female_mortality_vector[a];
@@ -5283,12 +5292,12 @@ namespace mas {
             //                }
             //            }
 
-            
-            std::cout<<"Estimated Parameters\n";
-                for(int i  = 0; i < this->estimated_parameters.size(); i++){
-                    std::cout<<this->estimated_parameters[i]->GetName()<<" --- "<<this->estimated_parameters[i]->GetValue()<<"\n";
-                }
-            
+
+            std::cout << "Estimated Parameters\n";
+            for (int i = 0; i < this->estimated_parameters.size(); i++) {
+                std::cout << this->estimated_parameters[i]->GetName() << " --- " << this->estimated_parameters[i]->GetValue() << "\n";
+            }
+
             if (!this->valid_configuration) {
                 std::cout << "Configuration Error:  Invalid model configuration. See mas.log for errors.\n";
                 mas_log << "Configuration Error:  Invalid model configuration. See mas.log for errors.\n";
