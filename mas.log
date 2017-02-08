@@ -1,4 +1,4 @@
-MAS Run: Tue Feb  7 15:25:00 2017
+MAS Run: Wed Feb  8 11:41:43 2017
 
 Configuration Warning: Recruitment model "Von Bertalannfy" does not define "l_inf". Model will use the default value of 0 and "l_inf" will not be estimated.
 Configuration Warning: Recruitment model "Von Bertalannfy" does not define "l_inf". Model will use the default value of 0 and "l_inf" will not be estimated.
@@ -13,8 +13,8 @@ Growth:
 von_bertalanffy_c_2						0.5						1
 von_bertalanffy_amin_1						1						1
 von_bertalanffy_amax_1						7						1
-						20						1
-						70						1
+von_bertalanffy_lmin_1						20						1
+von_bertalanffy_lmax_1						70						1
 von_bertalanffy_c_1						0.5						1
 
 Selectivity:
