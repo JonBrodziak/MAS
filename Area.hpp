@@ -46,6 +46,8 @@ namespace mas {
     struct Area {
         typedef typename mas::VariableTrait<REAL_T>::variable variable;
         std::string name;
+        REAL_T logscale_standard_deviation_catch_biomass = static_cast<REAL_T> (.1);
+        REAL_T logscale_standard_deviation_survey_biomass = static_cast<REAL_T> (.3);
         int id;
 
         int years;
@@ -137,6 +139,14 @@ namespace mas {
         std::vector<std::shared_ptr<DataObject<REAL_T> > > catch_proportion_data;
         std::vector<std::shared_ptr<DataObject<REAL_T> > > catch_proportion_length_data;
         std::vector<std::shared_ptr<DataObject<REAL_T> > > catch_mean_size_data;
+
+
+        //runtime
+        variable catch_biomass_component;
+        variable survey_biomass_component;
+        variable fishery_age_comp_component;
+        variable survey_age_comp_component;
+        variable recruitment_deviations_component;
 
         void Initialize(size_t years, size_t seasons, size_t ages) {
             this->years = years;
@@ -311,6 +321,7 @@ namespace mas {
             for (int y = 0; y < this->years; y++) {
                 for (int s = 0; s < this->seasons; s++) {
 
+                    variable total_sn;
                     variable total_sn_males;
                     variable total_sn_females;
                     variable& total_sn_b = this->survey_biomass_total[y * this->seasons + s];
@@ -382,14 +393,22 @@ namespace mas {
         }
 
         const variable Compute() {
-            
+
+
+
+
             //this is all nonsense.
             variable f;
             variable c_f;
+            variable c_b_nll;
             variable c_p_f;
             variable s_f;
             variable s_p_f;
+            variable s_b_nll;
             size_t index = 0;
+            REAL_T cl = 0;
+            REAL_T sl = 0;
+
             for (int y = 0; y < this->years; y++) {
                 for (int s = 0; s < this->seasons; s++) {
                     REAL_T temp = static_cast<REAL_T> (0.0);
@@ -415,39 +434,108 @@ namespace mas {
 
                         }
                     }
-                    c_f += ((this->catch_biomass_total[y * seasons + s] - temp)*
-                            (this->catch_biomass_total[y * seasons + s] - temp));
+                    std::cout << "temp = " << temp << "\n";
+
+                    c_f += (((.1 + atl::log(temp / this->catch_biomass_total[y * seasons + s])) / this->logscale_standard_deviation_catch_biomass
+                            + .5 * this->logscale_standard_deviation_catch_biomass))*
+                            (((.1 + atl::log(temp / this->catch_biomass_total[y * seasons + s])) / this->logscale_standard_deviation_catch_biomass
+                            + .5 * this->logscale_standard_deviation_catch_biomass));
+                    std::cout << "c_f = " << c_f << "\n";
+                    cl += std::log(this->logscale_standard_deviation_catch_biomass);
 
                     temp = static_cast<REAL_T> (0.0);
                     for (int i = 0; i < this->survey_biomass_data.size(); i++) {
                         temp += survey_biomass_data[i]->get(y, s);
                     }
-                    s_f += ((this->survey_biomass_total[y * seasons + s] - temp)*
-                            (this->survey_biomass_total[y * seasons + s] - temp));
+                    //                    s_f += ((this->survey_biomass_total[y * seasons + s] - temp)*
+                    //                            (this->survey_biomass_total[y * seasons + s] - temp));
 
-                    temp = static_cast<REAL_T> (0.0);
-                    for (int a = 0; a <this->ages; a++) {
-                        for (int i = 0; i < this->catch_proportion_data.size(); i++) {
-                            index = y * this->seasons * this->ages + (s) * this->ages + a;
-                            c_p_f += (this->catch_proportion_at_age[index] - this->catch_proportion_data[i]->get(y, s, a))*
-                                    (this->catch_proportion_at_age[index] - this->catch_proportion_data[i]->get(y, s, a));
-                        }
-                    }
+                    s_f += (((.1 + atl::log(temp / this->survey_biomass_total[y * seasons + s])) / this->logscale_standard_deviation_survey_biomass
+                            + .5 * this->logscale_standard_deviation_survey_biomass))*
+                            (((.1 + atl::log(temp / this->survey_biomass_total[y * seasons + s])) / this->logscale_standard_deviation_survey_biomass +
+                            .5 * this->logscale_standard_deviation_survey_biomass));
+                    sl += std::log(this->logscale_standard_deviation_catch_biomass);
 
-                    for (int a = 0; a <this->ages; a++) {
-                        for (int i = 0; i < this->survey_proportion_data.size(); i++) {
-                            index = y * this->seasons * this->ages + (s) * this->ages + a;
-                            s_p_f += (this->survey_proportion_at_age[index] - this->survey_proportion_data[i]->get(y, s, a))*
-                                    (this->survey_proportion_at_age[index] - this->survey_proportion_data[i]->get(y, s, a));
-                        }
-                    }
+                    //                    temp = static_cast<REAL_T> (0.0);
+                    //                    for (int a = 0; a <this->ages; a++) {
+                    //                        for (int i = 0; i < this->catch_proportion_data.size(); i++) {
+                    //                            index = y * this->seasons * this->ages + (s) * this->ages + a;
+                    //                            c_p_f += (this->catch_proportion_at_age[index] - this->catch_proportion_data[i]->get(y, s, a))*
+                    //                                    (this->catch_proportion_at_age[index] - this->catch_proportion_data[i]->get(y, s, a));
+                    //                        }
+                    //                    }
+                    //
+                    //                    for (int a = 0; a <this->ages; a++) {
+                    //                        for (int i = 0; i < this->survey_proportion_data.size(); i++) {
+                    //                            index = y * this->seasons * this->ages + (s) * this->ages + a;
+                    //                            s_p_f += (this->survey_proportion_at_age[index] - this->survey_proportion_data[i]->get(y, s, a))*
+                    //                                    (this->survey_proportion_at_age[index] - this->survey_proportion_data[i]->get(y, s, a));
+                    //                        }
+                    //                    }
 
                 }
             }
-            f = static_cast<REAL_T> (.5) * atl::log(c_f) + static_cast<REAL_T> (.5) * atl::log(s_f) +
-                    static_cast<REAL_T> (.5) * atl::log(s_p_f) + static_cast<REAL_T> (.5) * atl::log(c_p_f);
+            c_b_nll = .1 + .5 * c_f;
+            s_b_nll = .3 + .5 * s_f;
+
+            std::cout << c_b_nll << "  " << s_b_nll << "\n";
+
+            f = c_b_nll + s_b_nll; //+static_cast<REAL_T> (.5) * atl::log(s_p_f) + static_cast<REAL_T> (.5) * atl::log(c_p_f);
+
+            //            f = static_cast<REAL_T> (.5) * atl::log(c_f) + static_cast<REAL_T> (.5) * atl::log(s_f) +
+            //                    static_cast<REAL_T> (.5) * atl::log(s_p_f) + static_cast<REAL_T> (.5) * atl::log(c_p_f);
 
             return f;
+        }
+
+        /**
+         * Returns a reference to the catch biomass component for the 
+         * likelihood function.
+         *  
+         * @return 
+         */
+        const variable& GetCatchBiomassComponent() const {
+            return catch_biomass_component;
+        }
+
+        /**
+         * Returns a reference to the survey age composition component for the 
+         * likelihood function.
+         *  
+         * @return 
+         */
+        const variable& GetSurveyAgeCompComponent() const {
+            return survey_age_comp_component;
+        }
+
+        /**
+         * Returns a reference to the survey biomass component for the 
+         * likelihood function.
+         *  
+         * @return 
+         */
+        const variable& GetSurveyBiomassComponent() const {
+            return survey_biomass_component;
+        }
+
+        /**
+         * Returns a reference to the fishery age composition component for the 
+         * likelihood function.
+         *  
+         * @return 
+         */
+        const variable& GetFisheryAgeCompComponent() const {
+            return fishery_age_comp_component;
+        }
+
+        /**
+         * Returns a reference to the recruitment deviations component for the 
+         * likelihood function.
+         *  
+         * @return 
+         */
+        const variable& GetRecruitmentDeviationsComponent() const {
+            return recruitment_deviations_component;
         }
 
 
@@ -494,6 +582,63 @@ namespace mas {
             out << "\n";
         }
         out << "\n\n";
+        
+        out << "\n\n";
+        out << "Area " << area.id << "\n";
+        out << "Proportion of Fish at Age:\nMales\n";
+
+        for (int a = 0; a < area.ages; a++) {
+            for (int y = 0; y < area.years; y++) {
+                for (int s = 0; s < area.seasons; s++) {
+                    out << area.proportion_at_age_males[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
+                }
+            }
+            out << "\n";
+        }
+        out << "\n\n";
+        
+          out << "\n\n";
+        out << "Area " << area.id << "\n";
+        out << "Proportion of Fish at Age:\nFemales\n";
+
+        for (int a = 0; a < area.ages; a++) {
+            for (int y = 0; y < area.years; y++) {
+                for (int s = 0; s < area.seasons; s++) {
+                    out << area.proportion_at_age_females[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
+                }
+            }
+            out << "\n";
+        }
+        out << "\n\n";
+        
+        out << "\n\n";
+        out << "Area " << area.id << "\n";
+        out << "Proportion of Fish at Age:\nMales\n";
+
+        for (int a = 0; a < area.ages; a++) {
+            for (int y = 0; y < area.years; y++) {
+                for (int s = 0; s < area.seasons; s++) {
+                    out << area.proportion_at_age_males[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
+                }
+            }
+            out << "\n";
+        }
+        out << "\n\n";
+        
+        out << "\n\n";
+        out << "Area " << area.id << "\n";
+        out << "Proportion of Fish at Age:\nFemales\n";
+
+        for (int a = 0; a < area.ages; a++) {
+            for (int y = 0; y < area.years; y++) {
+                for (int s = 0; s < area.seasons; s++) {
+                    out << area.proportion_at_age_females[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
+                }
+            }
+            out << "\n";
+        }
+        out << "\n\n";
+        
         out << "Area " << area.id << "\n";
         out << "Catch at Age:\n";
 
@@ -507,7 +652,35 @@ namespace mas {
         }
         out << "\n\n";
         out << "Area " << area.id << "\n";
-        out << "Catch Proportion at Age:\n";
+        out << "Catch at Age:\nMales\n";
+
+        for (int a = 0; a < area.ages; a++) {
+            for (int y = 0; y < area.years; y++) {
+                for (int s = 0; s < area.seasons; s++) {
+                    out << area.catch_at_age_males[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
+                }
+            }
+            out << "\n";
+        }
+        out << "\n\n";
+
+        out << "\n\n";
+        out << "Area " << area.id << "\n";
+        out << "Catch at Age:\nFemales\n";
+
+        for (int a = 0; a < area.ages; a++) {
+            for (int y = 0; y < area.years; y++) {
+                for (int s = 0; s < area.seasons; s++) {
+                    out << area.catch_at_age_males[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
+                }
+            }
+            out << "\n";
+        }
+        out << "\n\n";
+
+        out << "\n\n";
+        out << "Area " << area.id << "\n";
+        out << "Catch Proportion at Age:\nMales and Females\n";
 
         for (int a = 0; a < area.ages; a++) {
             for (int y = 0; y < area.years; y++) {
@@ -518,8 +691,37 @@ namespace mas {
             out << "\n";
         }
         out << "\n\n";
+
+        out << "\n\n";
         out << "Area " << area.id << "\n";
-        out << "Catch Biomass:\n";
+        out << "Catch Proportion at Age:\nMales\n";
+
+        for (int a = 0; a < area.ages; a++) {
+            for (int y = 0; y < area.years; y++) {
+                for (int s = 0; s < area.seasons; s++) {
+                    out << area.catch_proportion_at_age_males[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
+                }
+            }
+            out << "\n";
+        }
+        out << "\n\n";
+
+        out << "\n\n";
+        out << "Area " << area.id << "\n";
+        out << "Catch Proportion at Age:\nFemales\n";
+
+        for (int a = 0; a < area.ages; a++) {
+            for (int y = 0; y < area.years; y++) {
+                for (int s = 0; s < area.seasons; s++) {
+                    out << area.catch_proportion_at_age_females[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
+                }
+            }
+            out << "\n";
+        }
+        out << "\n\n";
+
+        out << "Area " << area.id << "\n";
+        out << "Catch Biomass:\nMales and Females\n";
 
         for (int a = 0; a < area.ages; a++) {
             for (int y = 0; y < area.years; y++) {
@@ -530,8 +732,37 @@ namespace mas {
             out << "\n";
         }
         out << "\n\n";
+
+        out << "\n\n";
         out << "Area " << area.id << "\n";
-        out << "Survey Numbers at Age:\n";
+        out << "Catch Biomass:\nMales\n";
+
+        for (int a = 0; a < area.ages; a++) {
+            for (int y = 0; y < area.years; y++) {
+                for (int s = 0; s < area.seasons; s++) {
+                    out << area.catch_biomass_at_age_males[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
+                }
+            }
+            out << "\n";
+        }
+        out << "\n\n";
+
+        out << "\n\n";
+        out << "Area " << area.id << "\n";
+        out << "Catch Biomass:\nFemales\n";
+
+        for (int a = 0; a < area.ages; a++) {
+            for (int y = 0; y < area.years; y++) {
+                for (int s = 0; s < area.seasons; s++) {
+                    out << area.catch_biomass_at_age_females[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
+                }
+            }
+            out << "\n";
+        }
+        out << "\n\n";
+
+        out << "Area " << area.id << "\n";
+        out << "Survey Numbers at Age:\nMales and Females\n";
 
         for (int a = 0; a < area.ages; a++) {
             for (int y = 0; y < area.years; y++) {
@@ -542,8 +773,37 @@ namespace mas {
             out << "\n";
         }
         out << "\n\n";
+
+        out << "\n\n";
         out << "Area " << area.id << "\n";
-        out << "Survey Proportion at Age:\n";
+        out << "Survey Numbers at Age:\nMales\n";
+
+        for (int a = 0; a < area.ages; a++) {
+            for (int y = 0; y < area.years; y++) {
+                for (int s = 0; s < area.seasons; s++) {
+                    out << area.survey_numbers_at_age_males[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
+                }
+            }
+            out << "\n";
+        }
+        out << "\n\n";
+
+        out << "\n\n";
+        out << "Area " << area.id << "\n";
+        out << "Survey Numbers at Age:\nFemales\n";
+
+        for (int a = 0; a < area.ages; a++) {
+            for (int y = 0; y < area.years; y++) {
+                for (int s = 0; s < area.seasons; s++) {
+                    out << area.survey_numbers_at_age_females[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
+                }
+            }
+            out << "\n";
+        }
+        out << "\n\n";
+
+        out << "Area " << area.id << "\n";
+        out << "Survey Proportion at Age:\nMales and Females\n";
 
         for (int a = 0; a < area.ages; a++) {
             for (int y = 0; y < area.years; y++) {
@@ -555,7 +815,60 @@ namespace mas {
         }
         out << "\n\n";
 
-        out << "Survey Biomass:\n";
+        out << "\n\n";
+        out << "Area " << area.id << "\n";
+        out << "Survey Proportion at Age:\nMales\n";
+
+        for (int a = 0; a < area.ages; a++) {
+            for (int y = 0; y < area.years; y++) {
+                for (int s = 0; s < area.seasons; s++) {
+                    out << area.survey_proportion_at_age_males[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
+                }
+            }
+            out << "\n";
+        }
+        out << "\n\n";
+
+        out << "\n\n";
+        out << "Area " << area.id << "\n";
+        out << "Survey Proportion at Age:\nFemales\n";
+
+        for (int a = 0; a < area.ages; a++) {
+            for (int y = 0; y < area.years; y++) {
+                for (int s = 0; s < area.seasons; s++) {
+                    out << area.survey_proportion_at_age_females[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
+                }
+            }
+            out << "\n";
+        }
+        out << "\n\n";
+
+        out << "Survey Biomass Total:\n Females\n";
+        out << "Area " << area.id << "\n";
+        for (int a = 0; a < area.ages; a++) {
+            for (int y = 0; y < area.years; y++) {
+                for (int s = 0; s < area.seasons; s++) {
+                    out << area.survey_biomass_at_age_females[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
+                }
+            }
+            out << "\n";
+        }
+        out << "\n\n";
+
+        out << "Survey Biomass Total:\n Males\n";
+        out << "Area " << area.id << "\n";
+        for (int a = 0; a < area.ages; a++) {
+            for (int y = 0; y < area.years; y++) {
+                for (int s = 0; s < area.seasons; s++) {
+                    out << area.survey_biomass_at_age_males[y * area.seasons * area.ages + (s) * area.ages + a] << " ";
+                }
+            }
+            out << "\n";
+        }
+        out << "\n\n";
+
+        out << "Survey Biomass Total:\n";
+        out << "Male and Female\n";
         out << "Area " << area.id << "\n";
         for (int a = 0; a < area.ages; a++) {
             for (int y = 0; y < area.years; y++) {
