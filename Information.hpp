@@ -4728,7 +4728,6 @@ namespace mas {
 
                 std::string type;
                 (*it).second.getAtt("data_object_type").getValues(type);
-                std::cout << "Data object type = " << type << "\n";
                 std::string area;
                 (*it).second.getAtt("area").getValues(area);
                 data->area_id = StringToNumber<uint32_t>(area);
@@ -4902,7 +4901,7 @@ namespace mas {
 
                 for (ait = this->areas.begin(); ait != this->areas.end(); ++ait) {
                     population->areas_list.push_back((*ait).second);
-                    mas::AreaPopulationInfo<REAL_T>& male_pop_info = population->male_cohorts[(*ait).second->id];
+                    mas::AreaPopulationInfo<REAL_T>& male_pop_info = population->males[(*ait).second->id];
                     male_pop_info.sex = mas::MALE;
                     male_pop_info.natal_area = population->natal_area;
                     male_pop_info.natal_population = population;
@@ -4962,10 +4961,10 @@ namespace mas {
                     male_pop_info.years = this->nyears;
                     male_pop_info.seasons = this->nseasons;
                     male_pop_info.ages = this->ages;
-                    male_pop_info.male_chohorts = true;
+                    male_pop_info.males = true;
                     //                    male_pop_info.Initialize();
 
-                    mas::AreaPopulationInfo<REAL_T>& female_pop_info = population->female_cohorts[(*ait).second->id];
+                    mas::AreaPopulationInfo<REAL_T>& female_pop_info = population->females[(*ait).second->id];
                     female_pop_info.sex = mas::FEMALE;
                     female_pop_info.natal_area = population->natal_area;
                     female_pop_info.natal_population = population;
@@ -5019,7 +5018,7 @@ namespace mas {
                     female_pop_info.years = this->nyears;
                     female_pop_info.seasons = this->nseasons;
                     female_pop_info.ages = this->ages;
-                    female_pop_info.male_chohorts = false;
+                    female_pop_info.males = false;
                     //                    female_pop_info.Initialize();
                 }
 
@@ -5293,10 +5292,7 @@ namespace mas {
             //            }
 
 
-            std::cout << "Estimated Parameters\n";
-            for (int i = 0; i < this->estimated_parameters.size(); i++) {
-                std::cout << this->estimated_parameters[i]->GetName() << " --- " << this->estimated_parameters[i]->GetValue() << "\n";
-            }
+           
 
             if (!this->valid_configuration) {
                 std::cout << "Configuration Error:  Invalid model configuration. See mas.log for errors.\n";

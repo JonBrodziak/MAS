@@ -51,7 +51,7 @@ namespace mas {
         variable B = 3.0;
         variable F = .1;
         /*==================================*/
-        bool male_chohorts = true;
+        bool males = true;
         mas::FishSexType sex;
 
         Population<REAL_T>* natal_population;
@@ -257,7 +257,7 @@ namespace mas {
                 length_at_season_start[a] =
                         this->area->growth_model->Evaluate(this->ages[a] + fract);
 
-                weight_at_season_start[a] = this->area->growth_model->getWeight(this->male_chohorts, length_at_season_start[a]); //this->A * atl::exp(this->B * atl::log(length_at_season_start[a]));
+                weight_at_season_start[a] = this->area->growth_model->getWeight(this->males, length_at_season_start[a]); //this->A * atl::exp(this->B * atl::log(length_at_season_start[a]));
 
                 length_at_spawning[a - 1] = (static_cast<REAL_T> (1.0) - this->spawning_season_offset) *
                         length_at_season_start[a - 1] + this->spawning_season_offset * length_at_season_start[a];
@@ -487,7 +487,7 @@ namespace mas {
         out << "Population " << pi.natal_population->id << "\n";
         out << "Area " << pi.area->id << "\n";
         out << "Total Mortality at Age (Z)\n";
-        if (pi.male_chohorts) {
+        if (pi.males) {
             out << "Males\n";
         } else {
             out << "Females\n";
@@ -505,7 +505,7 @@ namespace mas {
         out << "Population " << pi.natal_population->id << "\n";
         out << "Area " << pi.area->id << "\n";
         out << "Numbers at Age \n";
-        if (pi.male_chohorts) {
+        if (pi.males) {
             out << "Males\n";
         } else {
             out << "Females\n";
@@ -523,7 +523,7 @@ namespace mas {
         out << "Population " << pi.natal_population->id << "\n";
         out << "Area " << pi.area->id << "\n";
         out << "Catch Numbers at Age \n";
-        if (pi.male_chohorts) {
+        if (pi.males) {
             out << "Males\n";
         } else {
             out << "Females\n";
@@ -541,7 +541,7 @@ namespace mas {
         out << "Population " << pi.natal_population->id << "\n";
         out << "Area " << pi.area->id << "\n";
         out << "Catch Biomass at Age \n";
-        if (pi.male_chohorts) {
+        if (pi.males) {
             out << "Males\n";
         } else {
             out << "Females\n";
@@ -559,7 +559,7 @@ namespace mas {
         out << "Population " << pi.natal_population->id << "\n";
         out << "Area " << pi.area->id << "\n";
         out << "Survey Numbers at Age \n";
-        if (pi.male_chohorts) {
+        if (pi.males) {
             out << "Males\n";
         } else {
             out << "Females\n";
@@ -577,7 +577,7 @@ namespace mas {
         out << "Population " << pi.natal_population->id << "\n";
         out << "Area " << pi.area->id << "\n";
         out << "Survey Biomass at Age \n";
-        if (pi.male_chohorts) {
+        if (pi.males) {
             out << "Males\n";
         } else {
             out << "Females\n";
@@ -595,7 +595,7 @@ namespace mas {
         out << "Population " << pi.natal_population->id << "\n";
         out << "Area " << pi.area->id << "\n";
         out << "Total Immigrants \n";
-        if (pi.male_chohorts) {
+        if (pi.males) {
             out << "Males\n";
         } else {
             out << "Females\n";
@@ -613,7 +613,7 @@ namespace mas {
         out << "Population " << pi.natal_population->id << "\n";
         out << "Area " << pi.area->id << "\n";
         out << "Total Emigrants \n";
-        if (pi.male_chohorts) {
+        if (pi.males) {
             out << "Males\n";
         } else {
             out << "Females\n";
@@ -650,7 +650,7 @@ namespace mas {
         out << "Population " << pi.natal_population->id << "\n";
         out << "Area " << pi.area->id << "\n";
         out << "Spawning Biomass \n";
-        if (pi.male_chohorts) {
+        if (pi.males) {
             out << "Males\n";
         } else {
             out << "Females\n";
@@ -668,7 +668,7 @@ namespace mas {
         out << "Population " << pi.natal_population->id << "\n";
         out << "Area " << pi.area->id << "\n";
         out << "weight_at_spawning \n";
-        if (pi.male_chohorts) {
+        if (pi.males) {
             out << "Males\n";
         } else {
             out << "Females\n";
@@ -682,7 +682,7 @@ namespace mas {
         out << "Population " << pi.natal_population->id << "\n";
         out << "Area " << pi.area->id << "\n";
         out << "length_at_season_start \n";
-        if (pi.male_chohorts) {
+        if (pi.males) {
             out << "Males\n";
         } else {
             out << "Females\n";
@@ -702,7 +702,7 @@ namespace mas {
         out << "Population " << pi.natal_population->id << "\n";
         out << "Area " << pi.area->id << "\n";
         out << "spawning_biomass_at_age \n";
-        if (pi.male_chohorts) {
+        if (pi.males) {
             out << "Males\n";
         } else {
             out << "Females\n";
@@ -721,7 +721,7 @@ namespace mas {
         out << "Population " << pi.natal_population->id << "\n";
         out << "Area " << pi.area->id << "\n";
         out << "equilibrium_to_survival_at_spawning \n";
-        if (pi.male_chohorts) {
+        if (pi.males) {
             out << "Males\n";
         } else {
             out << "Females\n";
@@ -741,7 +741,7 @@ namespace mas {
         out << "Population " << pi.natal_population->id << "\n";
         out << "Area " << pi.area->id << "\n";
         out << "Recruitment \n";
-        if (pi.male_chohorts) {
+        if (pi.males) {
             out << "Males\n";
         } else {
             out << "Females\n";
@@ -760,7 +760,7 @@ namespace mas {
         out << "Redistributed Recruits " << pi.natal_population->id << "\n";
         out << "Area " << pi.area->id << "\n";
         out << "Recruitment \n";
-        if (pi.male_chohorts) {
+        if (pi.males) {
             out << "Males\n";
         } else {
             out << "Females\n";
@@ -827,8 +827,8 @@ namespace mas {
 
         //Movement Tracking
         typedef typename std::unordered_map<int, AreaPopulationInfo<REAL_T> >::iterator cohort_iterator;
-        std::unordered_map<int, AreaPopulationInfo<REAL_T> > male_cohorts;
-        std::unordered_map<int, AreaPopulationInfo<REAL_T> > female_cohorts;
+        std::unordered_map<int, AreaPopulationInfo<REAL_T> > males;
+        std::unordered_map<int, AreaPopulationInfo<REAL_T> > females;
         std::unordered_map<int, int > movement_models_ids; //season keyed
         typedef typename std::unordered_map<int, int >::iterator movement_model_id_iterator;
 
@@ -861,16 +861,16 @@ namespace mas {
         areas_list(areas) {
 
             for (int a = 0; a < areas_list.size(); a++) {
-                male_cohorts[areas_list[a]->id].natal_homing = this->natal_homing;
-                male_cohorts[areas_list[a]->id].area = areas_list[a];
-                male_cohorts[areas_list[a]->id].natal_area = this->natal_area;
-                male_cohorts[areas_list[a]->id].Initialize();
+                males[areas_list[a]->id].natal_homing = this->natal_homing;
+                males[areas_list[a]->id].area = areas_list[a];
+                males[areas_list[a]->id].natal_area = this->natal_area;
+                males[areas_list[a]->id].Initialize();
                 
-                female_cohorts[areas_list[a]->id].natal_homing = this->natal_homing;
-                female_cohorts[areas_list[a]->id].area = areas_list[a];
-                female_cohorts[areas_list[a]->id].natal_area = this->natal_area;
-                female_cohorts[areas_list[a]->id].male_chohorts = false;
-                female_cohorts[areas_list[a]->id].Initialize();
+                females[areas_list[a]->id].natal_homing = this->natal_homing;
+                females[areas_list[a]->id].area = areas_list[a];
+                females[areas_list[a]->id].natal_area = this->natal_area;
+                females[areas_list[a]->id].males = false;
+                females[areas_list[a]->id].Initialize();
             }
 
 
@@ -884,9 +884,9 @@ namespace mas {
             C.resize(years * seasons * ages);
             C_Biomass.resize(years * seasons * ages);
 
-            for (int a = 0; a < male_cohorts.size(); a++) {
-                male_cohorts[areas_list[a]->id].Reset();
-                female_cohorts[areas_list[a]->id].Reset();
+            for (int a = 0; a < males.size(); a++) {
+                males[areas_list[a]->id].Reset();
+                females[areas_list[a]->id].Reset();
             }
 
             for (int i = 0; i < this->initial_numbers.size(); i++) {
@@ -894,12 +894,12 @@ namespace mas {
                 switch (this->initial_numbers[i].type) {
                     case MALE:
 //                        std::cout << "Setting initial numbers for males in area " << this->initial_numbers[i].area_id << "\n";
-                        this->male_cohorts[this->initial_numbers[i].area_id].initial_numbers = this->initial_numbers[i].values;
+                        this->males[this->initial_numbers[i].area_id].initial_numbers = this->initial_numbers[i].values;
                         break;
 
                     case FEMALE:
 //                        std::cout << "Setting initial numbers for females in area " << this->initial_numbers[i].area_id << "\n";
-                        this->female_cohorts[this->initial_numbers[i].area_id].initial_numbers = this->initial_numbers[i].values;
+                        this->females[this->initial_numbers[i].area_id].initial_numbers = this->initial_numbers[i].values;
 
                         break;
 
@@ -945,11 +945,11 @@ namespace mas {
                 std::vector<std::vector<variable> >& rercruit_probabilities = (*it).second->recruit_connectivity[ss];
                 //should be square
                 for (int i = 0; i < male_probabilities.size(); i++) {
-                    AreaPopulationInfo<REAL_T>& male_info_from = this->male_cohorts[(i + 1)];
-                    AreaPopulationInfo<REAL_T>& female_info_from = this->female_cohorts[(i + 1)];
+                    AreaPopulationInfo<REAL_T>& male_info_from = this->males[(i + 1)];
+                    AreaPopulationInfo<REAL_T>& female_info_from = this->females[(i + 1)];
                     for (int j = 0; j < male_probabilities.size(); j++) {
-                        AreaPopulationInfo<REAL_T>& male_info_to = this->male_cohorts[(j + 1)];
-                        AreaPopulationInfo<REAL_T>& female_info_to = this->female_cohorts[(j + 1)];
+                        AreaPopulationInfo<REAL_T>& male_info_to = this->males[(j + 1)];
+                        AreaPopulationInfo<REAL_T>& female_info_to = this->females[(j + 1)];
 
 
 
@@ -997,8 +997,8 @@ namespace mas {
 
 
 
-                male_cohorts[areas_list[a]->id].InitNumbers();
-                female_cohorts[areas_list[a]->id].InitNumbers();
+                males[areas_list[a]->id].InitNumbers();
+                females[areas_list[a]->id].InitNumbers();
 
             }
 
@@ -1008,8 +1008,8 @@ namespace mas {
 
             for (int a = 0; a < areas_list.size(); a++) {
 
-                male_cohorts[areas_list[a]->id].Initialize();
-                female_cohorts[areas_list[a]->id].Initialize();
+                males[areas_list[a]->id].Initialize();
+                females[areas_list[a]->id].Initialize();
 
             }
 
@@ -1017,8 +1017,8 @@ namespace mas {
 
         void Show() {
             for (int a = 0; a < areas_list.size(); a++) {
-                std::cout << male_cohorts[areas_list[a]->id];
-                std::cout << female_cohorts[areas_list[a]->id];
+                std::cout << males[areas_list[a]->id];
+                std::cout << females[areas_list[a]->id];
             }
 
 
@@ -1130,48 +1130,48 @@ namespace mas {
                         /******************************************
                          * Growth
                          *****************************************/
-                        male_cohorts[areas_list[a]->id].Growth(y, s);
-                        female_cohorts[areas_list[a]->id].Growth(y, s);
+                        males[areas_list[a]->id].Growth(y, s);
+                        females[areas_list[a]->id].Growth(y, s);
 
 
                         /******************************************
                          * Mortality
                          *****************************************/
-                        male_cohorts[areas_list[a]->id].Mortality(y, s);
-                        female_cohorts[areas_list[a]->id].Mortality(y, s);
+                        males[areas_list[a]->id].Mortality(y, s);
+                        females[areas_list[a]->id].Mortality(y, s);
 
                         /******************************************
                          * Numbers at Age
                          *****************************************/
-                        male_cohorts[areas_list[a]->id].NumbersAtAge(y, s);
-                        female_cohorts[areas_list[a]->id].NumbersAtAge(y, s);
+                        males[areas_list[a]->id].NumbersAtAge(y, s);
+                        females[areas_list[a]->id].NumbersAtAge(y, s);
 
 
 
                         /******************************************
                          * Spawning Biomass
                          *****************************************/
-                        male_cohorts[areas_list[a]->id].SpawningBiomass(y, s);
-                        female_cohorts[areas_list[a]->id].SpawningBiomass(y, s);
+                        males[areas_list[a]->id].SpawningBiomass(y, s);
+                        females[areas_list[a]->id].SpawningBiomass(y, s);
 
                         /******************************************
                          * Recruitment
                          *****************************************/
-                        male_cohorts[areas_list[a]->id].Recruitment(y, s);
-                        female_cohorts[areas_list[a]->id].Recruitment(y, s);
+                        males[areas_list[a]->id].Recruitment(y, s);
+                        females[areas_list[a]->id].Recruitment(y, s);
 
                         /******************************************
                          * Catch Numbers at Age
                          *****************************************/
-                        male_cohorts[areas_list[a]->id].CatchAtAge(y, s);
-                        female_cohorts[areas_list[a]->id].CatchAtAge(y, s);
+                        males[areas_list[a]->id].CatchAtAge(y, s);
+                        females[areas_list[a]->id].CatchAtAge(y, s);
 
 
                         /******************************************
                          * Survey Numbers at Age
                          *****************************************/
-                        male_cohorts[areas_list[a]->id].SurveyNumbersAtAge(y, s);
-                        female_cohorts[areas_list[a]->id].SurveyNumbersAtAge(y, s);
+                        males[areas_list[a]->id].SurveyNumbersAtAge(y, s);
+                        females[areas_list[a]->id].SurveyNumbersAtAge(y, s);
 
 
                     }
@@ -1187,8 +1187,8 @@ namespace mas {
                 /******************************************
                  * Push info to areas
                  *****************************************/
-                male_cohorts[areas_list[a]->id].PushToArea();
-                female_cohorts[areas_list[a]->id].PushToArea();
+                males[areas_list[a]->id].PushToArea();
+                females[areas_list[a]->id].PushToArea();
             }
 
             /**
@@ -1201,20 +1201,20 @@ namespace mas {
                     for (int al = 0; al < areas_list.size(); al++) {
                         for (int a = 0; a < this->ages; a++) {
                             this->C[y * this->seasons * this->ages + (s - 1) * this->ages + a] +=
-                                    male_cohorts[areas_list[al]->id].C[y * this->seasons * this->ages + (s - 1) * this->ages + a] +
-                                    female_cohorts[areas_list[al]->id].C[y * this->seasons * this->ages + (s - 1) * this->ages + a];
+                                    males[areas_list[al]->id].C[y * this->seasons * this->ages + (s - 1) * this->ages + a] +
+                                    females[areas_list[al]->id].C[y * this->seasons * this->ages + (s - 1) * this->ages + a];
 
                             this->C_Biomass[y * this->seasons * this->ages + (s - 1) * this->ages + a] +=
-                                    male_cohorts[areas_list[al]->id].C_Biomass[y * this->seasons * this->ages + (s - 1) * this->ages + a] +
-                                    female_cohorts[areas_list[al]->id].C_Biomass[y * this->seasons * this->ages + (s - 1) * this->ages + a];
+                                    males[areas_list[al]->id].C_Biomass[y * this->seasons * this->ages + (s - 1) * this->ages + a] +
+                                    females[areas_list[al]->id].C_Biomass[y * this->seasons * this->ages + (s - 1) * this->ages + a];
 
                             this->SN[y * this->seasons * this->ages + (s - 1) * this->ages + a] +=
-                                    male_cohorts[areas_list[al]->id].SN[y * this->seasons * this->ages + (s - 1) * this->ages + a] +
-                                    female_cohorts[areas_list[al]->id].SN[y * this->seasons * this->ages + (s - 1) * this->ages + a];
+                                    males[areas_list[al]->id].SN[y * this->seasons * this->ages + (s - 1) * this->ages + a] +
+                                    females[areas_list[al]->id].SN[y * this->seasons * this->ages + (s - 1) * this->ages + a];
 
                             this->SN_Biomass[y * this->seasons * this->ages + (s - 1) * this->ages + a] +=
-                                    male_cohorts[areas_list[al]->id].SN_Biomass[y * this->seasons * this->ages + (s - 1) * this->ages + a] +
-                                    female_cohorts[areas_list[al]->id].SN_Biomass[y * this->seasons * this->ages + (s - 1) * this->ages + a];
+                                    males[areas_list[al]->id].SN_Biomass[y * this->seasons * this->ages + (s - 1) * this->ages + a] +
+                                    females[areas_list[al]->id].SN_Biomass[y * this->seasons * this->ages + (s - 1) * this->ages + a];
                         }
                     }
                 }

@@ -394,7 +394,10 @@ namespace mas {
 
         const variable Compute() {
 
-
+            this->catch_biomass_component = 0.0;
+            this->survey_biomass_component = 0.0;
+            this->fishery_age_comp_component = 0.0;
+            this->survey_age_comp_component = 0.0;
 
 
             //this is all nonsense.
@@ -434,13 +437,13 @@ namespace mas {
 
                         }
                     }
-                    std::cout << "temp = " << temp << "\n";
-
-                    c_f += (((.1 + atl::log(temp / this->catch_biomass_total[y * seasons + s])) / this->logscale_standard_deviation_catch_biomass
-                            + .5 * this->logscale_standard_deviation_catch_biomass))*
-                            (((.1 + atl::log(temp / this->catch_biomass_total[y * seasons + s])) / this->logscale_standard_deviation_catch_biomass
-                            + .5 * this->logscale_standard_deviation_catch_biomass));
-                    std::cout << "c_f = " << c_f << "\n";
+//                    std::cout << "temp = " << temp << "\n";
+                    this->catch_biomass_component += .5*atl::pow(std::log(temp+.00001) - atl::log(this->catch_biomass_total[y * seasons + s]+.00001), 2.0)/.05;
+//                    c_f += (((atl::log(temp / this->catch_biomass_total[y * seasons + s])) / this->logscale_standard_deviation_catch_biomass
+//                            + .5 * this->logscale_standard_deviation_catch_biomass))*
+//                            (((atl::log(temp / this->catch_biomass_total[y * seasons + s])) / this->logscale_standard_deviation_catch_biomass
+//                            + .5 * this->logscale_standard_deviation_catch_biomass));
+//                    std::cout << "c_f = " << c_f << "\n";
                     cl += std::log(this->logscale_standard_deviation_catch_biomass);
 
                     temp = static_cast<REAL_T> (0.0);
@@ -450,35 +453,39 @@ namespace mas {
                     //                    s_f += ((this->survey_biomass_total[y * seasons + s] - temp)*
                     //                            (this->survey_biomass_total[y * seasons + s] - temp));
 
-                    s_f += (((.1 + atl::log(temp / this->survey_biomass_total[y * seasons + s])) / this->logscale_standard_deviation_survey_biomass
-                            + .5 * this->logscale_standard_deviation_survey_biomass))*
-                            (((.1 + atl::log(temp / this->survey_biomass_total[y * seasons + s])) / this->logscale_standard_deviation_survey_biomass +
-                            .5 * this->logscale_standard_deviation_survey_biomass));
-                    sl += std::log(this->logscale_standard_deviation_catch_biomass);
+                    this->survey_biomass_component += .5*atl::pow(std::log(temp+.0001) - atl::log(this->survey_biomass_total[y * seasons + s]+.0001), 2.0)/.05;
+//                    s_f += (((atl::log(temp - this->survey_biomass_total[y * seasons + s])) / this->logscale_standard_deviation_survey_biomass
+//                            + .5 * this->logscale_standard_deviation_survey_biomass))*
+//                            (((atl::log(temp - this->survey_biomass_total[y * seasons + s])) / this->logscale_standard_deviation_survey_biomass +
+//                            .5 * this->logscale_standard_deviation_survey_biomass));
+//                    sl += std::log(this->logscale_standard_deviation_catch_biomass);
 
-                    //                    temp = static_cast<REAL_T> (0.0);
-                    //                    for (int a = 0; a <this->ages; a++) {
-                    //                        for (int i = 0; i < this->catch_proportion_data.size(); i++) {
-                    //                            index = y * this->seasons * this->ages + (s) * this->ages + a;
-                    //                            c_p_f += (this->catch_proportion_at_age[index] - this->catch_proportion_data[i]->get(y, s, a))*
-                    //                                    (this->catch_proportion_at_age[index] - this->catch_proportion_data[i]->get(y, s, a));
-                    //                        }
-                    //                    }
+                    temp = static_cast<REAL_T> (0.0);
+                    for (int a = 0; a <this->ages; a++) {
+                        for (int i = 0; i < this->catch_proportion_data.size(); i++) {
+                            index = y * this->seasons * this->ages + (s) * this->ages + a;
+//                            c_p_f += (this->catch_proportion_at_age[index] - this->catch_proportion_data[i]->get(y, s, a))*
+//                                    (this->catch_proportion_at_age[index] - this->catch_proportion_data[i]->get(y, s, a));
+                            this->fishery_age_comp_component += atl::pow(this->catch_proportion_data[i]->get(y, s, a)*(std::log(this->catch_proportion_data[i]->get(y, s, a)+.0001) - atl::log(this->catch_proportion_at_age[index]+.0001)), 2.0);
+                        }
+                    }
+           
                     //
-                    //                    for (int a = 0; a <this->ages; a++) {
-                    //                        for (int i = 0; i < this->survey_proportion_data.size(); i++) {
-                    //                            index = y * this->seasons * this->ages + (s) * this->ages + a;
-                    //                            s_p_f += (this->survey_proportion_at_age[index] - this->survey_proportion_data[i]->get(y, s, a))*
-                    //                                    (this->survey_proportion_at_age[index] - this->survey_proportion_data[i]->get(y, s, a));
-                    //                        }
-                    //                    }
+                    for (int a = 0; a <this->ages; a++) {
+                        for (int i = 0; i < this->survey_proportion_data.size(); i++) {
+                            index = y * this->seasons * this->ages + (s) * this->ages + a;
+//                            s_p_f += (this->survey_proportion_at_age[index] - this->survey_proportion_data[i]->get(y, s, a))*
+//                                    (this->survey_proportion_at_age[index] - this->survey_proportion_data[i]->get(y, s, a));
+                            this->survey_age_comp_component += atl::pow(this->survey_proportion_data[i]->get(y, s, a)*(std::log(this->survey_proportion_data[i]->get(y, s, a)+.0001) - atl::log(this->survey_proportion_at_age[index]+.0001)), 2.0);
+                        }
+                    }
 
                 }
             }
             c_b_nll = .1 + .5 * c_f;
             s_b_nll = .3 + .5 * s_f;
 
-            std::cout << c_b_nll << "  " << s_b_nll << "\n";
+            //            std::cout << c_b_nll << "  " << s_b_nll << "\n";
 
             f = c_b_nll + s_b_nll; //+static_cast<REAL_T> (.5) * atl::log(s_p_f) + static_cast<REAL_T> (.5) * atl::log(c_p_f);
 
@@ -582,7 +589,7 @@ namespace mas {
             out << "\n";
         }
         out << "\n\n";
-        
+
         out << "\n\n";
         out << "Area " << area.id << "\n";
         out << "Proportion of Fish at Age:\nMales\n";
@@ -596,8 +603,8 @@ namespace mas {
             out << "\n";
         }
         out << "\n\n";
-        
-          out << "\n\n";
+
+        out << "\n\n";
         out << "Area " << area.id << "\n";
         out << "Proportion of Fish at Age:\nFemales\n";
 
@@ -610,7 +617,7 @@ namespace mas {
             out << "\n";
         }
         out << "\n\n";
-        
+
         out << "\n\n";
         out << "Area " << area.id << "\n";
         out << "Proportion of Fish at Age:\nMales\n";
@@ -624,7 +631,7 @@ namespace mas {
             out << "\n";
         }
         out << "\n\n";
-        
+
         out << "\n\n";
         out << "Area " << area.id << "\n";
         out << "Proportion of Fish at Age:\nFemales\n";
@@ -638,7 +645,7 @@ namespace mas {
             out << "\n";
         }
         out << "\n\n";
-        
+
         out << "Area " << area.id << "\n";
         out << "Catch at Age:\n";
 

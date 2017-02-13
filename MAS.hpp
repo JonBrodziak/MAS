@@ -57,6 +57,11 @@ namespace mas {
         std::vector<variable> Survey_Biomass;
         std::vector<variable> Survey_Proportions;
         int calls = 0;
+        variable catch_biomass_component;
+        variable survey_biomass_component;
+        variable fishery_age_comp_component;
+        variable survey_age_comp_component;
+        variable recruitment_deviations_component;
     public:
         mas::Information< REAL_T> info;
 
@@ -78,13 +83,12 @@ namespace mas {
         inline void Run(variable& f) {
             //            std::cout<<"Calls "<<calls++<<std::endl;
             f = 0.0;
+            this->catch_biomass_component = 0.0;
+            this->survey_biomass_component = 0.0;
+            this->fishery_age_comp_component = 0.0;
+            this->survey_age_comp_component = 0.0;
 
-            variable catch_biomass_component;
-            variable survey_biomass_component;
-            variable fishery_age_comp_component;
-            variable survey_age_comp_component;
-            variable recruitment_deviations_component;
-            
+
             typename std::unordered_map<int, std::shared_ptr<mas::Population<double> > >::iterator it;
             std::unordered_map<int, std::shared_ptr<mas::Population<double> > >& pops =
                     info.GetPopulations();
@@ -122,14 +126,37 @@ namespace mas {
                 (*ait).second->ComputeProportions();
             }
 
-            /**
-             * Evaluate the likelihood function. 
-             */
+            
+            
+            this->info.
+            
+            
+//            /**
+//             * Evaluate the likelihood function. 
+//             */
+//            variable t;
+//            for (ait = info.areas.begin(); ait != info.areas.end(); ait++) {
+//                (*ait).second->ComputeProportions();
+//                t += (*ait).second->Compute();
+//                this->catch_biomass_component += (*ait).second->catch_biomass_component;
+//                this->survey_biomass_component += (*ait).second->survey_biomass_component;
+//                this->fishery_age_comp_component += (*ait).second->fishery_age_comp_component;
+//                this->survey_age_comp_component += (*ait).second->survey_age_comp_component;
+//            }
+//
+//            f = .5 * atl::log(this->catch_biomass_component) +
+//                    .5 * atl::log(this->survey_biomass_component) +
+//                    .5 * atl::log(this->fishery_age_comp_component) +
+//                    .5 * atl::log(this->survey_age_comp_component);
 
-            for (ait = info.areas.begin(); ait != info.areas.end(); ait++) {
-                (*ait).second->ComputeProportions();
-                f += (*ait).second->Compute();
-            }
+
+            //            if(f.GetValue() != f.GetValue()) {
+            //                //                for (ait = info.areas.begin(); ait != info.areas.end(); ait++) {
+            //                //                    std::cout<<*(*ait).second<<"\n";
+            //                //            }
+            //                exit(0);
+            //            }
+
 
         }
 
@@ -138,7 +165,12 @@ namespace mas {
         }
 
         void Report() {
-
+            mas::Information<double>::area_iterator ait;
+            std::ofstream out("mas_report.txt");
+            out<<std::fixed;
+            for (ait = info.areas.begin(); ait != info.areas.end(); ait++) {
+                out << *(*ait).second;
+            }
         }
 
     private:

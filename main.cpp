@@ -109,45 +109,52 @@ void create() {
     out.add_variable_attribute("catch_biomass_area_1", "data_object_type", "catch_biomass");
     out.add_variable_attribute("catch_biomass_area_1", "sex", "undifferentiated");
     out.add_variable_attribute("catch_biomass_area_1", "area", "1");
+    out.add_variable_attribute("catch_biomass_area_1", "missing_values", "-999");
     //
     out.add_variable("catch_biomass_area_2", "float",{"years"});
     out.add_variable_attribute("catch_biomass_area_2", "data_object_type", "catch_biomass");
     out.add_variable_attribute("catch_biomass_area_2", "sex", "undifferentiated");
     out.add_variable_attribute("catch_biomass_area_2", "units", "MT");
     out.add_variable_attribute("catch_biomass_area_2", "area", "2");
+    out.add_variable_attribute("catch_biomass_area_2", "missing_values", "-999");
 
     out.add_variable("survey_biomass_area_1", "float",{"years"});
     out.add_variable_attribute("survey_biomass_area_1", "data_object_type", "survey_biomass");
     out.add_variable_attribute("survey_biomass_area_1", "sex", "undifferentiated");
     out.add_variable_attribute("survey_biomass_area_1", "units", "kg");
     out.add_variable_attribute("survey_biomass_area_1", "area", "1");
+    out.add_variable_attribute("survey_biomass_area_1", "missing_values", "-999");
 
     out.add_variable("survey_biomass_area_2", "float",{"years"});
     out.add_variable_attribute("survey_biomass_area_2", "data_object_type", "survey_biomass");
     out.add_variable_attribute("survey_biomass_area_2", "sex", "undifferentiated");
     out.add_variable_attribute("survey_biomass_area_2", "units", "kg");
     out.add_variable_attribute("survey_biomass_area_2", "area", "2");
-
+    out.add_variable_attribute("survey_biomass_area_2", "missing_values", "-999");
 
     out.add_variable("catch_proportions_at_age_area_1", "float",{"years", "seasons", "ages"});
     out.add_variable_attribute("catch_proportions_at_age_area_1", "data_object_type", "catch_proportion_at_age");
     out.add_variable_attribute("catch_proportions_at_age_area_1", "units", "proportion");
     out.add_variable_attribute("catch_proportions_at_age_area_1", "area", "1");
+    out.add_variable_attribute("catch_proportions_at_age_area_1", "missing_values", "-999");
 
     out.add_variable("catch_proportions_at_age_area_2", "float",{"years", "seasons", "ages"});
     out.add_variable_attribute("catch_proportions_at_age_area_2", "units", "proportion");
     out.add_variable_attribute("catch_proportions_at_age_area_2", "data_object_type", "catch_proportion_at_age");
     out.add_variable_attribute("catch_proportions_at_age_area_2", "area", "2");
+    out.add_variable_attribute("catch_proportions_at_age_area_2", "missing_values", "-999");
 
     out.add_variable("survey_proportions_at_age_area_1", "float",{"years", "seasons", "ages"});
     out.add_variable_attribute("survey_proportions_at_age_area_1", "units", "proportion");
     out.add_variable_attribute("survey_proportions_at_age_area_1", "data_object_type", "survey_proportion_at_age");
     out.add_variable_attribute("survey_proportions_at_age_area_1", "area", "1");
+    out.add_variable_attribute("survey_proportions_at_age_area_1", "missing_values", "-999");
 
     out.add_variable("survey_proportions_at_age_area_2", "float",{"years", "seasons", "ages"});
     out.add_variable_attribute("survey_proportions_at_age_area_2", "data_object_type", "survey_proportion_at_age");
     out.add_variable_attribute("survey_proportions_at_age_area_2", "units", "proportion");
     out.add_variable_attribute("survey_proportions_at_age_area_2", "area", "2");
+    out.add_variable_attribute("survey_proportions_at_age_area_2", "missing_values", "-999");
 
     //
     out.create();
@@ -348,9 +355,8 @@ public:
 
 template<typename REAL_T>
 class MASObjectiveFunction : public atl::ObjectiveFunction<REAL_T> {
-   
-    public:
-        
+public:
+
     mas::MAS<REAL_T> mas;
     std::string data_path = "mas_case_1.nc";
     std::string config_path = "mas_cas31.json";
@@ -358,12 +364,16 @@ class MASObjectiveFunction : public atl::ObjectiveFunction<REAL_T> {
 
     typedef typename mas::VariableTrait<REAL_T>::variable variable;
 
-   virtual void Initialize() {
+    virtual void Initialize() {
         mas.Initialize(config_path, data_path);
         for (int i = 0; i < mas.info.estimated_parameters.size(); i++) {
             this->RegisterParameter(*mas.info.estimated_parameters[i]);
-            std::cout<<mas.info.estimated_parameters[i]->GetName()<<" "<<mas.info.estimated_parameters[i]->GetValue()<<"\n";
+            std::cout << mas.info.estimated_parameters[i]->GetName() << " " << mas.info.estimated_parameters[i]->GetValue() << "\n";
         }
+    }
+
+    virtual void Finalize() {
+        mas.Report();
     }
 
     virtual const atl::Variable<REAL_T> Evaluate() {
@@ -371,10 +381,11 @@ class MASObjectiveFunction : public atl::ObjectiveFunction<REAL_T> {
         mas.Run(f);
         return f;
     }
-    
+
     virtual void ObjectiveFunction(atl::Variable<REAL_T>& f) {
         mas.Run(f);
-//        f = this->Evaluate();
+
+        //        f = this->Evaluate();
     }
 
 };
@@ -384,30 +395,34 @@ class MASObjectiveFunction : public atl::ObjectiveFunction<REAL_T> {
  */
 int main(int argc, char** argv) {
 
-    MASObjectiveFunction<double> objective_function;
+    for (int i = 0; i < 1; i++) {
+        MASObjectiveFunction<double> objective_function;
 
-    //initialize the objective function
-    objective_function.Initialize();
-    atl::Variable<double> f;
-    
-    //create an instance of a L-BFGS minimizer
-    atl::PortMinimizer<double> fm;
+        //initialize the objective function
+        objective_function.Initialize();
+        atl::Variable<double> f;
 
-    //set the objective function
-    fm.SetObjectiveFunction(&objective_function);
-    
-    //run the minimizer
-    fm.Run();
-    
+        //create an instance of a L-BFGS minimizer
+        atl::PortMinimizer<double> fm;
 
-    for(int i =0; i < objective_function.mas.info.estimated_parameters.size(); i++){
-            std::cout<<std::fixed;
-        std::cout<<objective_function.mas.info.estimated_parameters[i]->GetName()<<" \t"
-                <<objective_function.mas.info.estimated_parameters[i]->GetValue()<<" \t"<<std::scientific
-                <<objective_function.mas.info.estimated_parameters[i]->GetMinBoundary()<<" \t"
-                <<objective_function.mas.info.estimated_parameters[i]->GetMaxBoundary()<<"\n";
+        //set the objective function
+        fm.SetObjectiveFunction(&objective_function);
+
+        //run the minimizer
+        fm.Run();
+
+
+        objective_function.Finalize();
+
+
+//        for (int i = 0; i < objective_function.mas.info.estimated_parameters.size(); i++) {
+//            std::cout << std::fixed;
+//            std::cout << objective_function.mas.info.estimated_parameters[i]->GetName() << " \t"
+//                    << objective_function.mas.info.estimated_parameters[i]->GetValue() << " \t" << std::scientific
+//                    << objective_function.mas.info.estimated_parameters[i]->GetMinBoundary() << " \t"
+//                    << objective_function.mas.info.estimated_parameters[i]->GetMaxBoundary() << "\n";
+//        }
     }
-    
     exit(0);
 
     mas::Information<double> info1;

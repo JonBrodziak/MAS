@@ -50,8 +50,8 @@ namespace mas {
 
         virtual const variable Evaluate(const variable& age) = 0;
 
-        const variable getWeight(const int sex, const variable& length) {
-            return sex == 0 ? alpha_f * pow(length, beta_f) : alpha_m * pow(length, beta_m);
+       inline const variable getWeight(const int& sex, const variable& length) {
+            return sex == 0 ? alpha_f * atl::pow(length, beta_f) : alpha_m * atl::pow(length, beta_m);
         }
 
         virtual const std::string Name() {
