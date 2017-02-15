@@ -19,29 +19,33 @@
         "parameters": {
             "R0": {
                 "value": 10000000.0,
-                "estimated": "true"
+                "min":0.01,
+                "max":15000000.0,
+                "estimated": "false"
             },
             "h": {
                 "value": 0.7,
-                "estimated": "true"
+                "min":0.1,
+                "max":0.9,
+                "estimated": "false"
             },
             "S0": {
                 "value": 38000.0,
-                "estimated": "true"
+                "estimated": "false"
             },
             "phi0": {
                 "value": 0.0,
-                "estimated": "true"
+                "estimated": "false"
             },
             "rho": {
                 "value": 0.0,
-                "estimated": "true"
+                "estimated": "false"
             },
             "sigma_r": {
                 "value": 0.5,
-                "min":0.05,
-                "max":0.75,
-                "estimated": "true"
+                "min":0.1,
+                "max":0.7,
+                "estimated": "false"
             },
             "recruitment_deviations": {
                 "estimated": "false",
@@ -76,8 +80,7 @@
                     0.6034980449,
                     0.2407643582,
                     -0.2871103689
-                ],
-                "estimated": "true"
+                ]
             }
         }
     },
@@ -87,23 +90,45 @@
         "parameters": {
             "amin": {
                 "value": 1.0,
-                "estimated": "true"
+                "min":0.01,
+                "max":2.01,
+                "estimated": "false"
             },
             "amax": {
                 "value": 7.0,
-                "estimated": "true"
+                "min":6.0,
+                "max":10.0,
+                "estimated": "false"
             },
             "c": {
                 "value": 0.5,
-                "estimated": "true"
+                "estimated": "false",
+                "min":0.1,
+                "max":0.9
             },
             "lmin": {
                 "value": 20,
-                "estimated": "true"
+                "estimated": "false"
             },
             "lmax": {
                 "value": 70,
-                "estimated": "true"
+                "estimated": "false"
+            },
+            "alpha_m": {
+                "value": 0.00025,
+                "estimated": "false"
+            },
+            "alpha_f": {
+                "value": 0.00025,
+                "estimated": "false"
+            },
+            "beta_m": {
+                "value": 3.0,
+                "estimated": "false"
+            },
+            "beta_f": {
+                "value": 3.0,
+                "estimated": "false"
             }
         }
     },
@@ -119,14 +144,29 @@
             },
             "c": {
                 "value": 0.5,
-                "estimated": "true"
-                
+                "estimated": "false"
             },
             "lmin": {
                 "value": 20
             },
             "lmax": {
                 "value": 65
+            },
+            "alpha_m": {
+                "value": 0.00025,
+                "estimated": "false"
+            },
+            "alpha_f": {
+                "value": 0.00025,
+                "estimated": "false"
+            },
+            "beta_m": {
+                "value": 2.95,
+                "estimated": "false"
+            },
+            "beta_f": {
+                "value": 2.95,
+                "estimated": "false"
             }
         }
     },
@@ -137,15 +177,11 @@
         "parameters": {
             "a50": {
                 "value": 3.0,
-                "min":0.001,
-                "max":5.8,
-                "estimated": "true"
+                "estimated": "false"
             },
             "s": {
                 "value": 0.3,
-                "min":0.001,
-                "max":0.8,
-                "estimated": "true"
+                "estimated": "false"
             }
         }
     },
@@ -156,15 +192,11 @@
         "parameters": {
             "a50": {
                 "value": 3.0,
-                "min":0.001,
-                "max":3.8,
-                "estimated": "true"
+                "estimated": "false"
             },
             "s": {
                 "value": 0.5,
-                "min":0.001,
-                "max":3.8,
-                "estimated": "true"
+                "estimated": "false"
             }
         }
     },
@@ -175,13 +207,11 @@
         "parameters": {
             "a50": {
                 "value": 3.0,
-                "min":0.001,
-                "max":3.80,
-                "estimated": "true"
+                "estimated": "false"
             },
             "s": {
                 "value": 0.25,
-                "estimated": "true"
+                "estimated": "false"
             }
         }
     },
@@ -192,13 +222,11 @@
         "parameters": {
             "a50": {
                 "value": 2.75,
-                "min":0.001,
-                "max":3.8,
-                "estimated": "true"
+                "estimated": "false"
             },
             "s": {
                 "value": 0.5,
-                "estimated": "true"
+                "estimated": "false"
             }
         }
     },
@@ -222,14 +250,14 @@
             {
                 "id": 4,
                 "season": 1,
-                "area": 1
+                "area": 2
             }
         ]
     },
     "movement":
             {
                 "id": 1,
-                "estimated": "true",
+                "estimated": "false",
                 "recruits": [
                     [[0.9, 0.1],
                         [0.1, 0.9]]
@@ -244,7 +272,7 @@
     "movement":
             {
                 "id": 2,
-                "estimated": "true",
+                "estimated": "false",
                 "recruits": [
                     [[0.75, 0.25],
                         [0.25, 0.75]]
@@ -260,8 +288,8 @@
         "id": 1,
         "parameters": {
             "estimated": "false",
-            "min":[0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01],
-            "max":[0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8],
+            "min": [0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01],
+            "max": [0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8],
             "values": [0.5, 0.3, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2]
         }
     },
@@ -269,8 +297,8 @@
         "id": 2,
         "parameters": {
             "estimated": "false",
-            "min":[0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01],
-            "max":[0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8],
+            "min": [0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01],
+            "max": [0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8],
             "values": [0.55, 0.35, 0.25, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2]
         }
     },
@@ -357,7 +385,6 @@
         "growth_model": 1,
         "mortality_model": 1,
         "fecundity_model": 1
-
     },
     "area": {
         "id": 2,
@@ -510,7 +537,6 @@
                     1.00,
                     1.00
                 ]
-
             },
             {
                 "sex": "female",
@@ -527,7 +553,6 @@
                     1.00,
                     1.00
                 ]
-
             },
             {
                 "sex": "male",
@@ -544,7 +569,6 @@
                     1.00,
                     1.00
                 ]
-
             },
             {
                 "sex": "female",
@@ -561,7 +585,6 @@
                     1.00,
                     1.00
                 ]
-
             }
         ],
         "parameters": {
@@ -582,7 +605,6 @@
                         409895,
                         1171600
                     ]
-
                 },
                 {
                     "sex": "female",
@@ -599,7 +621,6 @@
                         409895,
                         1171600
                     ]
-
                 },
                 {
                     "sex": "male",
@@ -616,7 +637,6 @@
                         237315,
                         678322
                     ]
-
                 },
                 {
                     "sex": "female",
@@ -633,7 +653,6 @@
                         237315,
                         678322
                     ]
-
                 }
             ],
             "recruitment": [
@@ -812,7 +831,6 @@
                     1.00,
                     1.00
                 ]
-
             },
             {
                 "sex": "female",
@@ -829,7 +847,6 @@
                     1.00,
                     1.00
                 ]
-
             },
             {
                 "sex": "male",
@@ -846,7 +863,6 @@
                     1.00,
                     1.00
                 ]
-
             },
             {
                 "sex": "female",
@@ -863,7 +879,6 @@
                     1.00,
                     1.00
                 ]
-
             }
         ],
         "parameters": {
@@ -884,7 +899,6 @@
                         371368,
                         1061479
                     ]
-
                 },
                 {
                     "sex": "female",
@@ -901,7 +915,6 @@
                         371368,
                         1061479
                     ]
-
                 },
                 {
                     "sex": "male",
@@ -918,7 +931,6 @@
                         371380,
                         1061522
                     ]
-
                 },
                 {
                     "sex": "female",
@@ -935,7 +947,6 @@
                         371380,
                         1061522
                     ]
-
                 }
             ],
             "recruitment": [
@@ -1006,6 +1017,5 @@
                 "area": 2
             }
         ]
-
     }
 }

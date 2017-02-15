@@ -54,13 +54,14 @@ namespace mas {
 
 
         std::map<int, std::vector<std::shared_ptr<DataObject<REAL_T> > > > data_dictionary;
+        std::vector<std::shared_ptr<DataObject<REAL_T> > > data;
         typedef typename std::map<int, std::vector<std::shared_ptr<DataObject<REAL_T> > > >::iterator data_iterator;
 
         std::string analyst = "NA";
         std::string study_name = "NA";
 
         std::string data_path;
-
+    public:
         int nyears;
         int nseasons = 1;
         int first_year;
@@ -71,7 +72,7 @@ namespace mas {
 
 
 
-    public:
+
         std::unordered_map<int, std::shared_ptr<mas::Area<REAL_T> > > areas;
         std::unordered_map<int, std::shared_ptr<mas::Season<REAL_T> > > seasons;
 
@@ -1769,6 +1770,8 @@ namespace mas {
 
             rapidjson::Document::MemberIterator pit = (*growth_model).value.FindMember("parameters");
 
+
+
             if (smodel == std::string("von_bertalanffy")) {
                 model = std::make_shared<mas::VonBertalanffy<REAL_T> >();
                 mas::VonBertalanffy<REAL_T>* vb = (mas::VonBertalanffy<REAL_T>*)model.get();
@@ -1787,6 +1790,23 @@ namespace mas {
                 ss.str("");
                 ss << "von_bertalanffy_amin_" << model_id;
                 VariableTrait<REAL_T>::SetName(vb->a_min, ss.str());
+
+                ss.str("");
+                ss << "von_bertalanffy_alpha_m_" << model_id;
+                VariableTrait<REAL_T>::SetName(vb->alpha_m, ss.str());
+
+                ss.str("");
+                ss << "von_bertalanffy_beta_m_" << model_id;
+                VariableTrait<REAL_T>::SetName(vb->beta_m, ss.str());
+
+                ss.str("");
+                ss << "von_bertalanffy_alpha_f_" << model_id;
+                VariableTrait<REAL_T>::SetName(vb->alpha_f, ss.str());
+
+                ss.str("");
+                ss << "von_bertalanffy_beta_f_" << model_id;
+                VariableTrait<REAL_T>::SetName(vb->beta_f, ss.str());
+
 
                 if (pit == (*growth_model).value.MemberEnd()) {
                     std::cout << "Configuration Error: Recruitment model \"Beverton-Holt\" has no parameter definitions.\n";
@@ -1842,6 +1862,231 @@ namespace mas {
                             }
                             //register alpha
                             vb->Register(vb->k, phase);
+
+                        }
+
+                    }
+
+
+                    ppit = (*pit).value.FindMember("alpha_m");
+                    if (ppit == (*pit).value.MemberEnd()) {
+                        std::cout << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" " <<
+                                "does not define \"alpha_m\". Model will use the default value of 0.000025 and \"alpha_m\" will not be estimated.\n";
+                        mas::mas_log << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" " <<
+                                "does not define \"alpha_m\". Model will use the default value of 0.000025 and \"alpha_m\" will not be estimated.\n";
+                    } else {
+
+                        ss.str("");
+                        ss << "von_bertalanffy_alpha_m_" << model_id;
+                        VariableTrait<REAL_T>::SetName(vb->alpha_m, ss.str());
+                        bool estimated = false;
+                        int phase = 1;
+                        //1. Get initial value if there is one.
+                        rapidjson::Document::MemberIterator pm = (*ppit).value.FindMember("value");
+
+                        if (pm == (*ppit).value.MemberEnd()) {
+                            std::cout << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" does not provide a initial value for \"alpha_m\".\n";
+                            mas::mas_log << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" does not provide a initial value for \"alpha_m\".\n";
+                        } else {
+                            VariableTrait<REAL_T>::SetValue(vb->alpha_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                        }
+
+                        //2. Get min boundary if there is one.
+                        pm = (*ppit).value.FindMember("min");
+                        if (pm != (*ppit).value.MemberEnd()) {
+                            VariableTrait<REAL_T>::SetMinBoundary(vb->alpha_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                        }
+
+                        //3. Get max boundary if there is one.
+                        pm = (*ppit).value.FindMember("max");
+                        if (pm != (*ppit).value.MemberEnd()) {
+                            VariableTrait<REAL_T>::SetMaxBoundary(vb->alpha_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                        }
+
+                        pm = (*ppit).value.FindMember("estimated");
+                        if (pm != (*ppit).value.MemberEnd()) {
+                            std::string e = std::string((*pm).value.GetString());
+                            if (e == "true") {
+                                estimated = true;
+                            }
+                        }
+
+                        if (estimated) {
+                            phase = 1;
+                            pm = (*ppit).value.FindMember("phase");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                phase = (*pm).value.GetInt();
+                            }
+                            //register alpha
+                            vb->Register(vb->alpha_m, phase);
+
+                        }
+
+                    }
+
+                    ppit = (*pit).value.FindMember("alpha_f");
+                    if (ppit == (*pit).value.MemberEnd()) {
+                        std::cout << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" " <<
+                                "does not define \"alpha_m\". Model will use the default value of 0.000025 and \"alpha_f\" will not be estimated.\n";
+                        mas::mas_log << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" " <<
+                                "does not define \"alpha_f\". Model will use the default value of 0.000025 and \"alpha_f\" will not be estimated.\n";
+                    } else {
+
+                        ss.str("");
+                        ss << "von_bertalanffy_alpha_f_" << model_id;
+                        VariableTrait<REAL_T>::SetName(vb->alpha_f, ss.str());
+                        bool estimated = false;
+                        int phase = 1;
+                        //1. Get initial value if there is one.
+                        rapidjson::Document::MemberIterator pm = (*ppit).value.FindMember("value");
+
+                        if (pm == (*ppit).value.MemberEnd()) {
+                            std::cout << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" does not provide a initial value for \"alpha_f\".\n";
+                            mas::mas_log << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" does not provide a initial value for \"alpha_f\".\n";
+                        } else {
+                            VariableTrait<REAL_T>::SetValue(vb->alpha_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                        }
+
+                        //2. Get min boundary if there is one.
+                        pm = (*ppit).value.FindMember("min");
+                        if (pm != (*ppit).value.MemberEnd()) {
+                            VariableTrait<REAL_T>::SetMinBoundary(vb->alpha_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                        }
+
+                        //3. Get max boundary if there is one.
+                        pm = (*ppit).value.FindMember("max");
+                        if (pm != (*ppit).value.MemberEnd()) {
+                            VariableTrait<REAL_T>::SetMaxBoundary(vb->alpha_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                        }
+
+                        pm = (*ppit).value.FindMember("estimated");
+                        if (pm != (*ppit).value.MemberEnd()) {
+                            std::string e = std::string((*pm).value.GetString());
+                            if (e == "true") {
+                                estimated = true;
+                            }
+                        }
+
+                        if (estimated) {
+                            phase = 1;
+                            pm = (*ppit).value.FindMember("phase");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                phase = (*pm).value.GetInt();
+                            }
+                            //register alpha
+                            vb->Register(vb->alpha_f, phase);
+
+                        }
+
+                    }
+
+                    ppit = (*pit).value.FindMember("beta_m");
+                    if (ppit == (*pit).value.MemberEnd()) {
+                        std::cout << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" " <<
+                                "does not define \"alpha_m\". Model will use the default value of 3.0 and \"beta_m\" will not be estimated.\n";
+                        mas::mas_log << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" " <<
+                                "does not define \"beta_m\". Model will use the default value of 3.0 and \"beta_m\" will not be estimated.\n";
+                    } else {
+
+                        ss.str("");
+                        ss << "von_bertalanffy_beta_m_" << model_id;
+                        VariableTrait<REAL_T>::SetName(vb->beta_m, ss.str());
+                        bool estimated = false;
+                        int phase = 1;
+                        //1. Get initial value if there is one.
+                        rapidjson::Document::MemberIterator pm = (*ppit).value.FindMember("value");
+
+                        if (pm == (*ppit).value.MemberEnd()) {
+                            std::cout << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" does not provide a initial value for \"beta_m\".\n";
+                            mas::mas_log << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" does not provide a initial value for \"beta_m\".\n";
+                        } else {
+                            VariableTrait<REAL_T>::SetValue(vb->beta_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                        }
+
+                        //2. Get min boundary if there is one.
+                        pm = (*ppit).value.FindMember("min");
+                        if (pm != (*ppit).value.MemberEnd()) {
+                            VariableTrait<REAL_T>::SetMinBoundary(vb->beta_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                        }
+
+                        //3. Get max boundary if there is one.
+                        pm = (*ppit).value.FindMember("max");
+                        if (pm != (*ppit).value.MemberEnd()) {
+                            VariableTrait<REAL_T>::SetMaxBoundary(vb->beta_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                        }
+
+                        pm = (*ppit).value.FindMember("estimated");
+                        if (pm != (*ppit).value.MemberEnd()) {
+                            std::string e = std::string((*pm).value.GetString());
+                            if (e == "true") {
+                                estimated = true;
+                            }
+                        }
+
+                        if (estimated) {
+                            phase = 1;
+                            pm = (*ppit).value.FindMember("phase");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                phase = (*pm).value.GetInt();
+                            }
+                            //register alpha
+                            vb->Register(vb->beta_m, phase);
+
+                        }
+
+                    }
+
+                    ppit = (*pit).value.FindMember("beta_f");
+                    if (ppit == (*pit).value.MemberEnd()) {
+                        std::cout << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" " <<
+                                "does not define \"alpha_m\". Model will use the default value of 3.0 and \"beta_f\" will not be estimated.\n";
+                        mas::mas_log << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" " <<
+                                "does not define \"beta_f\". Model will use the default value of 3.0 and \"beta_f\" will not be estimated.\n";
+                    } else {
+
+                        ss.str("");
+                        ss << "von_bertalanffy_beta_f_" << model_id;
+                        VariableTrait<REAL_T>::SetName(vb->beta_f, ss.str());
+                        bool estimated = false;
+                        int phase = 1;
+                        //1. Get initial value if there is one.
+                        rapidjson::Document::MemberIterator pm = (*ppit).value.FindMember("value");
+
+                        if (pm == (*ppit).value.MemberEnd()) {
+                            std::cout << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" does not provide a initial value for \"beta_f\".\n";
+                            mas::mas_log << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" does not provide a initial value for \"beta_f\".\n";
+                        } else {
+                            VariableTrait<REAL_T>::SetValue(vb->beta_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                        }
+
+                        //2. Get min boundary if there is one.
+                        pm = (*ppit).value.FindMember("min");
+                        if (pm != (*ppit).value.MemberEnd()) {
+                            VariableTrait<REAL_T>::SetMinBoundary(vb->beta_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                        }
+
+                        //3. Get max boundary if there is one.
+                        pm = (*ppit).value.FindMember("max");
+                        if (pm != (*ppit).value.MemberEnd()) {
+                            VariableTrait<REAL_T>::SetMaxBoundary(vb->beta_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                        }
+
+                        pm = (*ppit).value.FindMember("estimated");
+                        if (pm != (*ppit).value.MemberEnd()) {
+                            std::string e = std::string((*pm).value.GetString());
+                            if (e == "true") {
+                                estimated = true;
+                            }
+                        }
+
+                        if (estimated) {
+                            phase = 1;
+                            pm = (*ppit).value.FindMember("phase");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                phase = (*pm).value.GetInt();
+                            }
+                            //register alpha
+                            vb->Register(vb->beta_f, phase);
 
                         }
 
@@ -1910,31 +2155,48 @@ namespace mas {
                 mas::VonBertalanffyModified<REAL_T>* vb = (mas::VonBertalanffyModified<REAL_T>*)model.get();
 
                 std::stringstream ss;
-                ss << "von_bertalanffy_c_" << model_id;
+                ss << "von_bertalanffy_modified_c_" << model_id;
                 VariableTrait<REAL_T>::SetName(vb->c, ss.str());
                 ss.str("");
-                ss << "von_bertalanffy_l_inf_" << model_id;
+                ss << "von_bertalanffy_modified_l_inf_" << model_id;
                 VariableTrait<REAL_T>::SetName(vb->l_inf, ss.str());
 
                 ss.str("");
-                ss << "von_bertalanffy_amax_" << model_id;
+                ss << "von_bertalanffy_modified_amax_" << model_id;
                 VariableTrait<REAL_T>::SetName(vb->a_max, ss.str());
 
                 ss.str("");
-                ss << "von_bertalanffy_amin_" << model_id;
+                ss << "von_bertalanffy_modified_amin_" << model_id;
                 VariableTrait<REAL_T>::SetName(vb->a_min, ss.str());
 
+                ss.str("");
+                ss << "von_bertalanffy_modified_alpha_m_" << model_id;
+                VariableTrait<REAL_T>::SetName(vb->alpha_m, ss.str());
+
+                ss.str("");
+                ss << "von_bertalanffy_modified_beta_m_" << model_id;
+                VariableTrait<REAL_T>::SetName(vb->beta_m, ss.str());
+
+                ss.str("");
+                ss << "von_bertalanffy_modified_alpha_f_" << model_id;
+                VariableTrait<REAL_T>::SetName(vb->alpha_f, ss.str());
+
+                ss.str("");
+                ss << "von_bertalanffy_modified_beta_f_" << model_id;
+                VariableTrait<REAL_T>::SetName(vb->beta_f, ss.str());
+
+
                 if (pit == (*growth_model).value.MemberEnd()) {
-                    std::cout << "Configuration Error: Recruitment model \"Beverton-Holt\" has no parameter definitions.\n";
-                    mas::mas_log << "Configuration Error: Recruitment model \"Beverton-Holt\" has no parameter definitions.\n";
+                    std::cout << "Configuration Error: Growth model \"Von Bertalannfy Modified\" has no parameter definitions.\n";
+                    mas::mas_log << "Configuration Error: Growth model \"Von Bertalannfy\" has no parameter definitions.\n";
                     this->valid_configuration = false;
 
                 } else {
                     rapidjson::Document::MemberIterator ppit = (*pit).value.FindMember("c");
                     if (ppit == (*pit).value.MemberEnd()) {
-                        std::cout << "Configuration Warning: Growth model \"Von Bertalannfy\" " <<
+                        std::cout << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" " <<
                                 "does not define \"c\". Model will use the default value of 0 and \"c\" will not be estimated.\n";
-                        mas::mas_log << "Configuration Warning: Recruitment model \"Von Bertalannfy\" " <<
+                        mas::mas_log << "Configuration Warning: Recruitment model \"Von Bertalannfy Modified\" " <<
                                 "does not define \"c\". Model will use the default value of 0 and \"c\" will not be estimated.\n";
                     } else {
 
@@ -1982,6 +2244,232 @@ namespace mas {
                         }
 
                     }
+
+
+                    ppit = (*pit).value.FindMember("alpha_m");
+                    if (ppit == (*pit).value.MemberEnd()) {
+                        std::cout << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" " <<
+                                "does not define \"alpha_m\". Model will use the default value of 0.000025 and \"alpha_m\" will not be estimated.\n";
+                        mas::mas_log << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" " <<
+                                "does not define \"alpha_m\". Model will use the default value of 0.000025 and \"alpha_m\" will not be estimated.\n";
+                    } else {
+
+                        ss.str("");
+                        ss << "von_bertalanffy_alpha_m_" << model_id;
+                        VariableTrait<REAL_T>::SetName(vb->alpha_m, ss.str());
+                        bool estimated = false;
+                        int phase = 1;
+                        //1. Get initial value if there is one.
+                        rapidjson::Document::MemberIterator pm = (*ppit).value.FindMember("value");
+
+                        if (pm == (*ppit).value.MemberEnd()) {
+                            std::cout << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" does not provide a initial value for \"alpha_m\".\n";
+                            mas::mas_log << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" does not provide a initial value for \"alpha_m\".\n";
+                        } else {
+                            VariableTrait<REAL_T>::SetValue(vb->alpha_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                        }
+
+                        //2. Get min boundary if there is one.
+                        pm = (*ppit).value.FindMember("min");
+                        if (pm != (*ppit).value.MemberEnd()) {
+                            VariableTrait<REAL_T>::SetMinBoundary(vb->alpha_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                        }
+
+                        //3. Get max boundary if there is one.
+                        pm = (*ppit).value.FindMember("max");
+                        if (pm != (*ppit).value.MemberEnd()) {
+                            VariableTrait<REAL_T>::SetMaxBoundary(vb->alpha_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                        }
+
+                        pm = (*ppit).value.FindMember("estimated");
+                        if (pm != (*ppit).value.MemberEnd()) {
+                            std::string e = std::string((*pm).value.GetString());
+                            if (e == "true") {
+                                estimated = true;
+                            }
+                        }
+
+                        if (estimated) {
+                            phase = 1;
+                            pm = (*ppit).value.FindMember("phase");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                phase = (*pm).value.GetInt();
+                            }
+                            //register alpha
+                            vb->Register(vb->alpha_m, phase);
+
+                        }
+
+                    }
+
+                    ppit = (*pit).value.FindMember("alpha_f");
+                    if (ppit == (*pit).value.MemberEnd()) {
+                        std::cout << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" " <<
+                                "does not define \"alpha_m\". Model will use the default value of 0.000025 and \"alpha_f\" will not be estimated.\n";
+                        mas::mas_log << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" " <<
+                                "does not define \"alpha_f\". Model will use the default value of 0.000025 and \"alpha_f\" will not be estimated.\n";
+                    } else {
+
+                        ss.str("");
+                        ss << "von_bertalanffy_alpha_f_" << model_id;
+                        VariableTrait<REAL_T>::SetName(vb->alpha_f, ss.str());
+                        bool estimated = false;
+                        int phase = 1;
+                        //1. Get initial value if there is one.
+                        rapidjson::Document::MemberIterator pm = (*ppit).value.FindMember("value");
+
+                        if (pm == (*ppit).value.MemberEnd()) {
+                            std::cout << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" does not provide a initial value for \"alpha_f\".\n";
+                            mas::mas_log << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" does not provide a initial value for \"alpha_f\".\n";
+                        } else {
+                            VariableTrait<REAL_T>::SetValue(vb->alpha_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                        }
+
+                        //2. Get min boundary if there is one.
+                        pm = (*ppit).value.FindMember("min");
+                        if (pm != (*ppit).value.MemberEnd()) {
+                            VariableTrait<REAL_T>::SetMinBoundary(vb->alpha_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                        }
+
+                        //3. Get max boundary if there is one.
+                        pm = (*ppit).value.FindMember("max");
+                        if (pm != (*ppit).value.MemberEnd()) {
+                            VariableTrait<REAL_T>::SetMaxBoundary(vb->alpha_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                        }
+
+                        pm = (*ppit).value.FindMember("estimated");
+                        if (pm != (*ppit).value.MemberEnd()) {
+                            std::string e = std::string((*pm).value.GetString());
+                            if (e == "true") {
+                                estimated = true;
+                            }
+                        }
+
+                        if (estimated) {
+                            phase = 1;
+                            pm = (*ppit).value.FindMember("phase");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                phase = (*pm).value.GetInt();
+                            }
+                            //register alpha
+                            vb->Register(vb->alpha_f, phase);
+
+                        }
+
+                    }
+
+                    ppit = (*pit).value.FindMember("beta_m");
+                    if (ppit == (*pit).value.MemberEnd()) {
+                        std::cout << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" " <<
+                                "does not define \"alpha_m\". Model will use the default value of 3.0 and \"beta_m\" will not be estimated.\n";
+                        mas::mas_log << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" " <<
+                                "does not define \"beta_m\". Model will use the default value of 3.0 and \"beta_m\" will not be estimated.\n";
+                    } else {
+
+                        ss.str("");
+                        ss << "von_bertalanffy_beta_m_" << model_id;
+                        VariableTrait<REAL_T>::SetName(vb->beta_m, ss.str());
+                        bool estimated = false;
+                        int phase = 1;
+                        //1. Get initial value if there is one.
+                        rapidjson::Document::MemberIterator pm = (*ppit).value.FindMember("value");
+
+                        if (pm == (*ppit).value.MemberEnd()) {
+                            std::cout << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" does not provide a initial value for \"beta_m\".\n";
+                            mas::mas_log << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" does not provide a initial value for \"beta_m\".\n";
+                        } else {
+                            VariableTrait<REAL_T>::SetValue(vb->beta_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                        }
+
+                        //2. Get min boundary if there is one.
+                        pm = (*ppit).value.FindMember("min");
+                        if (pm != (*ppit).value.MemberEnd()) {
+                            VariableTrait<REAL_T>::SetMinBoundary(vb->beta_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                        }
+
+                        //3. Get max boundary if there is one.
+                        pm = (*ppit).value.FindMember("max");
+                        if (pm != (*ppit).value.MemberEnd()) {
+                            VariableTrait<REAL_T>::SetMaxBoundary(vb->beta_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                        }
+
+                        pm = (*ppit).value.FindMember("estimated");
+                        if (pm != (*ppit).value.MemberEnd()) {
+                            std::string e = std::string((*pm).value.GetString());
+                            if (e == "true") {
+                                estimated = true;
+                            }
+                        }
+
+                        if (estimated) {
+                            phase = 1;
+                            pm = (*ppit).value.FindMember("phase");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                phase = (*pm).value.GetInt();
+                            }
+                            //register alpha
+                            vb->Register(vb->beta_m, phase);
+
+                        }
+
+                    }
+
+                    ppit = (*pit).value.FindMember("beta_f");
+                    if (ppit == (*pit).value.MemberEnd()) {
+                        std::cout << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" " <<
+                                "does not define \"alpha_m\". Model will use the default value of 3.0 and \"beta_f\" will not be estimated.\n";
+                        mas::mas_log << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" " <<
+                                "does not define \"beta_f\". Model will use the default value of 3.0 and \"beta_f\" will not be estimated.\n";
+                    } else {
+
+                        ss.str("");
+                        ss << "von_bertalanffy_beta_f_" << model_id;
+                        VariableTrait<REAL_T>::SetName(vb->beta_f, ss.str());
+                        bool estimated = false;
+                        int phase = 1;
+                        //1. Get initial value if there is one.
+                        rapidjson::Document::MemberIterator pm = (*ppit).value.FindMember("value");
+
+                        if (pm == (*ppit).value.MemberEnd()) {
+                            std::cout << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" does not provide a initial value for \"beta_f\".\n";
+                            mas::mas_log << "Configuration Warning: Growth model \"Von Bertalannfy Modified\" does not provide a initial value for \"beta_f\".\n";
+                        } else {
+                            VariableTrait<REAL_T>::SetValue(vb->beta_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                        }
+
+                        //2. Get min boundary if there is one.
+                        pm = (*ppit).value.FindMember("min");
+                        if (pm != (*ppit).value.MemberEnd()) {
+                            VariableTrait<REAL_T>::SetMinBoundary(vb->beta_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                        }
+
+                        //3. Get max boundary if there is one.
+                        pm = (*ppit).value.FindMember("max");
+                        if (pm != (*ppit).value.MemberEnd()) {
+                            VariableTrait<REAL_T>::SetMaxBoundary(vb->beta_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                        }
+
+                        pm = (*ppit).value.FindMember("estimated");
+                        if (pm != (*ppit).value.MemberEnd()) {
+                            std::string e = std::string((*pm).value.GetString());
+                            if (e == "true") {
+                                estimated = true;
+                            }
+                        }
+
+                        if (estimated) {
+                            phase = 1;
+                            pm = (*ppit).value.FindMember("phase");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                phase = (*pm).value.GetInt();
+                            }
+                            //register alpha
+                            vb->Register(vb->beta_f, phase);
+
+                        }
+
+                    }
+
 
                     ppit = (*pit).value.FindMember("lmin");
                     if (ppit == (*pit).value.MemberEnd()) {
@@ -2176,11 +2664,29 @@ namespace mas {
                 ss << "schnute_case_I_lmax_" << model_id;
                 VariableTrait<REAL_T>::SetName(s->lmax, ss.str());
 
+                ss.str("");
+                ss << "schnute_case_I_alpha_m_" << model_id;
+                VariableTrait<REAL_T>::SetName(s->alpha_m, ss.str());
+
+                ss.str("");
+                ss << "schnute_case_I_beta_m_" << model_id;
+                VariableTrait<REAL_T>::SetName(s->beta_m, ss.str());
+
+                ss.str("");
+                ss << "schnute_case_I_alpha_f_" << model_id;
+                VariableTrait<REAL_T>::SetName(s->alpha_f, ss.str());
+
+                ss.str("");
+                ss << "schnute_case_I_beta_f_" << model_id;
+                VariableTrait<REAL_T>::SetName(s->beta_f, ss.str());
+
+
+
                 if (pit == (*growth_model).value.MemberEnd()) {
                     std::cout << "Configuration Error: Recruitment model \"Schnute Case I\" has no parameter definitions.\n";
                     mas::mas_log << "Configuration Error: Recruitment model \"Schnute Case I\" has no parameter definitions.\n";
                     this->valid_configuration = false;
-                    ;
+
                 } else {
                     rapidjson::Document::MemberIterator ppit = (*pit).value.FindMember("alpha");
                     if (ppit == (*pit).value.MemberEnd()) {
@@ -2232,6 +2738,232 @@ namespace mas {
                             s->Register(s->alpha, phase);
 
                         }
+
+                        ppit = (*pit).value.FindMember("alpha_m");
+                        if (ppit == (*pit).value.MemberEnd()) {
+                            std::cout << "Configuration Warning: Growth model \"Schnute Case I\"  " <<
+                                    "does not define \"alpha_m\". Model will use the default value of 0.000025 and \"alpha_m\" will not be estimated.\n";
+                            mas::mas_log << "Configuration Warning: Growth model \"Schnute Case I\"  " <<
+                                    "does not define \"alpha_m\". Model will use the default value of 0.000025 and \"alpha_m\" will not be estimated.\n";
+                        } else {
+
+                            ss.str("");
+                            ss << "von_bertalanffy_alpha_m_" << model_id;
+                            VariableTrait<REAL_T>::SetName(s->alpha_m, ss.str());
+                            bool estimated = false;
+                            int phase = 1;
+                            //1. Get initial value if there is one.
+                            rapidjson::Document::MemberIterator pm = (*ppit).value.FindMember("value");
+
+                            if (pm == (*ppit).value.MemberEnd()) {
+                                std::cout << "Configuration Warning: Growth model \"Schnute Case I\"  does not provide a initial value for \"alpha_m\".\n";
+                                mas::mas_log << "Configuration Warning: Growth model \"Schnute Case I\"  does not provide a initial value for \"alpha_m\".\n";
+                            } else {
+                                VariableTrait<REAL_T>::SetValue(s->alpha_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //2. Get min boundary if there is one.
+                            pm = (*ppit).value.FindMember("min");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMinBoundary(s->alpha_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //3. Get max boundary if there is one.
+                            pm = (*ppit).value.FindMember("max");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMaxBoundary(s->alpha_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            pm = (*ppit).value.FindMember("estimated");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                std::string e = std::string((*pm).value.GetString());
+                                if (e == "true") {
+                                    estimated = true;
+                                }
+                            }
+
+                            if (estimated) {
+                                phase = 1;
+                                pm = (*ppit).value.FindMember("phase");
+                                if (pm != (*ppit).value.MemberEnd()) {
+                                    phase = (*pm).value.GetInt();
+                                }
+                                //register alpha
+                                s->Register(s->alpha_m, phase);
+
+                            }
+
+                        }
+
+                        ppit = (*pit).value.FindMember("alpha_f");
+                        if (ppit == (*pit).value.MemberEnd()) {
+                            std::cout << "Configuration Warning: Growth model \"Schnute Case I\"  " <<
+                                    "does not define \"alpha_m\". Model will use the default value of 0.000025 and \"alpha_f\" will not be estimated.\n";
+                            mas::mas_log << "Configuration Warning: Growth model \"Schnute Case I\"  " <<
+                                    "does not define \"alpha_f\". Model will use the default value of 0.000025 and \"alpha_f\" will not be estimated.\n";
+                        } else {
+
+                            ss.str("");
+                            ss << "von_bertalanffy_alpha_f_" << model_id;
+                            VariableTrait<REAL_T>::SetName(s->alpha_f, ss.str());
+                            bool estimated = false;
+                            int phase = 1;
+                            //1. Get initial value if there is one.
+                            rapidjson::Document::MemberIterator pm = (*ppit).value.FindMember("value");
+
+                            if (pm == (*ppit).value.MemberEnd()) {
+                                std::cout << "Configuration Warning: Growth model \"Schnute Case I\"  does not provide a initial value for \"alpha_f\".\n";
+                                mas::mas_log << "Configuration Warning: Growth model \"Schnute Case I\"  does not provide a initial value for \"alpha_f\".\n";
+                            } else {
+                                VariableTrait<REAL_T>::SetValue(s->alpha_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //2. Get min boundary if there is one.
+                            pm = (*ppit).value.FindMember("min");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMinBoundary(s->alpha_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //3. Get max boundary if there is one.
+                            pm = (*ppit).value.FindMember("max");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMaxBoundary(s->alpha_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            pm = (*ppit).value.FindMember("estimated");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                std::string e = std::string((*pm).value.GetString());
+                                if (e == "true") {
+                                    estimated = true;
+                                }
+                            }
+
+                            if (estimated) {
+                                phase = 1;
+                                pm = (*ppit).value.FindMember("phase");
+                                if (pm != (*ppit).value.MemberEnd()) {
+                                    phase = (*pm).value.GetInt();
+                                }
+                                //register alpha
+                                s->Register(s->alpha_f, phase);
+
+                            }
+
+                        }
+
+                        ppit = (*pit).value.FindMember("beta_m");
+                        if (ppit == (*pit).value.MemberEnd()) {
+                            std::cout << "Configuration Warning: Growth model \"Schnute Case I\"  " <<
+                                    "does not define \"alpha_m\". Model will use the default value of 3.0 and \"beta_m\" will not be estimated.\n";
+                            mas::mas_log << "Configuration Warning: Growth model \"Schnute Case I\"  " <<
+                                    "does not define \"beta_m\". Model will use the default value of 3.0 and \"beta_m\" will not be estimated.\n";
+                        } else {
+
+                            ss.str("");
+                            ss << "von_bertalanffy_beta_m_" << model_id;
+                            VariableTrait<REAL_T>::SetName(s->beta_m, ss.str());
+                            bool estimated = false;
+                            int phase = 1;
+                            //1. Get initial value if there is one.
+                            rapidjson::Document::MemberIterator pm = (*ppit).value.FindMember("value");
+
+                            if (pm == (*ppit).value.MemberEnd()) {
+                                std::cout << "Configuration Warning: Growth model \"Schnute Case I\" does not provide a initial value for \"beta_m\".\n";
+                                mas::mas_log << "Configuration Warning: Growth model \"Schnute Case I\"  does not provide a initial value for \"beta_m\".\n";
+                            } else {
+                                VariableTrait<REAL_T>::SetValue(s->beta_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //2. Get min boundary if there is one.
+                            pm = (*ppit).value.FindMember("min");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMinBoundary(s->beta_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //3. Get max boundary if there is one.
+                            pm = (*ppit).value.FindMember("max");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMaxBoundary(s->beta_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            pm = (*ppit).value.FindMember("estimated");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                std::string e = std::string((*pm).value.GetString());
+                                if (e == "true") {
+                                    estimated = true;
+                                }
+                            }
+
+                            if (estimated) {
+                                phase = 1;
+                                pm = (*ppit).value.FindMember("phase");
+                                if (pm != (*ppit).value.MemberEnd()) {
+                                    phase = (*pm).value.GetInt();
+                                }
+                                //register alpha
+                                s->Register(s->beta_m, phase);
+
+                            }
+
+                        }
+
+                        ppit = (*pit).value.FindMember("beta_f");
+                        if (ppit == (*pit).value.MemberEnd()) {
+                            std::cout << "Configuration Warning: Growth model \"Schnute Case I\"  " <<
+                                    "does not define \"alpha_m\". Model will use the default value of 3.0 and \"beta_f\" will not be estimated.\n";
+                            mas::mas_log << "Configuration Warning: Growth model \"Schnute Case I\"  " <<
+                                    "does not define \"beta_f\". Model will use the default value of 3.0 and \"beta_f\" will not be estimated.\n";
+                        } else {
+
+                            ss.str("");
+                            ss << "von_bertalanffy_beta_f_" << model_id;
+                            VariableTrait<REAL_T>::SetName(s->beta_f, ss.str());
+                            bool estimated = false;
+                            int phase = 1;
+                            //1. Get initial value if there is one.
+                            rapidjson::Document::MemberIterator pm = (*ppit).value.FindMember("value");
+
+                            if (pm == (*ppit).value.MemberEnd()) {
+                                std::cout << "Configuration Warning: Growth model \"Schnute Case I\"  does not provide a initial value for \"beta_f\".\n";
+                                mas::mas_log << "Configuration Warning: Growth model \"Schnute Case I\"  does not provide a initial value for \"beta_f\".\n";
+                            } else {
+                                VariableTrait<REAL_T>::SetValue(s->beta_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //2. Get min boundary if there is one.
+                            pm = (*ppit).value.FindMember("min");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMinBoundary(s->beta_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //3. Get max boundary if there is one.
+                            pm = (*ppit).value.FindMember("max");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMaxBoundary(s->beta_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            pm = (*ppit).value.FindMember("estimated");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                std::string e = std::string((*pm).value.GetString());
+                                if (e == "true") {
+                                    estimated = true;
+                                }
+                            }
+
+                            if (estimated) {
+                                phase = 1;
+                                pm = (*ppit).value.FindMember("phase");
+                                if (pm != (*ppit).value.MemberEnd()) {
+                                    phase = (*pm).value.GetInt();
+                                }
+                                //register alpha
+                                s->Register(s->beta_f, phase);
+
+                            }
+
+                        }
+
+
 
                         ppit = (*pit).value.FindMember("beta");
                         if (ppit == (*pit).value.MemberEnd()) {
@@ -2410,6 +3142,24 @@ namespace mas {
                 ss << "schnute_case_II_lmax_" << model_id;
                 VariableTrait<REAL_T>::SetName(s->lmax, ss.str());
 
+                ss.str("");
+                ss << "schnute_case_II_alpha_m_" << model_id;
+                VariableTrait<REAL_T>::SetName(s->alpha_m, ss.str());
+
+                ss.str("");
+                ss << "schnute_case_II_beta_m_" << model_id;
+                VariableTrait<REAL_T>::SetName(s->beta_m, ss.str());
+
+                ss.str("");
+                ss << "schnute_case_II_alpha_f_" << model_id;
+                VariableTrait<REAL_T>::SetName(s->alpha_f, ss.str());
+
+                ss.str("");
+                ss << "schnute_case_II_beta_f_" << model_id;
+                VariableTrait<REAL_T>::SetName(s->beta_f, ss.str());
+
+
+
                 if (pit == (*growth_model).value.MemberEnd()) {
                     std::cout << "Configuration Error: Recruitment model \"Schnute Case II\" has no parameter definitions.\n";
                     mas::mas_log << "Configuration Error: Recruitment model \"Schnute Case II\" has no parameter definitions.\n";
@@ -2464,6 +3214,230 @@ namespace mas {
                             }
                             //register alpha
                             s->Register(s->alpha, phase);
+
+                        }
+
+                        ppit = (*pit).value.FindMember("alpha_m");
+                        if (ppit == (*pit).value.MemberEnd()) {
+                            std::cout << "Configuration Warning: Growth model \"Schnute Case II\"  " <<
+                                    "does not define \"alpha_m\". Model will use the default value of 0.000025 and \"alpha_m\" will not be estimated.\n";
+                            mas::mas_log << "Configuration Warning: Growth model \"Schnute Case II\"  " <<
+                                    "does not define \"alpha_m\". Model will use the default value of 0.000025 and \"alpha_m\" will not be estimated.\n";
+                        } else {
+
+                            ss.str("");
+                            ss << "von_bertalanffy_alpha_m_" << model_id;
+                            VariableTrait<REAL_T>::SetName(s->alpha_m, ss.str());
+                            bool estimated = false;
+                            int phase = 1;
+                            //1. Get initial value if there is one.
+                            rapidjson::Document::MemberIterator pm = (*ppit).value.FindMember("value");
+
+                            if (pm == (*ppit).value.MemberEnd()) {
+                                std::cout << "Configuration Warning: Growth model \"Schnute Case II\"  does not provide a initial value for \"alpha_m\".\n";
+                                mas::mas_log << "Configuration Warning: Growth model \"Schnute Case II\"  does not provide a initial value for \"alpha_m\".\n";
+                            } else {
+                                VariableTrait<REAL_T>::SetValue(s->alpha_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //2. Get min boundary if there is one.
+                            pm = (*ppit).value.FindMember("min");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMinBoundary(s->alpha_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //3. Get max boundary if there is one.
+                            pm = (*ppit).value.FindMember("max");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMaxBoundary(s->alpha_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            pm = (*ppit).value.FindMember("estimated");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                std::string e = std::string((*pm).value.GetString());
+                                if (e == "true") {
+                                    estimated = true;
+                                }
+                            }
+
+                            if (estimated) {
+                                phase = 1;
+                                pm = (*ppit).value.FindMember("phase");
+                                if (pm != (*ppit).value.MemberEnd()) {
+                                    phase = (*pm).value.GetInt();
+                                }
+                                //register alpha
+                                s->Register(s->alpha_m, phase);
+
+                            }
+
+                        }
+
+                        ppit = (*pit).value.FindMember("alpha_f");
+                        if (ppit == (*pit).value.MemberEnd()) {
+                            std::cout << "Configuration Warning: Growth model \"Schnute Case II\"  " <<
+                                    "does not define \"alpha_m\". Model will use the default value of 0.000025 and \"alpha_f\" will not be estimated.\n";
+                            mas::mas_log << "Configuration Warning: Growth model \"Schnute Case II\"  " <<
+                                    "does not define \"alpha_f\". Model will use the default value of 0.000025 and \"alpha_f\" will not be estimated.\n";
+                        } else {
+
+                            ss.str("");
+                            ss << "von_bertalanffy_alpha_f_" << model_id;
+                            VariableTrait<REAL_T>::SetName(s->alpha_f, ss.str());
+                            bool estimated = false;
+                            int phase = 1;
+                            //1. Get initial value if there is one.
+                            rapidjson::Document::MemberIterator pm = (*ppit).value.FindMember("value");
+
+                            if (pm == (*ppit).value.MemberEnd()) {
+                                std::cout << "Configuration Warning: Growth model \"Schnute Case II\"  does not provide a initial value for \"alpha_f\".\n";
+                                mas::mas_log << "Configuration Warning: Growth model \"Schnute Case II\"  does not provide a initial value for \"alpha_f\".\n";
+                            } else {
+                                VariableTrait<REAL_T>::SetValue(s->alpha_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //2. Get min boundary if there is one.
+                            pm = (*ppit).value.FindMember("min");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMinBoundary(s->alpha_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //3. Get max boundary if there is one.
+                            pm = (*ppit).value.FindMember("max");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMaxBoundary(s->alpha_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            pm = (*ppit).value.FindMember("estimated");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                std::string e = std::string((*pm).value.GetString());
+                                if (e == "true") {
+                                    estimated = true;
+                                }
+                            }
+
+                            if (estimated) {
+                                phase = 1;
+                                pm = (*ppit).value.FindMember("phase");
+                                if (pm != (*ppit).value.MemberEnd()) {
+                                    phase = (*pm).value.GetInt();
+                                }
+                                //register alpha
+                                s->Register(s->alpha_f, phase);
+
+                            }
+
+                        }
+
+                        ppit = (*pit).value.FindMember("beta_m");
+                        if (ppit == (*pit).value.MemberEnd()) {
+                            std::cout << "Configuration Warning: Growth model \"Schnute Case II\"  " <<
+                                    "does not define \"alpha_m\". Model will use the default value of 3.0 and \"beta_m\" will not be estimated.\n";
+                            mas::mas_log << "Configuration Warning: Growth model \"Schnute Case II\"  " <<
+                                    "does not define \"beta_m\". Model will use the default value of 3.0 and \"beta_m\" will not be estimated.\n";
+                        } else {
+
+                            ss.str("");
+                            ss << "von_bertalanffy_beta_m_" << model_id;
+                            VariableTrait<REAL_T>::SetName(s->beta_m, ss.str());
+                            bool estimated = false;
+                            int phase = 1;
+                            //1. Get initial value if there is one.
+                            rapidjson::Document::MemberIterator pm = (*ppit).value.FindMember("value");
+
+                            if (pm == (*ppit).value.MemberEnd()) {
+                                std::cout << "Configuration Warning: Growth model \"Schnute Case II\" does not provide a initial value for \"beta_m\".\n";
+                                mas::mas_log << "Configuration Warning: Growth model \"Schnute Case II\"  does not provide a initial value for \"beta_m\".\n";
+                            } else {
+                                VariableTrait<REAL_T>::SetValue(s->beta_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //2. Get min boundary if there is one.
+                            pm = (*ppit).value.FindMember("min");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMinBoundary(s->beta_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //3. Get max boundary if there is one.
+                            pm = (*ppit).value.FindMember("max");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMaxBoundary(s->beta_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            pm = (*ppit).value.FindMember("estimated");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                std::string e = std::string((*pm).value.GetString());
+                                if (e == "true") {
+                                    estimated = true;
+                                }
+                            }
+
+                            if (estimated) {
+                                phase = 1;
+                                pm = (*ppit).value.FindMember("phase");
+                                if (pm != (*ppit).value.MemberEnd()) {
+                                    phase = (*pm).value.GetInt();
+                                }
+                                //register alpha
+                                s->Register(s->beta_m, phase);
+
+                            }
+
+                        }
+
+                        ppit = (*pit).value.FindMember("beta_f");
+                        if (ppit == (*pit).value.MemberEnd()) {
+                            std::cout << "Configuration Warning: Growth model \"Schnute Case II\"  " <<
+                                    "does not define \"alpha_m\". Model will use the default value of 3.0 and \"beta_f\" will not be estimated.\n";
+                            mas::mas_log << "Configuration Warning: Growth model \"Schnute Case II\"  " <<
+                                    "does not define \"beta_f\". Model will use the default value of 3.0 and \"beta_f\" will not be estimated.\n";
+                        } else {
+
+                            ss.str("");
+                            ss << "von_bertalanffy_beta_f_" << model_id;
+                            VariableTrait<REAL_T>::SetName(s->beta_f, ss.str());
+                            bool estimated = false;
+                            int phase = 1;
+                            //1. Get initial value if there is one.
+                            rapidjson::Document::MemberIterator pm = (*ppit).value.FindMember("value");
+
+                            if (pm == (*ppit).value.MemberEnd()) {
+                                std::cout << "Configuration Warning: Growth model \"Schnute Case II\"  does not provide a initial value for \"beta_f\".\n";
+                                mas::mas_log << "Configuration Warning: Growth model \"Schnute Case II\"  does not provide a initial value for \"beta_f\".\n";
+                            } else {
+                                VariableTrait<REAL_T>::SetValue(s->beta_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //2. Get min boundary if there is one.
+                            pm = (*ppit).value.FindMember("min");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMinBoundary(s->beta_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //3. Get max boundary if there is one.
+                            pm = (*ppit).value.FindMember("max");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMaxBoundary(s->beta_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            pm = (*ppit).value.FindMember("estimated");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                std::string e = std::string((*pm).value.GetString());
+                                if (e == "true") {
+                                    estimated = true;
+                                }
+                            }
+
+                            if (estimated) {
+                                phase = 1;
+                                pm = (*ppit).value.FindMember("phase");
+                                if (pm != (*ppit).value.MemberEnd()) {
+                                    phase = (*pm).value.GetInt();
+                                }
+                                //register alpha
+                                s->Register(s->beta_f, phase);
+
+                            }
 
                         }
 
@@ -2596,6 +3570,24 @@ namespace mas {
                 ss << "schnute_case_III_lmax_" << model_id;
                 VariableTrait<REAL_T>::SetName(s->lmax, ss.str());
 
+                ss.str("");
+                ss << "schnute_case_III_alpha_m_" << model_id;
+                VariableTrait<REAL_T>::SetName(s->alpha_m, ss.str());
+
+                ss.str("");
+                ss << "schnute_case_III_beta_m_" << model_id;
+                VariableTrait<REAL_T>::SetName(s->beta_m, ss.str());
+
+                ss.str("");
+                ss << "schnute_case_III_alpha_f_" << model_id;
+                VariableTrait<REAL_T>::SetName(s->alpha_f, ss.str());
+
+                ss.str("");
+                ss << "schnute_case_III_beta_f_" << model_id;
+                VariableTrait<REAL_T>::SetName(s->beta_f, ss.str());
+
+
+
                 if (pit == (*growth_model).value.MemberEnd()) {
                     std::cout << "Configuration Error: Recruitment model \"Schnute Case III\" has no parameter definitions.\n";
                     mas::mas_log << "Configuration Error: Recruitment model \"Schnute Case III\" has no parameter definitions.\n";
@@ -2701,6 +3693,230 @@ namespace mas {
                                 }
                                 //register alpha
                                 s->Register(s->beta, phase);
+
+                            }
+
+                        }
+
+                        ppit = (*pit).value.FindMember("alpha_m");
+                        if (ppit == (*pit).value.MemberEnd()) {
+                            std::cout << "Configuration Warning: Growth model \"Schnute Case III\"  " <<
+                                    "does not define \"alpha_m\". Model will use the default value of 0.000025 and \"alpha_m\" will not be estimated.\n";
+                            mas::mas_log << "Configuration Warning: Growth model \"Schnute Case III\"  " <<
+                                    "does not define \"alpha_m\". Model will use the default value of 0.000025 and \"alpha_m\" will not be estimated.\n";
+                        } else {
+
+                            ss.str("");
+                            ss << "von_bertalanffy_alpha_m_" << model_id;
+                            VariableTrait<REAL_T>::SetName(s->alpha_m, ss.str());
+                            bool estimated = false;
+                            int phase = 1;
+                            //1. Get initial value if there is one.
+                            rapidjson::Document::MemberIterator pm = (*ppit).value.FindMember("value");
+
+                            if (pm == (*ppit).value.MemberEnd()) {
+                                std::cout << "Configuration Warning: Growth model \"Schnute Case III\"  does not provide a initial value for \"alpha_m\".\n";
+                                mas::mas_log << "Configuration Warning: Growth model \"Schnute Case III\"  does not provide a initial value for \"alpha_m\".\n";
+                            } else {
+                                VariableTrait<REAL_T>::SetValue(s->alpha_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //2. Get min boundary if there is one.
+                            pm = (*ppit).value.FindMember("min");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMinBoundary(s->alpha_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //3. Get max boundary if there is one.
+                            pm = (*ppit).value.FindMember("max");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMaxBoundary(s->alpha_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            pm = (*ppit).value.FindMember("estimated");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                std::string e = std::string((*pm).value.GetString());
+                                if (e == "true") {
+                                    estimated = true;
+                                }
+                            }
+
+                            if (estimated) {
+                                phase = 1;
+                                pm = (*ppit).value.FindMember("phase");
+                                if (pm != (*ppit).value.MemberEnd()) {
+                                    phase = (*pm).value.GetInt();
+                                }
+                                //register alpha
+                                s->Register(s->alpha_m, phase);
+
+                            }
+
+                        }
+
+                        ppit = (*pit).value.FindMember("alpha_f");
+                        if (ppit == (*pit).value.MemberEnd()) {
+                            std::cout << "Configuration Warning: Growth model \"Schnute Case III\"  " <<
+                                    "does not define \"alpha_m\". Model will use the default value of 0.000025 and \"alpha_f\" will not be estimated.\n";
+                            mas::mas_log << "Configuration Warning: Growth model \"Schnute Case III\"  " <<
+                                    "does not define \"alpha_f\". Model will use the default value of 0.000025 and \"alpha_f\" will not be estimated.\n";
+                        } else {
+
+                            ss.str("");
+                            ss << "von_bertalanffy_alpha_f_" << model_id;
+                            VariableTrait<REAL_T>::SetName(s->alpha_f, ss.str());
+                            bool estimated = false;
+                            int phase = 1;
+                            //1. Get initial value if there is one.
+                            rapidjson::Document::MemberIterator pm = (*ppit).value.FindMember("value");
+
+                            if (pm == (*ppit).value.MemberEnd()) {
+                                std::cout << "Configuration Warning: Growth model \"Schnute Case III\"  does not provide a initial value for \"alpha_f\".\n";
+                                mas::mas_log << "Configuration Warning: Growth model \"Schnute Case III\"  does not provide a initial value for \"alpha_f\".\n";
+                            } else {
+                                VariableTrait<REAL_T>::SetValue(s->alpha_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //2. Get min boundary if there is one.
+                            pm = (*ppit).value.FindMember("min");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMinBoundary(s->alpha_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //3. Get max boundary if there is one.
+                            pm = (*ppit).value.FindMember("max");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMaxBoundary(s->alpha_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            pm = (*ppit).value.FindMember("estimated");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                std::string e = std::string((*pm).value.GetString());
+                                if (e == "true") {
+                                    estimated = true;
+                                }
+                            }
+
+                            if (estimated) {
+                                phase = 1;
+                                pm = (*ppit).value.FindMember("phase");
+                                if (pm != (*ppit).value.MemberEnd()) {
+                                    phase = (*pm).value.GetInt();
+                                }
+                                //register alpha
+                                s->Register(s->alpha_f, phase);
+
+                            }
+
+                        }
+
+                        ppit = (*pit).value.FindMember("beta_m");
+                        if (ppit == (*pit).value.MemberEnd()) {
+                            std::cout << "Configuration Warning: Growth model \"Schnute Case III\"  " <<
+                                    "does not define \"alpha_m\". Model will use the default value of 3.0 and \"beta_m\" will not be estimated.\n";
+                            mas::mas_log << "Configuration Warning: Growth model \"Schnute Case III\"  " <<
+                                    "does not define \"beta_m\". Model will use the default value of 3.0 and \"beta_m\" will not be estimated.\n";
+                        } else {
+
+                            ss.str("");
+                            ss << "von_bertalanffy_beta_m_" << model_id;
+                            VariableTrait<REAL_T>::SetName(s->beta_m, ss.str());
+                            bool estimated = false;
+                            int phase = 1;
+                            //1. Get initial value if there is one.
+                            rapidjson::Document::MemberIterator pm = (*ppit).value.FindMember("value");
+
+                            if (pm == (*ppit).value.MemberEnd()) {
+                                std::cout << "Configuration Warning: Growth model \"Schnute Case III\" does not provide a initial value for \"beta_m\".\n";
+                                mas::mas_log << "Configuration Warning: Growth model \"Schnute Case III\"  does not provide a initial value for \"beta_m\".\n";
+                            } else {
+                                VariableTrait<REAL_T>::SetValue(s->beta_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //2. Get min boundary if there is one.
+                            pm = (*ppit).value.FindMember("min");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMinBoundary(s->beta_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //3. Get max boundary if there is one.
+                            pm = (*ppit).value.FindMember("max");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMaxBoundary(s->beta_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            pm = (*ppit).value.FindMember("estimated");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                std::string e = std::string((*pm).value.GetString());
+                                if (e == "true") {
+                                    estimated = true;
+                                }
+                            }
+
+                            if (estimated) {
+                                phase = 1;
+                                pm = (*ppit).value.FindMember("phase");
+                                if (pm != (*ppit).value.MemberEnd()) {
+                                    phase = (*pm).value.GetInt();
+                                }
+                                //register alpha
+                                s->Register(s->beta_m, phase);
+
+                            }
+
+                        }
+
+                        ppit = (*pit).value.FindMember("beta_f");
+                        if (ppit == (*pit).value.MemberEnd()) {
+                            std::cout << "Configuration Warning: Growth model \"Schnute Case III\"  " <<
+                                    "does not define \"alpha_m\". Model will use the default value of 3.0 and \"beta_f\" will not be estimated.\n";
+                            mas::mas_log << "Configuration Warning: Growth model \"Schnute Case III\"  " <<
+                                    "does not define \"beta_f\". Model will use the default value of 3.0 and \"beta_f\" will not be estimated.\n";
+                        } else {
+
+                            ss.str("");
+                            ss << "von_bertalanffy_beta_f_" << model_id;
+                            VariableTrait<REAL_T>::SetName(s->beta_f, ss.str());
+                            bool estimated = false;
+                            int phase = 1;
+                            //1. Get initial value if there is one.
+                            rapidjson::Document::MemberIterator pm = (*ppit).value.FindMember("value");
+
+                            if (pm == (*ppit).value.MemberEnd()) {
+                                std::cout << "Configuration Warning: Growth model \"Schnute Case III\"  does not provide a initial value for \"beta_f\".\n";
+                                mas::mas_log << "Configuration Warning: Growth model \"Schnute Case III\"  does not provide a initial value for \"beta_f\".\n";
+                            } else {
+                                VariableTrait<REAL_T>::SetValue(s->beta_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //2. Get min boundary if there is one.
+                            pm = (*ppit).value.FindMember("min");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMinBoundary(s->beta_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //3. Get max boundary if there is one.
+                            pm = (*ppit).value.FindMember("max");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMaxBoundary(s->beta_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            pm = (*ppit).value.FindMember("estimated");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                std::string e = std::string((*pm).value.GetString());
+                                if (e == "true") {
+                                    estimated = true;
+                                }
+                            }
+
+                            if (estimated) {
+                                phase = 1;
+                                pm = (*ppit).value.FindMember("phase");
+                                if (pm != (*ppit).value.MemberEnd()) {
+                                    phase = (*pm).value.GetInt();
+                                }
+                                //register alpha
+                                s->Register(s->beta_f, phase);
 
                             }
 
@@ -2835,6 +4051,27 @@ namespace mas {
                 ss << "schnute_case_IV_lmax_" << model_id;
                 VariableTrait<REAL_T>::SetName(s->lmax, ss.str());
 
+                ss.str("");
+                ss << "schnute_case_III_lmax_" << model_id;
+                VariableTrait<REAL_T>::SetName(s->lmax, ss.str());
+
+                ss.str("");
+                ss << "schnute_case_IV_alpha_m_" << model_id;
+                VariableTrait<REAL_T>::SetName(s->alpha_m, ss.str());
+
+                ss.str("");
+                ss << "schnute_case_IV_beta_m_" << model_id;
+                VariableTrait<REAL_T>::SetName(s->beta_m, ss.str());
+
+                ss.str("");
+                ss << "schnute_case_IV_alpha_f_" << model_id;
+                VariableTrait<REAL_T>::SetName(s->alpha_f, ss.str());
+
+                ss.str("");
+                ss << "schnute_case_IV_beta_f_" << model_id;
+                VariableTrait<REAL_T>::SetName(s->beta_f, ss.str());
+
+
                 if (pit == (*growth_model).value.MemberEnd()) {
                     std::cout << "Configuration Error: Recruitment model \"Schnute Case IV\" has no parameter definitions.\n";
                     mas::mas_log << "Configuration Error: Recruitment model \"Schnute Case IV\" has no parameter definitions.\n";
@@ -2889,6 +4126,230 @@ namespace mas {
                             }
                             //register alpha
                             s->Register(s->alpha, phase);
+
+                        }
+
+                        ppit = (*pit).value.FindMember("alpha_m");
+                        if (ppit == (*pit).value.MemberEnd()) {
+                            std::cout << "Configuration Warning: Growth model \"Schnute Case IV\"  " <<
+                                    "does not define \"alpha_m\". Model will use the default value of 0.000025 and \"alpha_m\" will not be estimated.\n";
+                            mas::mas_log << "Configuration Warning: Growth model \"Schnute Case IV\"  " <<
+                                    "does not define \"alpha_m\". Model will use the default value of 0.000025 and \"alpha_m\" will not be estimated.\n";
+                        } else {
+
+                            ss.str("");
+                            ss << "von_bertalanffy_alpha_m_" << model_id;
+                            VariableTrait<REAL_T>::SetName(s->alpha_m, ss.str());
+                            bool estimated = false;
+                            int phase = 1;
+                            //1. Get initial value if there is one.
+                            rapidjson::Document::MemberIterator pm = (*ppit).value.FindMember("value");
+
+                            if (pm == (*ppit).value.MemberEnd()) {
+                                std::cout << "Configuration Warning: Growth model \"Schnute Case IV\"  does not provide a initial value for \"alpha_m\".\n";
+                                mas::mas_log << "Configuration Warning: Growth model \"Schnute Case IV\"  does not provide a initial value for \"alpha_m\".\n";
+                            } else {
+                                VariableTrait<REAL_T>::SetValue(s->alpha_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //2. Get min boundary if there is one.
+                            pm = (*ppit).value.FindMember("min");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMinBoundary(s->alpha_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //3. Get max boundary if there is one.
+                            pm = (*ppit).value.FindMember("max");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMaxBoundary(s->alpha_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            pm = (*ppit).value.FindMember("estimated");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                std::string e = std::string((*pm).value.GetString());
+                                if (e == "true") {
+                                    estimated = true;
+                                }
+                            }
+
+                            if (estimated) {
+                                phase = 1;
+                                pm = (*ppit).value.FindMember("phase");
+                                if (pm != (*ppit).value.MemberEnd()) {
+                                    phase = (*pm).value.GetInt();
+                                }
+                                //register alpha
+                                s->Register(s->alpha_m, phase);
+
+                            }
+
+                        }
+
+                        ppit = (*pit).value.FindMember("alpha_f");
+                        if (ppit == (*pit).value.MemberEnd()) {
+                            std::cout << "Configuration Warning: Growth model \"Schnute Case IV\"  " <<
+                                    "does not define \"alpha_m\". Model will use the default value of 0.000025 and \"alpha_f\" will not be estimated.\n";
+                            mas::mas_log << "Configuration Warning: Growth model \"Schnute Case IV\"  " <<
+                                    "does not define \"alpha_f\". Model will use the default value of 0.000025 and \"alpha_f\" will not be estimated.\n";
+                        } else {
+
+                            ss.str("");
+                            ss << "von_bertalanffy_alpha_f_" << model_id;
+                            VariableTrait<REAL_T>::SetName(s->alpha_f, ss.str());
+                            bool estimated = false;
+                            int phase = 1;
+                            //1. Get initial value if there is one.
+                            rapidjson::Document::MemberIterator pm = (*ppit).value.FindMember("value");
+
+                            if (pm == (*ppit).value.MemberEnd()) {
+                                std::cout << "Configuration Warning: Growth model \"Schnute Case IV\"  does not provide a initial value for \"alpha_f\".\n";
+                                mas::mas_log << "Configuration Warning: Growth model \"Schnute Case IV\"  does not provide a initial value for \"alpha_f\".\n";
+                            } else {
+                                VariableTrait<REAL_T>::SetValue(s->alpha_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //2. Get min boundary if there is one.
+                            pm = (*ppit).value.FindMember("min");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMinBoundary(s->alpha_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //3. Get max boundary if there is one.
+                            pm = (*ppit).value.FindMember("max");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMaxBoundary(s->alpha_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            pm = (*ppit).value.FindMember("estimated");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                std::string e = std::string((*pm).value.GetString());
+                                if (e == "true") {
+                                    estimated = true;
+                                }
+                            }
+
+                            if (estimated) {
+                                phase = 1;
+                                pm = (*ppit).value.FindMember("phase");
+                                if (pm != (*ppit).value.MemberEnd()) {
+                                    phase = (*pm).value.GetInt();
+                                }
+                                //register alpha
+                                s->Register(s->alpha_f, phase);
+
+                            }
+
+                        }
+
+                        ppit = (*pit).value.FindMember("beta_m");
+                        if (ppit == (*pit).value.MemberEnd()) {
+                            std::cout << "Configuration Warning: Growth model \"Schnute Case IV\"  " <<
+                                    "does not define \"alpha_m\". Model will use the default value of 3.0 and \"beta_m\" will not be estimated.\n";
+                            mas::mas_log << "Configuration Warning: Growth model \"Schnute Case IV\"  " <<
+                                    "does not define \"beta_m\". Model will use the default value of 3.0 and \"beta_m\" will not be estimated.\n";
+                        } else {
+
+                            ss.str("");
+                            ss << "von_bertalanffy_beta_m_" << model_id;
+                            VariableTrait<REAL_T>::SetName(s->beta_m, ss.str());
+                            bool estimated = false;
+                            int phase = 1;
+                            //1. Get initial value if there is one.
+                            rapidjson::Document::MemberIterator pm = (*ppit).value.FindMember("value");
+
+                            if (pm == (*ppit).value.MemberEnd()) {
+                                std::cout << "Configuration Warning: Growth model \"Schnute Case IV\" does not provide a initial value for \"beta_m\".\n";
+                                mas::mas_log << "Configuration Warning: Growth model \"Schnute Case IV\"  does not provide a initial value for \"beta_m\".\n";
+                            } else {
+                                VariableTrait<REAL_T>::SetValue(s->beta_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //2. Get min boundary if there is one.
+                            pm = (*ppit).value.FindMember("min");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMinBoundary(s->beta_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //3. Get max boundary if there is one.
+                            pm = (*ppit).value.FindMember("max");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMaxBoundary(s->beta_m, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            pm = (*ppit).value.FindMember("estimated");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                std::string e = std::string((*pm).value.GetString());
+                                if (e == "true") {
+                                    estimated = true;
+                                }
+                            }
+
+                            if (estimated) {
+                                phase = 1;
+                                pm = (*ppit).value.FindMember("phase");
+                                if (pm != (*ppit).value.MemberEnd()) {
+                                    phase = (*pm).value.GetInt();
+                                }
+                                //register alpha
+                                s->Register(s->beta_m, phase);
+
+                            }
+
+                        }
+
+                        ppit = (*pit).value.FindMember("beta_f");
+                        if (ppit == (*pit).value.MemberEnd()) {
+                            std::cout << "Configuration Warning: Growth model \"Schnute Case IV\"  " <<
+                                    "does not define \"alpha_m\". Model will use the default value of 3.0 and \"beta_f\" will not be estimated.\n";
+                            mas::mas_log << "Configuration Warning: Growth model \"Schnute Case IV\"  " <<
+                                    "does not define \"beta_f\". Model will use the default value of 3.0 and \"beta_f\" will not be estimated.\n";
+                        } else {
+
+                            ss.str("");
+                            ss << "von_bertalanffy_beta_f_" << model_id;
+                            VariableTrait<REAL_T>::SetName(s->beta_f, ss.str());
+                            bool estimated = false;
+                            int phase = 1;
+                            //1. Get initial value if there is one.
+                            rapidjson::Document::MemberIterator pm = (*ppit).value.FindMember("value");
+
+                            if (pm == (*ppit).value.MemberEnd()) {
+                                std::cout << "Configuration Warning: Growth model \"Schnute Case IV\"  does not provide a initial value for \"beta_f\".\n";
+                                mas::mas_log << "Configuration Warning: Growth model \"Schnute Case IV\"  does not provide a initial value for \"beta_f\".\n";
+                            } else {
+                                VariableTrait<REAL_T>::SetValue(s->beta_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //2. Get min boundary if there is one.
+                            pm = (*ppit).value.FindMember("min");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMinBoundary(s->beta_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            //3. Get max boundary if there is one.
+                            pm = (*ppit).value.FindMember("max");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                VariableTrait<REAL_T>::SetMaxBoundary(s->beta_f, static_cast<REAL_T> ((*pm).value.GetDouble()));
+                            }
+
+                            pm = (*ppit).value.FindMember("estimated");
+                            if (pm != (*ppit).value.MemberEnd()) {
+                                std::string e = std::string((*pm).value.GetString());
+                                if (e == "true") {
+                                    estimated = true;
+                                }
+                            }
+
+                            if (estimated) {
+                                phase = 1;
+                                pm = (*ppit).value.FindMember("phase");
+                                if (pm != (*ppit).value.MemberEnd()) {
+                                    phase = (*pm).value.GetInt();
+                                }
+                                //register alpha
+                                s->Register(s->beta_f, phase);
+
+                            }
 
                         }
 
@@ -4660,7 +6121,7 @@ namespace mas {
                 mas::mas_log << "Configuration Error: More than one recruitment model with the same identifier defined. Recruitment models require a unique id.\n";
 
                 this->valid_configuration = false;
-                ;
+                
             } else {
                 this->recruitment_models[model->id] = model;
             }
@@ -4728,9 +6189,17 @@ namespace mas {
 
                 std::string type;
                 (*it).second.getAtt("data_object_type").getValues(type);
+                std::string id;
+                (*it).second.getAtt("id").getValues(id);
+                data->id = StringToNumber<uint32_t>(id);
                 std::string area;
                 (*it).second.getAtt("area").getValues(area);
                 data->area_id = StringToNumber<uint32_t>(area);
+                std::string missing;
+                (*it).second.getAtt("missing_values").getValues(missing);
+                data->missing_value = StringToNumber<uint32_t>(missing);
+
+
                 data->type = DataObject<REAL_T>::GetType(type);
                 std::vector<NcDim> dims = (*it).second.getDims();
                 int i, j, k, l, m, n;
@@ -4826,7 +6295,7 @@ namespace mas {
                 }
 
                 data_dictionary[data->area_id].push_back(data);
-
+                this->data.push_back(data);
             }
         }
 
@@ -5132,6 +6601,9 @@ namespace mas {
 
             fleet_iterator fit;
             for (fit = this->fleets.begin(); fit != this->fleets.end(); ++fit) {
+
+                (*fit).second->Initialize(nyears, nseasons, this->ages.size());
+
                 typename Fleet<REAL_T>::season_area_id_iterator sit;
                 for (sit = (*fit).second->season_area_selectivity_ids.begin(); sit != (*fit).second->season_area_selectivity_ids.end(); ++sit) {
                     typename Fleet<REAL_T>::area_id_iteraor ait;
@@ -5158,11 +6630,33 @@ namespace mas {
                     }
                 }
 
+                for (int i = 0; i <this->data.size(); i++) {
+                    if (data[i]->id == (*fit).second->id) {
+                        switch (data[i]->type) {
+                            case mas::CATCH_BIOMASS:
+                                (*fit).second->catch_biomass_data = data[i];
+                                break;
+                            case mas::CATCH_PROPORTION_AT_AGE:
+                                (*fit).second->catch_proportion_at_age_data = data[i];
+                                break;
+                            case mas::CATCH_PROPORTION_AT_LENGTH:
+                                (*fit).second->catch_proportion_at_length_data = data[i];
+                                break;
+                            case mas::CATCH_MEAN_SIZE_AT_AGE:
+                                (*fit).second->catch_mean_size_at_age_data = data[i];
+                                break;
+                        }
+                    }
+                }
+
             }
 
             survey_model_iterator ssit;
             for (ssit = this->survey_models.begin(); ssit != this->survey_models.end(); ++ssit) {
                 typename Survey<REAL_T>::season_area_id_iterator sit;
+
+                (*ssit)->Initialize(this->nyears, this->nseasons, this->ages.size());
+
                 for (sit = (*ssit)->season_area_selectivity_ids.begin(); sit != (*ssit)->season_area_selectivity_ids.end(); ++sit) {
                     typename Survey<REAL_T>::area_id_iteraor ait;
                     int season = (*sit).first;
@@ -5171,6 +6665,7 @@ namespace mas {
                         int id = (*ait).second;
                         (*ssit)->area_season_selectivity[area][season] = this->selectivity_models[id];
                         (*ssit)->season_area_selectivity[season][area] = this->selectivity_models[id];
+                        (*ssit)->seasonal_areas_of_operation[season][area] = this->areas[area];
                         //                        std::cout << "setting survey " << id << ""
 
                         //find area
@@ -5180,6 +6675,25 @@ namespace mas {
                         }
                         //add population by season
 
+                    }
+                }
+
+                for (int i = 0; i <this->data.size(); i++) {
+                    if (data[i]->id == (*ssit)->id) {
+                        switch (data[i]->type) {
+                            case mas::SURVEY_BIOMASS:
+                                (*ssit)->survey_biomass_data = data[i];
+                                break;
+                            case mas::SURVEY_PROPORTION_AT_AGE:
+                                (*ssit)->survey_proportion_at_age_data = data[i];
+                                break;
+                            case mas::SURVEY_PROPORTION_AT_LENGTH:
+                                (*ssit)->survey_proportion_at_length_data = data[i];
+                                break;
+                            case mas::SURVEY_MEAN_SIZE_AT_AGE:
+                                (*ssit)->survey_mean_size_at_age_data = data[i];
+                                break;
+                        }
                     }
                 }
             }
@@ -5192,6 +6706,7 @@ namespace mas {
                 if (ait == this->areas.end()) {
                     std::cout << "Configuration Error: Data area id not found  \n";
                     mas_log << "Configuration Error: Data area id not found  \n";
+
 
                 } else {
                     for (int i = 0; i < (*dit).second.size(); i++) {
@@ -5292,7 +6807,7 @@ namespace mas {
             //            }
 
 
-           
+
 
             if (!this->valid_configuration) {
                 std::cout << "Configuration Error:  Invalid model configuration. See mas.log for errors.\n";

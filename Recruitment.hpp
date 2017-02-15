@@ -39,6 +39,7 @@ namespace mas {
     struct RecruitmentBase : mas::ModelObject<REAL_T> {
         typedef typename mas::VariableTrait<REAL_T>::variable variable;
         std::vector<variable> recruitment_deviations;
+        bool estimating_recruitment_deviations = false;
         variable sigma_r;
         variable rho;
 
@@ -46,6 +47,17 @@ namespace mas {
 
         virtual const std::string Name() {
             return "RecruitmentBase";
+        }
+        
+        void Prepare(){
+            variable sum;
+            for(int i =0; i < this->recruitment_deviations.size(); i++){
+                sum+=this->recruitment_deviations[i];
+            }
+            
+            for(int i =0; i < this->recruitment_deviations.size(); i++){
+                this->recruitment_deviations[i] -= sum/static_cast<REAL_T>(this->recruitment_deviations.size());
+            }
         }
     };
 

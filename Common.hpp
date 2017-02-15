@@ -106,7 +106,9 @@ namespace mas {
         FishSexType sex_type;
         DataUnits units;
         std::string name;
-
+        REAL_T missing_value;
+        
+        uint32_t id;
         uint32_t area_id;
         uint32_t population_id;
         uint32_t dimensions;

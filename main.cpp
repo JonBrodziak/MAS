@@ -109,6 +109,7 @@ void create() {
     out.add_variable_attribute("catch_biomass_area_1", "data_object_type", "catch_biomass");
     out.add_variable_attribute("catch_biomass_area_1", "sex", "undifferentiated");
     out.add_variable_attribute("catch_biomass_area_1", "area", "1");
+    out.add_variable_attribute("catch_biomass_area_1", "id", "1");
     out.add_variable_attribute("catch_biomass_area_1", "missing_values", "-999");
     //
     out.add_variable("catch_biomass_area_2", "float",{"years"});
@@ -116,6 +117,7 @@ void create() {
     out.add_variable_attribute("catch_biomass_area_2", "sex", "undifferentiated");
     out.add_variable_attribute("catch_biomass_area_2", "units", "MT");
     out.add_variable_attribute("catch_biomass_area_2", "area", "2");
+    out.add_variable_attribute("catch_biomass_area_2", "id", "2");
     out.add_variable_attribute("catch_biomass_area_2", "missing_values", "-999");
 
     out.add_variable("survey_biomass_area_1", "float",{"years"});
@@ -123,6 +125,7 @@ void create() {
     out.add_variable_attribute("survey_biomass_area_1", "sex", "undifferentiated");
     out.add_variable_attribute("survey_biomass_area_1", "units", "kg");
     out.add_variable_attribute("survey_biomass_area_1", "area", "1");
+    out.add_variable_attribute("survey_biomass_area_1", "id", "1");
     out.add_variable_attribute("survey_biomass_area_1", "missing_values", "-999");
 
     out.add_variable("survey_biomass_area_2", "float",{"years"});
@@ -130,30 +133,35 @@ void create() {
     out.add_variable_attribute("survey_biomass_area_2", "sex", "undifferentiated");
     out.add_variable_attribute("survey_biomass_area_2", "units", "kg");
     out.add_variable_attribute("survey_biomass_area_2", "area", "2");
+    out.add_variable_attribute("survey_biomass_area_2", "id", "2");
     out.add_variable_attribute("survey_biomass_area_2", "missing_values", "-999");
 
     out.add_variable("catch_proportions_at_age_area_1", "float",{"years", "seasons", "ages"});
     out.add_variable_attribute("catch_proportions_at_age_area_1", "data_object_type", "catch_proportion_at_age");
     out.add_variable_attribute("catch_proportions_at_age_area_1", "units", "proportion");
     out.add_variable_attribute("catch_proportions_at_age_area_1", "area", "1");
+    out.add_variable_attribute("catch_proportions_at_age_area_1", "id", "1");
     out.add_variable_attribute("catch_proportions_at_age_area_1", "missing_values", "-999");
 
     out.add_variable("catch_proportions_at_age_area_2", "float",{"years", "seasons", "ages"});
     out.add_variable_attribute("catch_proportions_at_age_area_2", "units", "proportion");
     out.add_variable_attribute("catch_proportions_at_age_area_2", "data_object_type", "catch_proportion_at_age");
     out.add_variable_attribute("catch_proportions_at_age_area_2", "area", "2");
+    out.add_variable_attribute("catch_proportions_at_age_area_2", "id", "2");
     out.add_variable_attribute("catch_proportions_at_age_area_2", "missing_values", "-999");
 
     out.add_variable("survey_proportions_at_age_area_1", "float",{"years", "seasons", "ages"});
     out.add_variable_attribute("survey_proportions_at_age_area_1", "units", "proportion");
     out.add_variable_attribute("survey_proportions_at_age_area_1", "data_object_type", "survey_proportion_at_age");
     out.add_variable_attribute("survey_proportions_at_age_area_1", "area", "1");
+    out.add_variable_attribute("survey_proportions_at_age_area_1", "id", "1");
     out.add_variable_attribute("survey_proportions_at_age_area_1", "missing_values", "-999");
 
     out.add_variable("survey_proportions_at_age_area_2", "float",{"years", "seasons", "ages"});
     out.add_variable_attribute("survey_proportions_at_age_area_2", "data_object_type", "survey_proportion_at_age");
     out.add_variable_attribute("survey_proportions_at_age_area_2", "units", "proportion");
     out.add_variable_attribute("survey_proportions_at_age_area_2", "area", "2");
+    out.add_variable_attribute("survey_proportions_at_age_area_2", "id", "2");
     out.add_variable_attribute("survey_proportions_at_age_area_2", "missing_values", "-999");
 
     //
@@ -395,6 +403,8 @@ public:
  */
 int main(int argc, char** argv) {
 
+ 
+    
     for (int i = 0; i < 1; i++) {
         MASObjectiveFunction<double> objective_function;
 
@@ -415,13 +425,13 @@ int main(int argc, char** argv) {
         objective_function.Finalize();
 
 
-//        for (int i = 0; i < objective_function.mas.info.estimated_parameters.size(); i++) {
-//            std::cout << std::fixed;
-//            std::cout << objective_function.mas.info.estimated_parameters[i]->GetName() << " \t"
-//                    << objective_function.mas.info.estimated_parameters[i]->GetValue() << " \t" << std::scientific
-//                    << objective_function.mas.info.estimated_parameters[i]->GetMinBoundary() << " \t"
-//                    << objective_function.mas.info.estimated_parameters[i]->GetMaxBoundary() << "\n";
-//        }
+        //        for (int i = 0; i < objective_function.mas.info.estimated_parameters.size(); i++) {
+        //            std::cout << std::fixed;
+        //            std::cout << objective_function.mas.info.estimated_parameters[i]->GetName() << " \t"
+        //                    << objective_function.mas.info.estimated_parameters[i]->GetValue() << " \t" << std::scientific
+        //                    << objective_function.mas.info.estimated_parameters[i]->GetMinBoundary() << " \t"
+        //                    << objective_function.mas.info.estimated_parameters[i]->GetMaxBoundary() << "\n";
+        //        }
     }
     exit(0);
 

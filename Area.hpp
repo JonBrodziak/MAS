@@ -394,9 +394,10 @@ namespace mas {
 
         const variable Compute() {
 
-            this->catch_biomass_component = 0.0;
-            this->survey_biomass_component = 0.0;
             this->fishery_age_comp_component = 0.0;
+             this->catch_biomass_component = 0.0;
+            this->survey_biomass_component = 0.0;
+           
             this->survey_age_comp_component = 0.0;
 
 
@@ -411,6 +412,7 @@ namespace mas {
             size_t index = 0;
             REAL_T cl = 0;
             REAL_T sl = 0;
+            
 
             for (int y = 0; y < this->years; y++) {
                 for (int s = 0; s < this->seasons; s++) {

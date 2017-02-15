@@ -46,7 +46,8 @@ namespace mas {
         variable catch_fraction_of_year = .5;
         variable survey_fraction_of_year = .75;
         variable catch_biomass_units = 1000.0;
-        variable survey_biomass_units = 1000.0;
+        variable spawning_biomass_units = 1000.0;
+        variable survey_biomass_units = 1000000.0;
         variable A = 0.000025;
         variable B = 3.0;
         variable F = .1;
@@ -213,7 +214,7 @@ namespace mas {
         inline void Recruitment(int year, int season) {
             int y = year;
             int s = season;
-            
+
 
             //#warning add compiler hint here
             if (year == 0 && season == 1) {
@@ -232,7 +233,11 @@ namespace mas {
                     std::cout << "recruitment model not found!!!\n";
                     exit(0);
                 }
-                this->N[year * this->seasons * this->ages.size() + (season - 1) * this->ages.size()] = this->recruitment[year * seasons + (season - 1)];
+                this->N[year * this->seasons * this->ages.size() + (season - 1) * this->ages.size()] = 
+                        this->recruitment[year * seasons + (season - 1)];
+                
+                this->N[year * this->seasons * this->ages.size() + (season - 1) * this->ages.size()] *=
+                        atl::exp((*rit).second->recruitment_deviations[year * seasons + (season - 1)]);
             }
 
         }
@@ -250,8 +255,8 @@ namespace mas {
             //                        this->area->growth_model->Evaluate(this->ages[a]);
             //            }
             variable fract = static_cast<REAL_T> (season) / static_cast<REAL_T> (this->seasons);
-//            std::cout<<length_at_season_start.size()<<"<<<< ---- "<<std::endl;
-            length_at_season_start[0] = .01;//variable(.01);
+            //            std::cout<<length_at_season_start.size()<<"<<<< ---- "<<std::endl;
+            length_at_season_start[0] = .01; //variable(.01);
             weight_at_season_start[0] = this->A * atl::exp(this->B * atl::log(length_at_season_start[0]));
             for (int a = 1; a< this->ages.size(); a++) {
                 length_at_season_start[a] =
@@ -268,9 +273,9 @@ namespace mas {
                 length_at_survey_time[a - 1] = (static_cast<REAL_T> (1.0) - this->survey_fraction_of_year) *
                         length_at_season_start[a - 1] + this->survey_fraction_of_year * length_at_season_start[a];
 
-                weight_at_spawning[a - 1] = this->A * atl::exp(this->B * atl::log(length_at_spawning[a - 1]));
-                weight_at_catch_time[a - 1] = this->A * atl::exp(this->B * atl::log(length_at_catch_time[a - 1]));
-                weight_at_survey_time[a - 1] = this->A * atl::exp(this->B * atl::log(length_at_survey_time[a - 1]));
+                weight_at_spawning[a - 1] = this->area->growth_model->getWeight(this->males, length_at_spawning[a - 1]); //this->A * atl::exp(this->B * atl::log(length_at_spawning[a - 1]));
+                weight_at_catch_time[a - 1] = this->area->growth_model->getWeight(this->males, length_at_catch_time[a - 1]); //this->A * atl::exp(this->B * atl::log(length_at_catch_time[a - 1]));
+                weight_at_survey_time[a - 1] = this->area->growth_model->getWeight(this->males, length_at_survey_time[a - 1]); //this->A * atl::exp(this->B * atl::log(length_at_survey_time[a - 1]));
             }
 
             int index = ages.size() - 1;
@@ -288,9 +293,10 @@ namespace mas {
                     length_at_season_start[index] + this->survey_fraction_of_year * length_at_season_start[ages.size()];
 
 
-            weight_at_spawning[index] = this->A * atl::exp(this->B * atl::log(length_at_spawning[index]));
-            weight_at_catch_time[index] = this->A * atl::exp(this->B * atl::log(length_at_catch_time[index]));
-            weight_at_survey_time[index] = this->A * atl::exp(this->B * atl::log(length_at_survey_time[index]));
+            weight_at_spawning[index] = this->area->growth_model->getWeight(this->males, length_at_spawning[index]); //this->A * atl::exp(this->B * atl::log(length_at_spawning[index]));
+            weight_at_catch_time[index] = this->area->growth_model->getWeight(this->males, length_at_catch_time[index]); //this->A * atl::exp(this->B * atl::log(length_at_catch_time[index]));
+            weight_at_survey_time[index] = this->area->growth_model->getWeight(this->males, length_at_survey_time[index]);
+            ;
 
 
 
@@ -381,18 +387,52 @@ namespace mas {
             std::vector< std::shared_ptr<Fleet<REAL_T> > >& fleets = this->area->seasonal_fleet_operations[season];
             for (int a = 0; a < this->ages.size(); a++) {
                 variable s;
+                size_t index = year * this->seasons * this->ages.size() + (season - 1) * this->ages.size() + a;
                 for (int f = 0; f < fleets.size(); f++) {
                     s += fleets[f]->season_area_selectivity[season][this->area->id]->Evaluate(ages[a]);
+
+                    fleets[f]->catch_at_age[index] +=
+                            N[index]*
+                            ((this->F * s))*
+                            (1.0 - atl::exp(-1.0 * (Z[index]))) /
+                            Z[index];
+
+                    fleets[f]->catch_biomass_at_age[index] +=
+                            fleets[f]->catch_at_age[index] * this->weight_at_catch_time[a] / this->catch_biomass_units;
+
+                    if (this->males) {
+
+                        fleets[f]->catch_at_age_males[index] +=
+                                N[index]*
+                                ((this->F * s))*
+                                (1.0 - atl::exp(-1.0 * (Z[index]))) /
+                                Z[index];
+
+                        fleets[f]->catch_biomass_at_age_males[index] +=
+                                fleets[f]->catch_at_age_males[index] * this->weight_at_catch_time[a] / this->catch_biomass_units;
+
+                    } else {
+
+                        fleets[f]->catch_at_age_females[index] +=
+                                N[index]*
+                                ((this->F * s))*
+                                (1.0 - atl::exp(-1.0 * (Z[index]))) /
+                                Z[index];
+
+                        fleets[f]->catch_biomass_at_age_females[index] +=
+                                fleets[f]->catch_at_age_females[index] * this->weight_at_catch_time[a] / this->catch_biomass_units;
+                    }
+
                 }
 
-                C[year * this->seasons * this->ages.size() + (season - 1) * this->ages.size() + a] =
-                        N[year * this->seasons * this->ages.size() + (season - 1) * this->ages.size() + a]*
+                C[index] =
+                        N[index]*
                         ((this->F * s))*
-                        (1.0 - atl::exp(-1.0 * (Z[year * this->seasons * this->ages.size() + (season - 1) * this->ages.size() + a]))) /
-                        Z[year * this->seasons * this->ages.size() + (season - 1) * this->ages.size() + a];
+                        (1.0 - atl::exp(-1.0 * (Z[index]))) /
+                        Z[index];
 
-                C_Biomass[year * this->seasons * this->ages.size() + (season - 1) * this->ages.size() + a] =
-                        C[year * this->seasons * this->ages.size() + (season - 1) * this->ages.size() + a] * this->weight_at_catch_time[a] / this->catch_biomass_units;
+                C_Biomass[index] =
+                        C[index] * this->weight_at_catch_time[a] / this->catch_biomass_units;
             }
         }
 
@@ -403,20 +443,35 @@ namespace mas {
          */
         inline void SurveyNumbersAtAge(int year, int season) {
             typename mas::Area<REAL_T>::survey_model_iterator it = this->area->survey_models.find(this->id);
-
+            //needs to be optimized
             if (it != this->area->survey_models.end()) {
                 typename mas::Area<REAL_T>::survey_season_iterator sit = (*it).second.find(season);
 
                 if (sit != (*it).second.end()) {
 #warning this needs a rewrite ... mapping 
                     for (int a = 0; a < this->ages.size(); a++) {
-                        this->SN[year * this->seasons * this->ages.size() + (season - 1) * this->ages.size() + a] =
-                                this->N[year * this->seasons * this->ages.size() + (season - 1) * this->ages.size() + a] * atl::exp(-1.0 * survey_fraction_of_year *
-                                this->Z[year * this->seasons * this->ages.size() + (season - 1) * this->ages.size() + a])*
+                        size_t index = year * this->seasons * this->ages.size() + (season - 1) * this->ages.size() + a;
+                        this->SN[index] =
+                                this->N[index] * atl::exp(-1.0 * survey_fraction_of_year *
+                                this->Z[index])*
                                 (*sit).second->season_area_selectivity[season][this->area->id]->Evaluate(this->ages[a]);
 
-                        SN_Biomass[year * this->seasons * this->ages.size() + (season - 1) * this->ages.size() + a] =
-                                SN[year * this->seasons * this->ages.size() + (season - 1) * this->ages.size() + a] * this->weight_at_survey_time[a] / this->survey_biomass_units;
+                        (*sit).second->survey_numbers_at_age[index] += this->SN[index];
+
+
+
+                        SN_Biomass[index] =
+                                SN[index] * this->weight_at_survey_time[a] / this->survey_biomass_units;
+
+                        (*sit).second->survey_biomass_at_age[index] += SN_Biomass[index];
+
+                        if (this->males) {
+                            (*sit).second->survey_numbers_at_age_males[index] += this->SN[index];
+                            (*sit).second->survey_biomass_at_age_males[index] += SN_Biomass[index];
+                        } else {
+                            (*sit).second->survey_numbers_at_age_females[index] += this->SN[index];
+                            (*sit).second->survey_biomass_at_age_females[index] += SN_Biomass[index];
+                        }
 
                     }
                     //                    std::cout << "has selectivity for survey!!!\n";
@@ -465,7 +520,7 @@ namespace mas {
                 sb += this->spawning_biomass_at_age[a] * this->N[year * this->seasons * this->ages.size() + (season - 1) * this->ages.size() + a];
 
             }
-            this->spawning_biomass[year * seasons + (season - 1)] = sb / this->survey_biomass_units;
+            this->spawning_biomass[year * seasons + (season - 1)] = sb / this->spawning_biomass_units;
         }
 
         inline void PushToArea() {
@@ -865,7 +920,7 @@ namespace mas {
                 males[areas_list[a]->id].area = areas_list[a];
                 males[areas_list[a]->id].natal_area = this->natal_area;
                 males[areas_list[a]->id].Initialize();
-                
+
                 females[areas_list[a]->id].natal_homing = this->natal_homing;
                 females[areas_list[a]->id].area = areas_list[a];
                 females[areas_list[a]->id].natal_area = this->natal_area;
@@ -893,12 +948,12 @@ namespace mas {
 
                 switch (this->initial_numbers[i].type) {
                     case MALE:
-//                        std::cout << "Setting initial numbers for males in area " << this->initial_numbers[i].area_id << "\n";
+                        //                        std::cout << "Setting initial numbers for males in area " << this->initial_numbers[i].area_id << "\n";
                         this->males[this->initial_numbers[i].area_id].initial_numbers = this->initial_numbers[i].values;
                         break;
 
                     case FEMALE:
-//                        std::cout << "Setting initial numbers for females in area " << this->initial_numbers[i].area_id << "\n";
+                        //                        std::cout << "Setting initial numbers for females in area " << this->initial_numbers[i].area_id << "\n";
                         this->females[this->initial_numbers[i].area_id].initial_numbers = this->initial_numbers[i].values;
 
                         break;
@@ -1232,9 +1287,9 @@ namespace mas {
         out << "Name: " << pop.name << "\n";
         out << "Id: " << pop.id << "\n";
         out << "Natal Area: " << pop.natal_area->id << "\n";
-        out << "Movement Areas: ";
+        out << "Population Area Info: ";
         for (int i = 0; i < pop.areas_list.size(); i++) {
-            out << pop.areas_list[i]->id << " ";
+            out << *pop.areas_list[i] << " ";
         }
         out << "\n";
 
