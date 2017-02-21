@@ -216,12 +216,13 @@ namespace mas {
                     REAL_T temp = this->survey_biomass_data->get(y, s);
                     if (temp != this->survey_biomass_data->missing_value) {
                         this->survey_biomass_component +=
-                                (.5) * atl::pow((std::log(temp + o) -
+                                (.5 * atl::pow((std::log(temp + o) -
                                 atl::log(this->survey_biomass_total[y * seasons + s] + o)
-                                + (std::pow(srv_CV, 2.0) / 2.0)) / srv_CV, 2.0);
+                                + (std::pow(srv_CV, 2.0) / 2.0)) / srv_CV, 2.0));
 //                        std::cout<<"survey_biomass_component = "<<survey_biomass_component<<"\n";
                     }
-
+//(0.5 * SQUARE(((atl::log(obs_srv_5_biomass(i) + o) - atl::log(est_srv_5_biomass(i) + o) + SQUARE((obs_srv_5_CV(i) / 2.0))) / obs_srv_5_CV(i))));
+//        }
                     variable sum;
                     for (int a = 0; a <this->ages; a++) {
                         size_t index = y * this->seasons * this->ages + (s) * this->ages + a;
@@ -231,7 +232,7 @@ namespace mas {
 
                     }
 
-                    this->survey_age_comp_component += sum;
+                    this->survey_age_comp_component -= sum;
 //                     std::cout<<"survey_age_comp_component = "<<survey_age_comp_component<<"\n";
 
                 }
