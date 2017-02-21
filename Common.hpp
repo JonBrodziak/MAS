@@ -107,17 +107,17 @@ namespace mas {
         DataUnits units;
         std::string name;
         REAL_T missing_value;
-        
+
         uint32_t id;
         uint32_t area_id;
         uint32_t population_id;
         uint32_t dimensions;
-        size_t imax;
-        size_t jmax;
-        size_t kmax;
-        size_t lmax;
-        size_t mmax;
-        size_t nmax;
+        size_t imax = 1;
+        size_t jmax = 1;
+        size_t kmax = 1;
+        size_t lmax = 1;
+        size_t mmax = 1;
+        size_t nmax = 1;
 
         inline REAL_T& get(int i) {
             return data[i];
@@ -141,6 +141,34 @@ namespace mas {
 
         inline REAL_T& get(int i, int j, int k, int l, int m, int n) {
             return data[i * jmax * kmax * lmax * mmax * nmax + j * kmax * lmax * mmax * nmax + k * lmax * mmax * nmax + l * mmax * nmax + m * nmax + m];
+        }
+
+        static DataUnits GetUnits(const std::string& str) {
+
+            if (str == "MT") {
+                return mas::MT;
+            } else if (str == "KG") {
+                return mas::KG;
+            } else if (str == "LBS") {
+                return mas::LBS;
+            } else if (str == "NUMBERS") {
+                return mas::NUMBERS;
+            } else {
+                return mas::NA;
+            }
+        }
+
+        static FishSexType GetSex(const std::string& str) {
+
+            if (str == "male") {
+                return mas::MALE;
+            } else if (str == "female") {
+                return mas::FEMALE;
+            } else if (str == "undifferentiated") {
+                return mas::UNDIFFERENTIATED;
+            } else {
+                return mas::UNDIFFERENTIATED;
+            }
         }
 
         static DataObjectType GetType(const std::string& str) {
@@ -174,7 +202,7 @@ namespace mas {
     };
 
     template<typename T>
-    std::ostream& operator<<(std::ostream& out, const mas::DataObject<T>& data_object) {
+    std::ostream& operator<<(std::ostream& out,  mas::DataObject<T>& data_object) {
 
         switch (data_object.type) {
             case CATCH_BIOMASS:
@@ -215,11 +243,30 @@ namespace mas {
             case UNDIFFERENTIATED:
                 out << "Undifferentiated\n";
                 break;
-            
+
         }
-        out <<"Dimensions: "<<data_object.dimensions<<"\n";
-        
-        
+        out << "Dimensions: " << data_object.dimensions << "\n";
+
+
+        for (int i = 0; i < data_object.imax; i++) {
+            for (int j = 0; j < data_object.jmax; j++) {
+                for (int k = 0; k < data_object.kmax; k++) {
+                    for (int l = 0; l < data_object.lmax; l++) {
+                        for (int m = 0; m < data_object.mmax; m++) {
+                            for (int n = 0; n < data_object.nmax; n++) {
+                                out <<
+                                        data_object.get(i,j,k,l,m,n)<<" ";
+                            }
+                        }
+                    }
+
+                }
+
+            }
+            out<<"\n";
+        }
+
+
 
         return out;
     }

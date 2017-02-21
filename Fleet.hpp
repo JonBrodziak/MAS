@@ -266,20 +266,21 @@ namespace mas {
                     REAL_T temp_f = static_cast<REAL_T> (0.0);
                     temp += catch_biomass_data->get(y, s);
 
-
-                    //                    std::cout << "temp = " << temp << "\n";
+                                        
                     this->catch_biomass_component += .5 * atl::pow(std::log(temp + .00001) - atl::log(this->catch_biomass_total[y * seasons + s] + .00001), 2.0) / .05;
-
+//std::cout << "catch_biomass_component = " << catch_biomass_component << "\n";
                     temp = static_cast<REAL_T> (0.0);
                     for (int a = 0; a <this->ages; a++) {
 
                         size_t index = y * this->seasons * this->ages + (s) * this->ages + a;
                         this->fishery_age_comp_component -= atl::pow(this->catch_proportion_at_age_data->get(y, s, a)*(std::log(this->catch_proportion_at_age_data->get(y, s, a) + .0001) - atl::log(this->catch_proportion_at_age[index] + .0001)), 2.0);
+//std::cout << "fishery_age_comp_component = " << fishery_age_comp_component << "\n";
 
                     }
 
                 }
             }
+         
         }
 
         inline void EvaluateBiomassComponent(int year, int season) {

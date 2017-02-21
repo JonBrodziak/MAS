@@ -219,6 +219,7 @@ namespace mas {
                                 (.5) * atl::pow((std::log(temp + o) -
                                 atl::log(this->survey_biomass_total[y * seasons + s] + o)
                                 + (std::pow(srv_CV, 2.0) / 2.0)) / srv_CV, 2.0);
+//                        std::cout<<"survey_biomass_component = "<<survey_biomass_component<<"\n";
                     }
 
                     variable sum;
@@ -231,11 +232,13 @@ namespace mas {
                     }
 
                     this->survey_age_comp_component += sum;
+//                     std::cout<<"survey_age_comp_component = "<<survey_age_comp_component<<"\n";
 
                 }
 
 
             }
+              
         }
 
         inline void EvaluateBiomassComponent(int year, int season) {

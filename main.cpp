@@ -21,6 +21,8 @@
 #include "MAS.hpp"
 using namespace std;
 
+#ifdef MAS_USE_NETCDF
+
 void create() {
 
     int fisheries = 2;
@@ -53,18 +55,19 @@ void create() {
         {0.191, 0.191, 0.191, 0.191, 0.191, 0.192, 0.192, 0.192, 0.192, 0.192, 0.189, 0.172, 0.149, 0.128, 0.107, 0.093, 0.079, 0.073, 0.067, 0.066, 0.062, 0.067, 0.069, 0.078, 0.081, 0.091, 0.093, 0.099, 0.099, 0.101}
     };
 
-    std::vector<std::vector<float> > area2_catch_proportion = {
-        {0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.002, 0.002, 0.002, 0.002, 0.002, 0.003, 0.003, 0.003, 0.003, 0.003, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002},
-        {0.007, 0.007, 0.007, 0.007, 0.007, 0.007, 0.007, 0.007, 0.007, 0.007, 0.009, 0.010, 0.011, 0.012, 0.012, 0.012, 0.013, 0.013, 0.013, 0.013, 0.012, 0.011, 0.010, 0.010, 0.010, 0.010, 0.010, 0.010, 0.010, 0.010},
-        {0.035, 0.035, 0.036, 0.035, 0.035, 0.036, 0.036, 0.036, 0.036, 0.036, 0.044, 0.054, 0.060, 0.062, 0.064, 0.065, 0.066, 0.067, 0.067, 0.068, 0.060, 0.055, 0.052, 0.052, 0.051, 0.051, 0.050, 0.050, 0.050, 0.050},
-        {0.156, 0.156, 0.157, 0.157, 0.155, 0.156, 0.157, 0.158, 0.159, 0.159, 0.173, 0.211, 0.233, 0.248, 0.250, 0.256, 0.258, 0.262, 0.263, 0.265, 0.254, 0.230, 0.219, 0.213, 0.214, 0.211, 0.211, 0.209, 0.209, 0.208},
-        {0.201, 0.200, 0.200, 0.200, 0.200, 0.198, 0.198, 0.199, 0.201, 0.200, 0.195, 0.204, 0.230, 0.241, 0.254, 0.253, 0.258, 0.257, 0.261, 0.260, 0.271, 0.269, 0.252, 0.247, 0.241, 0.244, 0.241, 0.242, 0.239, 0.240},
-        {0.155, 0.155, 0.155, 0.155, 0.155, 0.155, 0.153, 0.153, 0.153, 0.155, 0.149, 0.135, 0.133, 0.145, 0.148, 0.156, 0.153, 0.156, 0.153, 0.156, 0.159, 0.176, 0.178, 0.171, 0.169, 0.165, 0.167, 0.165, 0.167, 0.164},
-        {0.115, 0.115, 0.115, 0.115, 0.115, 0.116, 0.116, 0.114, 0.113, 0.113, 0.112, 0.098, 0.087, 0.083, 0.088, 0.088, 0.094, 0.090, 0.093, 0.089, 0.096, 0.100, 0.115, 0.115, 0.113, 0.111, 0.109, 0.111, 0.109, 0.112},
-        {0.085, 0.085, 0.085, 0.086, 0.086, 0.086, 0.086, 0.086, 0.085, 0.084, 0.081, 0.074, 0.062, 0.055, 0.050, 0.054, 0.052, 0.057, 0.053, 0.056, 0.054, 0.062, 0.065, 0.077, 0.074, 0.075, 0.073, 0.072, 0.074, 0.072},
-        {0.063, 0.063, 0.063, 0.063, 0.064, 0.064, 0.064, 0.064, 0.064, 0.063, 0.060, 0.054, 0.048, 0.038, 0.035, 0.030, 0.034, 0.031, 0.035, 0.031, 0.036, 0.034, 0.043, 0.041, 0.052, 0.047, 0.051, 0.047, 0.049, 0.049},
-        {0.181, 0.181, 0.181, 0.181, 0.182, 0.182, 0.182, 0.182, 0.182, 0.182, 0.176, 0.157, 0.134, 0.115, 0.096, 0.083, 0.071, 0.065, 0.059, 0.059, 0.056, 0.062, 0.063, 0.072, 0.075, 0.084, 0.086, 0.092, 0.092, 0.094}
-    };
+    std::vector<std::vector<float> > area2_catch_proportion ={
+{0.002,0.002,0.002,0.002,0.002,0.002,0.002,0.002,0.002,0.002,0.002,0.002,0.002,0.002,0.002,0.002,0.002,0.002,0.002,0.002,0.002,0.002,0.002,0.002,0.002,0.002,0.002,0.002,0.002,0.002},
+{0.007,0.007,0.007,0.007,0.007,0.007,0.007,0.007,0.007,0.008,0.004,0.005,0.006,0.006,0.006,0.007,0.007,0.007,0.007,0.007,0.013,0.012,0.011,0.011,0.011,0.011,0.010,0.010,0.010,0.010},
+{0.043,0.043,0.043,0.040,0.040,0.040,0.040,0.040,0.041,0.041,0.042,0.045,0.049,0.051,0.053,0.054,0.055,0.056,0.057,0.057,0.058,0.058,0.057,0.056,0.056,0.056,0.056,0.055,0.055,0.055},
+{0.141,0.141,0.141,0.141,0.133,0.134,0.135,0.135,0.136,0.136,0.138,0.147,0.159,0.169,0.175,0.177,0.181,0.182,0.185,0.186,0.187,0.188,0.185,0.182,0.181,0.181,0.179,0.179,0.178,0.178},
+{0.189,0.190,0.190,0.190,0.192,0.182,0.184,0.185,0.185,0.186,0.185,0.190,0.199,0.214,0.223,0.229,0.228,0.233,0.233,0.236,0.236,0.237,0.237,0.232,0.229,0.228,0.230,0.227,0.228,0.226},
+{0.158,0.158,0.158,0.158,0.160,0.162,0.154,0.155,0.156,0.155,0.156,0.152,0.152,0.156,0.167,0.170,0.175,0.172,0.176,0.173,0.177,0.175,0.180,0.179,0.175,0.174,0.172,0.175,0.172,0.174},
+{0.119,0.119,0.119,0.119,0.120,0.122,0.124,0.117,0.119,0.119,0.117,0.116,0.108,0.106,0.106,0.115,0.114,0.118,0.114,0.118,0.114,0.118,0.116,0.123,0.121,0.119,0.118,0.117,0.120,0.117},
+{0.088,0.088,0.088,0.088,0.089,0.091,0.092,0.093,0.087,0.089,0.089,0.085,0.083,0.073,0.072,0.070,0.077,0.074,0.078,0.073,0.078,0.072,0.078,0.075,0.084,0.080,0.080,0.079,0.078,0.081},
+{0.065,0.065,0.065,0.065,0.066,0.067,0.068,0.069,0.069,0.065,0.066,0.064,0.059,0.057,0.047,0.048,0.045,0.051,0.047,0.052,0.045,0.051,0.045,0.052,0.049,0.058,0.052,0.055,0.052,0.053},
+{0.187,0.187,0.187,0.187,0.189,0.192,0.194,0.196,0.198,0.199,0.196,0.189,0.178,0.161,0.145,0.125,0.113,0.101,0.098,0.092,0.092,0.087,0.089,0.086,0.092,0.092,0.100,0.100,0.104,0.104}
+};
+
 
     std::vector<std::vector<float> > area1_survey_proportion = {
         {0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.002, 0.002, 0.002, 0.002, 0.002, 0.003, 0.003, 0.003, 0.003, 0.003, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002},
@@ -94,24 +97,216 @@ void create() {
     };
 
 
+    std::ofstream jout("mas_case_1.json");
+    jout << "{\n";
+
+
     netcdf_output out("mas_case_1.nc");
     out.add_global_attribute("model", "mas case study 1");
+    jout << "\"model\":\"mas case study 1\",\n";
     out.add_global_attribute("workgroup", "mas worksop");
+    jout << "\"workgroup\":\"mas worksop\",\n";
     out.add_global_attribute("date", "10/19/2016");
-
+    jout << "\"date\":\"10/19/2016\",\n";
+    int years = 30;
+    int ages = 10;
     out.add_dimension("years", 30);
+    jout << "\"years\":30,\n";
     out.add_dimension("seasons", 1);
+    jout << "\"seasons\":1,\n";
     out.add_dimension("ages", 10);
+    jout << "\"ages\":10,\n";
 
     //
+
+    jout << "\"data_object\":{\n";
     out.add_variable("catch_biomass_area_1", "float",{"years"});
+    jout << "\"name\":\"catch_biomass_area_1\",\n";
     out.add_variable_attribute("catch_biomass_area_1", "units", "MT");
+    jout << "\"units\":\"MT\",\n";
     out.add_variable_attribute("catch_biomass_area_1", "data_object_type", "catch_biomass");
+    jout << "\"data_object_type\":\"catch_biomass\",\n";
+
     out.add_variable_attribute("catch_biomass_area_1", "sex", "undifferentiated");
+    jout << "\"sex\":\"undifferentiated\",\n";
+
     out.add_variable_attribute("catch_biomass_area_1", "area", "1");
+    jout << "\"areas_of_operation\":[{ \"season\":1,\"area\":1}],\n";
+
     out.add_variable_attribute("catch_biomass_area_1", "id", "1");
     out.add_variable_attribute("catch_biomass_area_1", "missing_values", "-999");
-    //
+    jout << "\"missing_values\":\"-999\",\n";
+    jout << "\"values\":[";
+    for (int i = 0; i < area1_biomass.size() - 1; i++) {
+        jout << area1_biomass[i] << ",";
+    }
+    jout << area1_biomass[area1_biomass.size() - 1] << "]\n},";
+
+    jout << "\"data_object\":{\n";
+    jout << "\"name\":\"catch_biomass_area_2\",\n";
+    jout << "\"units\":\"MT\",\n";
+    jout << "\"data_object_type\":\"catch_biomass\",\n";
+
+    jout << "\"sex\":\"undifferentiated\",\n";
+
+    jout << "\"areas_of_operation\":[{ \"season\":1,\"area\":2}],\n";
+    jout << "\"missing_values\":\"-999\",\n";
+    jout << "\"values\":[";
+    for (int i = 0; i < area2_biomass.size() - 1; i++) {
+        jout << area2_biomass[i] << ",";
+    }
+    jout << area2_biomass[area2_biomass.size() - 1] << "]\n},";
+
+    jout << "\"data_object\":{\n";
+    jout << "\"name\":\"survey_biomass_area_1\",\n";
+    jout << "\"units\":\"MT\",\n";
+    jout << "\"data_object_type\":\"survey_biomass\",\n";
+
+    jout << "\"sex\":\"undifferentiated\",\n";
+
+    jout << "\"areas_of_operation\":[{ \"season\":1,\"area\":1}],\n";
+    jout << "\"missing_values\":\"-999\",\n";
+    jout << "\"values\":[";
+    for (int i = 0; i < area1_survey_biomass.size() - 1; i++) {
+        jout << area1_survey_biomass[i] << ",";
+    }
+    jout << area1_survey_biomass[area1_survey_biomass.size() - 1] << "]\n},";
+
+
+    jout << "\"data_object\":{\n";
+    jout << "\"name\":\"survey_biomass_area_2\",\n";
+    jout << "\"units\":\"MT\",\n";
+    jout << "\"data_object_type\":\"survey_biomass\",\n";
+
+    jout << "\"sex\":\"undifferentiated\",\n";
+
+    jout << "\"areas_of_operation\":[{ \"season\":1,\"area\":2}],\n";
+    jout << "\"missing_values\":\"-999\",\n";
+    jout << "\"values\":[";
+    for (int i = 0; i < area2_survey_biomass.size() - 1; i++) {
+        jout << area2_survey_biomass[i] << ",";
+    }
+    jout << area2_survey_biomass[area2_survey_biomass.size() - 1] << "]\n},";
+
+
+    jout << "\"data_object\":{\n";
+    jout << "\"name\":\"catch_proportions_at_age_area_1\",\n";
+    jout << "\"units\":\"MT\",\n";
+    jout << "\"data_object_type\":\"catch_proportions_at_age\",\n";
+
+    jout << "\"sex\":\"undifferentiated\",\n";
+
+    jout << "\"areas_of_operation\":[{ \"season\":1,\"area\":1}],\n";
+    jout << "\"missing_values\":\"-999\",\n";
+    jout << "\"values\":[";
+     for (int j = 0; j < years; j++) {
+
+        jout << "[";
+        for (int i = 0; i < ages; i++) {
+            if (i == ages - 1) {
+                jout << area1_catch_proportion[i][j];
+            } else {
+                jout << area1_catch_proportion[i][j] << ",";
+            }
+        }
+        if (j == years - 1) {
+            jout << "]";
+        } else {
+            jout << "],\n";
+        }
+    }
+    jout << "]},\n";
+
+    jout << "\"data_object\":{\n";
+    jout << "\"name\":\"catch_proportions_at_age_area_2\",\n";
+    jout << "\"units\":\"MT\",\n";
+    jout << "\"data_object_type\":\"catch_proportions_at_age\",\n";
+
+    jout << "\"sex\":\"undifferentiated\",\n";
+
+    jout << "\"areas_of_operation\":[{ \"season\":1,\"area\":2}],\n";
+    jout << "\"missing_values\":\"-999\",\n";
+    jout << "\"values\":[";
+
+
+    jout << "[";
+     for (int j = 0; j < years; j++) {
+
+        jout << "[";
+        for (int i = 0; i < ages; i++) {
+            if (i == ages - 1) {
+                jout << area2_catch_proportion[i][j];
+            } else {
+                jout << area2_catch_proportion[i][j] << ",";
+            }
+        }
+        if (j == years - 1) {
+            jout << "]";
+        } else {
+            jout << "],\n";
+        }
+    }
+
+    jout << "]},\n";
+
+    jout << "\"data_object\":{\n";
+    jout << "\"name\":\"survey_proportions_at_age_area_1\",\n";
+    jout << "\"units\":\"MT\",\n";
+    jout << "\"data_object_type\":\"survey_proportions_at_age\",\n";
+
+    jout << "\"sex\":\"undifferentiated\",\n";
+
+    jout << "\"areas_of_operation\":[{ \"season\":1,\"area\":1}],\n";
+    jout << "\"missing_values\":\"-999\",\n";
+    jout << "\"values\":[";
+     for (int j = 0; j < years; j++) {
+
+        jout << "[";
+        for (int i = 0; i < ages; i++) {
+            if (i == ages - 1) {
+                jout << area1_survey_proportion[i][j];
+            } else {
+                jout << area1_survey_proportion[i][j] << ",";
+            }
+        }
+        if (j == years - 1) {
+            jout << "]";
+        } else {
+            jout << "],\n";
+        }
+    }
+    
+    jout << "]},\n";
+
+    jout << "\"data_object\":{\n";
+    jout << "\"name\":\"survey_proportions_at_age_area_2\",\n";
+    jout << "\"units\":\"MT\",\n";
+    jout << "\"data_object_type\":\"survey_proportions_at_age\",\n";
+
+    jout << "\"sex\":\"undifferentiated\",\n";
+
+    jout << "\"areas_of_operation\":[{ \"season\":1,\"area\":2}],\n";
+    jout << "\"missing_values\":\"-999\",\n";
+    jout << "\"values\":[";
+    for (int j = 0; j < years; j++) {
+
+        jout << "[";
+        for (int i = 0; i < ages; i++) {
+            if (i == ages - 1) {
+                jout << area2_survey_proportion[i][j];
+            } else {
+                jout << area2_survey_proportion[i][j] << ",";
+            }
+        }
+        if (j == years - 1) {
+            jout << "]";
+        } else {
+            jout << "],\n";
+        }
+    }
+    jout << "]}\n";
+    jout << "}";
+
     out.add_variable("catch_biomass_area_2", "float",{"years"});
     out.add_variable_attribute("catch_biomass_area_2", "data_object_type", "catch_biomass");
     out.add_variable_attribute("catch_biomass_area_2", "sex", "undifferentiated");
@@ -191,6 +386,7 @@ void create() {
 
 }
 
+#endif
 /**
  * Handles the gradient based minimization for the MAS model fit.
  */
@@ -366,7 +562,7 @@ class MASObjectiveFunction : public atl::ObjectiveFunction<REAL_T> {
 public:
 
     mas::MAS<REAL_T> mas;
-    std::string data_path = "mas_case_1.nc";
+    std::string data_path = "mas_case_1_data.json";
     std::string config_path = "mas_cas31.json";
 
 
@@ -403,8 +599,9 @@ public:
  */
 int main(int argc, char** argv) {
 
- 
-    
+
+//    create();
+//    exit(0);
     for (int i = 0; i < 1; i++) {
         MASObjectiveFunction<double> objective_function;
 

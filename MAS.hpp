@@ -78,6 +78,8 @@ namespace mas {
             info.ParseConfig(config_file);
             info.ParseData(data_file);
             info.CreateModel();
+            info.ShowData();
+//            exit(0);
         }
 
         inline void Run(variable& f) {
@@ -175,7 +177,7 @@ namespace mas {
 //                    << this->survey_biomass_component << " + " << catch_biomass_component << " + " <<
 //                    fishery_age_comp_component << "= " << f << std::endl;
 
-
+// exit(0);
         }
 
         void Forecast() {

@@ -42,8 +42,10 @@
 #include "third_party/rapidjson/document.h"
 #include "Fleet.hpp"
 #include <ctime>
-#include "NetCDF.hpp"
 
+#ifdef MAS_USE_NETCDF
+#include "NetCDF.hpp"
+#endif
 
 
 namespace mas {
@@ -6121,7 +6123,7 @@ namespace mas {
                 mas::mas_log << "Configuration Error: More than one recruitment model with the same identifier defined. Recruitment models require a unique id.\n";
 
                 this->valid_configuration = false;
-                
+
             } else {
                 this->recruitment_models[model->id] = model;
             }
@@ -6176,6 +6178,9 @@ namespace mas {
         //
         //        }
 
+        
+#ifdef MAS_USE_NETCDF
+        
         void ParseData(const std::string & path) {
 
             netcdf_input in(path);
@@ -6296,6 +6301,220 @@ namespace mas {
 
                 data_dictionary[data->area_id].push_back(data);
                 this->data.push_back(data);
+            }
+        }
+#else
+        
+        void ParseData(const std::string & path) {
+
+            std::stringstream ss;
+            std::ifstream config;
+            config.open(path.c_str());
+            if (!config.good()) {
+                std::cerr << "MAS Data file \"" << path << "\" not found.\n";
+                mas::mas_log << "MAS Data file \"" << path << "\" not found.\n";
+                this->valid_configuration = false;
+            }
+
+            while (config.good()) {
+                std::string line;
+                std::getline(config, line);
+                ss << line << "\n";
+            }
+
+            rapidjson::Document document;
+            document.Parse(ss.str().c_str());
+            rapidjson::Document::MemberIterator dit;
+
+            int years = 1;
+            int seasons = 1;
+            int ages = 1;
+
+            for (dit = document.MemberBegin(); dit != document.MemberEnd(); ++dit) {
+                if (std::string((*dit).name.GetString()) == "years") {
+                    years = (*dit).value.GetInt();
+                    std::cout << "setting years -> " << years << "\n";
+                }
+
+                if (std::string((*dit).name.GetString()) == "seasons") {
+                    seasons = (*dit).value.GetInt();
+                    std::cout << "setting seasons -> " << seasons << "\n";
+                }
+
+                if (std::string((*dit).name.GetString()) == "ages") {
+                    ages = (*dit).value.GetInt();
+                    std::cout << "setting ages -> " << ages << "\n";
+                }
+            }
+
+
+            for (dit = document.MemberBegin(); dit != document.MemberEnd(); ++dit) {
+                if (std::string((*dit).name.GetString()) == "data_object") {
+                    rapidjson::Document::MemberIterator mit;
+                    std::shared_ptr<DataObject<REAL_T> > data_object(new DataObject<REAL_T>());
+
+//                    data_object->imax = years;
+//                    data_object->jmax = seasons;
+//                    data_object->kmax = ages;
+
+                    mit = (*dit).value.FindMember("data_object_type");
+                    if (mit != (*dit).value.MemberEnd()) {
+                        data_object->type = DataObject<REAL_T>::GetType(std::string((*mit).value.GetString()));
+
+                        switch (data_object->type) {
+                            case mas::CATCH_BIOMASS:
+                                std::cout << "CATCH_BIOMASS\n";
+                                data_object->imax = years;
+                                data_object->jmax = seasons;
+                                break;
+                            case mas::SURVEY_BIOMASS:
+
+                                std::cout << "SURVEY_BIOMASS\n";
+                                data_object->imax = years;
+                                data_object->jmax = seasons;
+                                break;
+
+                            case mas::CATCH_PROPORTION_AT_AGE:
+                                std::cout << "CATCH_PROPORTION_AT_AGE\n";
+                                data_object->imax = years;
+                                data_object->jmax = seasons;
+                                data_object->kmax = ages;
+                                break;
+
+                            case mas::SURVEY_PROPORTION_AT_AGE:
+                                std::cout << "SURVEY_PROPORTION_AT_AGE\n";
+                                data_object->imax = years;
+                                data_object->jmax = seasons;
+                                data_object->kmax = ages;
+                                break;
+                            default:
+                                std::cout << "Unknown Data type\n";
+                        }
+
+                    } else {
+                        std::cout << "Data Warning: Data Object has no \"data_object_type\" specified.\n";
+                        mas_log << "Data Warning: Data Object has no \"data_object_type\" specified.\n";
+
+                    }
+
+                    mit = (*dit).value.FindMember("units");
+                    if (mit != (*dit).value.MemberEnd()) {
+                        data_object->units = DataObject<REAL_T>::GetUnits(std::string((*mit).value.GetString()));
+                    } else {
+                        std::cout << "Data Warning: Data Object has no \"units\" specified.\n";
+                        mas_log << "Data Warning: Data Object has no \"units\" specified.\n";
+
+                    }
+
+                    mit = (*dit).value.FindMember("id");
+                    if (mit != (*dit).value.MemberEnd()) {
+                        data_object->id = (*mit).value.GetInt();
+                    } else {
+                        std::cout << "Data Warning: Data Object has no \"id\" specified.\n";
+                        mas_log << "Data Warning: Data Object has no \"id\" specified.\n";
+
+                    }
+
+                    mit = (*dit).value.FindMember("sex");
+                    if (mit != (*dit).value.MemberEnd()) {
+                        data_object->sex_type = DataObject<float>::GetSex(std::string((*mit).value.GetString()));
+                    } else {
+                        std::cout << "Data Warning: Data Object has no \"sex\" specified.\n";
+                        mas_log << "Data Warning: Data Object has no \"sex\" specified.\n";
+
+                    }
+
+                    mit = (*dit).value.FindMember("missing_values");
+                    if (mit != (*dit).value.MemberEnd()) {
+                        data_object->missing_value = static_cast<float> ((*mit).value.GetDouble());
+                    } else {
+                        std::cout << "Data Warning: Data Object has no \"missing_values\" specified.\n";
+                        mas_log << "Data Warning: Data Object has no \"missing_values\" specified.\n";
+
+                    }
+
+                    //                    data_object->data.resize(years * seasons*ages, data_object->missing_value);
+
+                    mit = (*dit).value.FindMember("values");
+                    if (mit != (*dit).value.MemberEnd()) {
+                        if ((*mit).value.IsArray()) {
+                            int i, j;
+                            rapidjson::Value& v = (*mit).value;
+                            switch (data_object->type) {
+                                case mas::CATCH_BIOMASS:
+                                    for (i = 0; i < v.Size(); i++) {
+                                        data_object->data.push_back(static_cast<float> (v[i].GetDouble()));
+                                        std::cout << v[i].GetDouble() << " ";
+                                    }
+                                    std::cout << "\n";
+                                    break;
+                                case mas::SURVEY_BIOMASS:
+                                    for (i = 0; i < v.Size(); i++) {
+                                        data_object->data.push_back(static_cast<float> (v[i].GetDouble()));
+                                        std::cout << v[i].GetDouble() << " ";
+                                    }
+                                    std::cout << "\n";
+                                    break;
+
+                                case mas::CATCH_PROPORTION_AT_AGE:
+                                    for (i = 0; i < v.Size(); i++) {
+                                        if (!v[i].IsArray()) {
+                                            std::cout << "Data Warning: Data Object \"values\" for catch_proportion_at_age expect as vector of vectors.\n";
+                                            mas_log << "Data Warning: Data Object \"values\" for catch_proportion_at_age expect as vector of vectors.\n";
+                                        } else {
+                                            for (j = 0; j < v[i].Size(); j++) {
+                                                data_object->data.push_back(static_cast<float> (v[i][j].GetDouble()));
+                                                std::cout << v[i][j].GetDouble() << " ";
+                                            }
+                                            std::cout << "\n";
+                                        }
+                                        std::cout << "\n";
+                                    }
+                                    break;
+
+                                case mas::SURVEY_PROPORTION_AT_AGE:
+                                    for (i = 0; i < v.Size(); i++) {
+                                        if (!v[i].IsArray()) {
+                                            std::cout << "Data Warning: Data Object \"values\" for survey_proportion_at_age expect as vector of vectors.\n";
+                                            mas_log << "Data Warning: Data Object \"values\" for survey_proportion_at_age expect as vector of vectors.\n";
+                                        } else {
+                                            for (j = 0; j < v[i].Size(); j++) {
+                                                data_object->data.push_back(static_cast<float> (v[i][j].GetDouble()));
+                                                std::cout << v[i][j].GetDouble() << " ";
+                                            }
+                                            std::cout << "\n";
+                                        }
+                                        std::cout << "\n";
+                                    }
+                                    break;
+                            }
+
+
+                        } else {
+                            std::cout << "Data Warning: Data Object \"values\" expected to be a vector.\n";
+                            mas_log << "Data Warning: Data Object  \"values\" expected to be a vector.\n";
+                        }
+
+
+                    } else {
+                        std::cout << "Data Warning: Data Object has no \"values\" specified.\n";
+                        mas_log << "Data Warning: Data Object has no \"values\" specified.\n";
+
+                    }
+#warning remove this
+                    data_dictionary[data_object->id].push_back(data_object);
+                    this->data.push_back(data_object);
+
+
+                }
+
+            }
+
+        }
+#endif 
+        void ShowData(){
+            for(int i =0; i < this->data.size();i++){
+                std::cout<<*this->data[i]<<"\n\n";
             }
         }
 

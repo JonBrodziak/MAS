@@ -233,9 +233,9 @@ namespace mas {
                     std::cout << "recruitment model not found!!!\n";
                     exit(0);
                 }
-                this->N[year * this->seasons * this->ages.size() + (season - 1) * this->ages.size()] = 
+                this->N[year * this->seasons * this->ages.size() + (season - 1) * this->ages.size()] =
                         this->recruitment[year * seasons + (season - 1)];
-                
+
                 this->N[year * this->seasons * this->ages.size() + (season - 1) * this->ages.size()] *=
                         atl::exp((*rit).second->recruitment_deviations[year * seasons + (season - 1)]);
             }
@@ -1282,14 +1282,16 @@ namespace mas {
     };
 
     template<typename REAL_T>
-    std::ostream& operator<<(std::ostream& out, const mas::Population<REAL_T>& pop) {
+    std::ostream& operator<<(std::ostream& out,  mas::Population<REAL_T>& pop) {
         out << "Population:\n";
         out << "Name: " << pop.name << "\n";
         out << "Id: " << pop.id << "\n";
         out << "Natal Area: " << pop.natal_area->id << "\n";
         out << "Population Area Info: ";
-        for (int i = 0; i < pop.areas_list.size(); i++) {
-            out << *pop.areas_list[i] << " ";
+        for (int a = 0; a < pop.areas_list.size(); a++) {
+            out << pop.males[pop.areas_list[a]->id] << " \n\n";
+            out << pop.females[pop.areas_list[a]->id] << " \n\n";
+
         }
         out << "\n";
 
