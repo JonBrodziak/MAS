@@ -40,5 +40,5 @@ install:
 
 # command to run tests
 script: 
-  - make
+  - c++ -std=c++11 -O3 main.cpp -o mas.x 
 
