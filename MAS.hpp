@@ -232,6 +232,7 @@ namespace mas {
                 (*fit).second->Prepare();
             }
 
+            
             /**
              * Evaluate each population and push final numbers to 
              * Area objects.
