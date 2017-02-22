@@ -8,6 +8,6 @@ compiler:
 # Build steps
 script:
   - cd third_party
-  - ./get_atl.sh 
+  - git clone https://github.com/msupernaw/ATL.git
   - cd ..
   - clang++ -std=c++11 -O3 main.cpp -o mas.x
