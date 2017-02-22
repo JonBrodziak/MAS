@@ -7,4 +7,5 @@ compiler:
  
 # Build steps
 script:
+  - ./get_atl.sh 
   - clang++ -std=c++11 -O3 main.cpp -o mas.x
