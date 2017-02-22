@@ -1,0 +1,209 @@
+% MAS Case Study v1
+%\documentclass[]{article}
+
+\documentclass[12pt]{article}
+
+\usepackage{lipsum}
+\usepackage[margin=1in,left=1in,includefoot]{geometry}
+\usepackage{graphicx} %allows for impage import
+\graphicspath{{images/}}
+\usepackage[hidelinks]{hyper ref} % Allows for clickable links
+\usepackage{sectsty}
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[none]{hyphenat}
+\usepackage{array}
+\usepackage{lscape}
+\usepackage{geometry}
+\usepackage{pdflscape}
+\usepackage{longtable}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+%\usepackage[table]{xcolor}
+\usepackage{colortbl}
+\usepackage{fixltx2e}
+\usepackage{hhline}
+\usepackage{dcolumn}
+\usepackage{hyperref}
+\hypersetup{pdftex,colorlinks=true,allcolors=black}
+\usepackage{hypcap}
+\usepackage{amsmath}
+\usepackage{hyperref}
+
+\definecolor{lightgray}{gray}{0.92}
+
+\newcolumntype{L}{>{\centering\arraybackslash}m{3in}}
+%\newcolumntype{L}{>{\centering\arraybackslash}m{2in}}
+%\newcolumntype{L}{>{\centering\arraybackslash}m{1in}}
+
+%\sectionfont{\LARGE}
+%\subsectionfont{\Large}
+%\subsubsectionfont{\large}
+
+\usepackage{float}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhead{}
+
+\setlength{\extrarowheight}{1.5pt}
+\setlength{\arraycolsep}{1.5pt}
+
+%opening
+%\title{}
+%\author{}
+
+
+\title{\vspace{-15mm}\fontsize{24pt}{24pt}\selectfont\textbf{MAS Case Study v1}} % Article title
+
+\author{
+	\large
+	\textsc{Jon Brodziak, PhD}\\[2mm] % Your name
+	\normalsize National Oceanic Atmospheric Administration \\ % Your institution
+	\normalsize National Marine Fisheries Service, Pacific Islands Fisheries Science Center\\ % Your institution
+	\normalsize \href{mailto:jon.brodziak@noaa.gov}{jon.brodziak@noaa.gov} \\ % Your email address
+	\\
+	\textsc{Matthew R. Supernaw}\\[2mm] % Your name
+	\normalsize National Oceanic Atmospheric Administration \\ % Your institution
+	\normalsize National Marine Fisheries Service, Office of Science and Technology\\ % Your institution
+	\normalsize \href{mailto:matthew.supernaw@noaa.gov}{matthew.supernaw@noaa.gov} \\ % Your email address
+	\\
+	\textsc{Z. Teresa A'mar, PhD}\\[2mm] % Your name
+	\normalsize National Oceanic Atmospheric Administration \\ % Your institution
+	\normalsize National Marine Fisheries Service, Office of Science and Technology\\ % Your institution
+	\normalsize \href{mailto:teresa.amar@noaa.gov}{teresa.amar@noaa.gov} \\% Your email address
+	\vspace{-5mm}
+}
+\date{2016-10-21}
+
+
+\begin{document}
+
+\maketitle
+\thispagestyle{fancy} % All pages have headers and footers
+
+
+\newpage
+\tableofcontents
+\newpage
+
+
+\begin{abstract}
+Summary of the first case study, v1, for the Metapopulation Assessment System (MAS).
+\end{abstract}
+
+
+\section{Vignette}
+
+Case study v1 represents a simple two-population model with a hypothetical north-south latitudinal cline for the species characteristics between two areas. The two populations are loosely modeled as an abundant and migratory groundfish species with 9 true age classes comprised of ages 0 to 8 years and 1 plus group for ages 9 and older. The time horizon for assessment is 20 years and an annual time step with a single season is used for fishery dynamics modeling. Both populations are modeled as having two sexes but there is no difference between genders in either population. The two populations inhabit two areas and have distinct recruitment and demographic trajectories. Area 1 is more temperate (northerly) and area 2 is more southerly (subtropical). Both populations spawn in both areas. Population 1 is abundant in area 1 and less abundant in area 2. Population 2 is abundant in both areas 1 and 2. The two populations engage in feeding migrations between areas. Population 1 has lower net movement and recruitment distribution rates between areas than population 2. Population 1 has a somewhat lower natural mortality rate at age than population 2. Population 1 has greater stock-recruitment resilience in area 1 and lower stock-recruitment resilience in area 2 in comparison to population 2. Population 1 has slightly greater length at age and weight at length, or girth, in comparison to population 2. Both populations are 50\% mature at age 3 but population 2 has more variability in maturity probability at age which is more knife-edged for population 1.
+
+Both populations have life history characteristics that persist when individuals move among areas. This alludes to the issue of the relative importance of nature (genes) versus nurture (environment) for marine population dynamics. In this case, nature is paramount and the demographic characteristics of an individual are determined by their genetics and population of origin and not by the area which they occur. Further, the two populations are modeled as moving among areas, with population 2 exhibiting higher mixing rates for early life history stages, juveniles, and adults.
+
+There is a mixed-population fishery in both areas. Two fishing fleets are harvesting the species; one fleet in each area. Both fleets are stable in operating characteristics throughout the assessment time horizon and fishery selectivity at age is constant through time for each fleet. Fishing fleet 1 has a fishery selectivity at age pattern that matches the maturity ogive of population 1 and fishing fleet 2 has a fishery selectivity at age pattern that matches the maturity ogive of population 2. The fishing effort in both fleets has changed through time. In the pre-time horizon period consisting of 10 years (indexed as years y = -9 to 0), both fleets have a constant annual fully-recruited fishing mortality rate of $F_{pre} = 0.1$.
+
+In the first 10 years of the assessment time horizon (period 1, indexed as years y = 1 to 10), the fishing mortality increases in both areas as both fishing fleets expand in capacity. In area 1, the fully-recruited fishing mortality increases 4-fold to $F_{Period 1, Area 1} = 0.4$, while in area 2, F increases 2-fold to $F_{Period 1, Area 2} = 0.2$. In the second 10 years of the assessment time horizon (period 2, indexed as years y = 11 to 20), the fishing mortality decreases in area 1 and does not change in area 2. That is, the fully-recruited fishing mortality in area 1 decreases 50\% to $F_{Period 2, Area 1} = 0.2$ in period 2, while the fishing mortality in area 2 remains at $F_{Period 2, Area 2} = 0.2$. in period 2. Overall, fishing mortality ramps up in the first period and then decreases or remains the same in period 2, leading to changes in the abundances of both populations.
+
+There is a fishery-independent survey in both areas. The survey has had stable operating characteristics throughout the assessment time horizon. The survey selectivity at age is constant through time for each population. Survey selectivity for population 1 is slightly higher and less variable at age than for population 1. The survey produces a biomass index and survey age composition by year for each area.
+
+
+\section{Population equations}
+
+X
+
+
+\section{Population characteristics}
+
+\begin{itemize}
+	\item 2 populations (labeled as populations 1 and 2)
+
+	\item 2 areas (labeled as areas 1 and 2)
+
+	\item 2 sexes (genders are female and male)
+
+	\item Equal sex ratios at birth for both populations (Female fraction is 0.5 for both populations)
+
+	\item 10 age classes in each population model (true ages 0 to 8, plus groups is 9+)
+
+	\item 20 year assessment time horizon (labeled as years 1 to 20)
+
+	\item Single season (labeled as season 1, i.e., an annual time step)
+
+	\item Constant movement matrices (labeled as $\underline{T}^{(1)}$ and  $\underline{T}^{(2)}$
+	\begin{itemize}
+		\item For population 1
+		\item For population 2
+	\end{itemize}
+
+	\item Constant natural mortality at age and by sex in each population (equal natural mortality rates for females and males by population,  that is,
+	\begin{itemize}
+		\item For population 1
+		\item For population 2
+	\end{itemize}
+
+	\item Beverton-Holt stock-recruitment curve by population and area without process error
+	\begin{itemize}
+		\item For population 1
+		\item For population 2
+	\end{itemize}
+
+	\item Constant recruitment distribution matrices by spawning area and destination area for each population. 
+	\begin{itemize}
+		\item For population 1
+		\item For population 2
+	\end{itemize}
+
+	\item Constant length-weight relationships based on allometric weight (kg) at length (cm) curves by population,
+	\begin{itemize}
+		\item For population 1
+		\item For population 2
+	\end{itemize}
+
+	\item Constant modified von Bertalanffy growth curves for mean length at age by population with linear interpolation for within season values
+	\begin{itemize}
+		\item For population 1
+		\item For population 2
+	\end{itemize}
+
+	\item Constant female logistic maturation ogives by population
+	\begin{itemize}
+		\item For population 1
+		\item For population 2
+	\end{itemize}
+
+	\item Spawning output proportional to female spawning biomass with male spawning biomass assumed to not affect spawning success.
+	
+	\item Fishing fleets (fleets 1 and 2) with fleet 1 in area 1 and fleet 2 in area 2. Three periods of constant effort and fishing mortality where the time periods are: pre-time horizon pre=[years -9: 0], period 1= [years 1:10], and period 2=[years 11:20].
+	
+	\item Constant logistic fishery selectivity at age by population for both fleets.
+	
+	\item Fishery catch at age by population, area, and gender for both fleets.
+	
+	\item Fishery catch biomass at age by population, area, and gender by fleet.
+	
+	\item Constant logistic survey selectivity at age by population.
+	
+	\item Survey catch at age indices by area and gender with survey timing of
+	
+	\item Survey catch biomass at age indices by area and gender with survey timing of
+	
+	\item Normal negative loglikelihood component for fishery catch biomass by fleet/area
+	
+	\item Multinomial likelihood component for fishery age compositions by fleet.
+	
+	\item Lognormal negative loglikelihood component for survey biomass indices by area.
+	
+	\item Multinomial likelihood component for survey age compositions by area.
+	
+	\item Lognormal likelihood component for recruitment deviations by area.
+	
+	\item Constant lambda weights for catch biomass, survey biomass, fishery age composition, survey age composition, and recruitment likelihood components.
+	
+\end{itemize}
+
+
+\section{Order of operations}
+
+X
+
+\end{document}
