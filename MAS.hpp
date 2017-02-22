@@ -79,7 +79,7 @@ namespace mas {
             info.ParseData(data_file);
             info.CreateModel();
             info.ShowData();
-//            exit(0);
+            //            exit(0);
         }
 
         inline void Run(variable& f) {
@@ -173,11 +173,11 @@ namespace mas {
                 this->survey_biomass_component -= info.survey_models[i]->survey_biomass_component;
             }
             f = this->survey_age_comp_component + this->survey_biomass_component + this->fishery_age_comp_component + this->catch_biomass_component;
-//            std::cout << "f = " << this->survey_age_comp_component << " + "
-//                    << this->survey_biomass_component << " + " << catch_biomass_component << " + " <<
-//                    fishery_age_comp_component << "= " << f << std::endl;
+            //            std::cout << "f = " << this->survey_age_comp_component << " + "
+            //                    << this->survey_biomass_component << " + " << catch_biomass_component << " + " <<
+            //                    fishery_age_comp_component << "= " << f << std::endl;
 
-// exit(0);
+            // exit(0);
         }
 
         void Forecast() {
@@ -187,22 +187,28 @@ namespace mas {
         void Report() {
             std::ofstream out("mas_report.txt");
             out << std::fixed;
+            out<<"Estimated Parameters:\n";
+            out << std::setw(30) << std::left << "Name" << std::setw(25) << "Value" << " " << std::setw(25) << "Gradient" << "\n";
+
+            for (int i = 0; i < this->info.estimated_parameters.size(); i++) {
+                out << std::setw(30) << std::left << this->info.estimated_parameters[i]->GetName() << std::setw(25) << this->info.estimated_parameters[i]->info->vvalue << " " << std::setw(25) << this->info.estimated_parameters[i]->info->dvalue << "\n";
+            }
+            out<<"\n\n";
 
             typename mas::Information<REAL_T>::fleet_iterator fit;
             typename mas::Information<REAL_T>::recruitment_model_iterator rit;
-            
+
             typename std::unordered_map<int, std::shared_ptr<mas::Population<double> > >::iterator it;
             std::unordered_map<int, std::shared_ptr<mas::Population<double> > >& pops =
                     info.GetPopulations();
             mas::Information<double>::area_iterator ait;
 
-            
             //prepare the recruitment deviations.
-            
-            for(rit = info.recruitment_models.begin(); rit != info.recruitment_models.end(); ++rit){
+
+            for (rit = info.recruitment_models.begin(); rit != info.recruitment_models.end(); ++rit) {
                 (*rit).second->Prepare();
             }
-            
+
             /**
              * Prepare areas for evaluation. Resets runtime information.
              */
@@ -257,12 +263,13 @@ namespace mas {
             }
 
 
+
             std::ofstream out2("populations.txt");
             out2 << std::fixed;
             for (it = pops.begin(); it != pops.end(); ++it) {
-                out2<<*(*it).second<<"\n";
+                out2 << *(*it).second << "\n";
             }
-            
+
 
         }
 
