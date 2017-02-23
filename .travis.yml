@@ -89,16 +89,6 @@ matrix:
       env: CXX=g++-6 BUILD_DOC=1
       addons: *gcc6
 
-before_install:
- - echo ${CXX}
- - if [[ $(uname -s) == 'Darwin' ]]; then
-     brew install protobuf;
-   fi
-
-install:
- - make test
- - if [ -n "${BUILD_DOC}" ]; then make doc; fi
-
 script:
 
 # Build steps
