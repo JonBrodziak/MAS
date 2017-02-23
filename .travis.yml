@@ -7,11 +7,11 @@ language: cpp
 
 # Compiler selection
 compiler:
-  - clang++
+  - gcc
  
 # Build steps
 script:
   - cd third_party
   - git clone https://github.com/msupernaw/ATL.git
   - cd ..
-  - clang++ -std=c++11 -O3 main.cpp -o mas.x
+  - g++ -std=c++11 -O3 main.cpp -o mas.x
