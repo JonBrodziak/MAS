@@ -1,6 +1,8 @@
 # Enable C++ support
 language: cpp
 
+install: make get-deps
+
 # Compiler selection
 compiler:
   - clang++
