@@ -610,6 +610,7 @@ int main(int argc, char** argv) {
     for (int i = 0; i < 1; i++) {
         MASObjectiveFunction<double> objective_function;
 
+        
         //initialize the objective function
         objective_function.Initialize();
         atl::Variable<double> f;
