@@ -21,6 +21,7 @@
 #include "MAS.hpp"
 using namespace std;
 
+
 #ifdef MAS_USE_NETCDF
 
 void create() {
