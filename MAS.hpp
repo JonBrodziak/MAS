@@ -37,6 +37,7 @@
 
 namespace mas {
 
+   
     template<typename REAL_T>
     class MAS {
         typedef typename VariableTrait<REAL_T>::variable variable;
