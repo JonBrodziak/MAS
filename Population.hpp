@@ -101,7 +101,7 @@ namespace mas {
         std::vector<variable> N;
         std::vector<variable> C;
         std::vector<variable> C_Biomass;
-        std::vector<variable> predicted_N;
+        std::vector<variable> expected_N;
         //        std::vector<variable> S;
 
         void Initialize() {
@@ -133,7 +133,7 @@ namespace mas {
             N.resize(years * seasons * ages.size());
             C.resize(years * seasons * ages.size());
             C_Biomass.resize(years * seasons * ages.size());
-            predicted_N.resize(years * seasons * ages.size());
+            expected_N.resize(years * seasons * ages.size());
 
         }
 
@@ -149,7 +149,7 @@ namespace mas {
                 mas::VariableTrait<REAL_T>::SetValue(N[i], static_cast<REAL_T> (0.0));
                 mas::VariableTrait<REAL_T>::SetValue(C[i], static_cast<REAL_T> (0.0));
                 mas::VariableTrait<REAL_T>::SetValue(C_Biomass[i], static_cast<REAL_T> (0.0));
-                mas::VariableTrait<REAL_T>::SetValue(predicted_N[i], static_cast<REAL_T> (0.0));
+                mas::VariableTrait<REAL_T>::SetValue(expected_N[i], static_cast<REAL_T> (0.0));
 
             }
 
@@ -389,7 +389,7 @@ namespace mas {
                 variable s;
                 size_t index = year * this->seasons * this->ages.size() + (season - 1) * this->ages.size() + a;
                 for (int f = 0; f < fleets.size(); f++) {
-                    s += fleets[f]->season_area_selectivity[season][this->area->id]->Evaluate(ages[a]);
+                    s = fleets[f]->season_area_selectivity[season][this->area->id]->Evaluate(ages[a]);
 
                     fleets[f]->catch_at_age[index] +=
                             N[index]*
@@ -442,6 +442,7 @@ namespace mas {
          * @param season
          */
         inline void SurveyNumbersAtAge(int year, int season) {
+#warning cant get survey model by pop id
             typename mas::Area<REAL_T>::survey_model_iterator it = this->area->survey_models.find(this->id);
             //needs to be optimized
             if (it != this->area->survey_models.end()) {
@@ -995,14 +996,14 @@ namespace mas {
 
 
                 int ss = season - 1;
-                std::vector<std::vector<variable> >& male_probabilities = (*it).second->male_connectivity[ss];
-                std::vector<std::vector<variable> >& female_probabilities = (*it).second->female_connectivity[ss];
-                std::vector<std::vector<variable> >& rercruit_probabilities = (*it).second->recruit_connectivity[ss];
+                std::vector<std::vector<variable> >& male_fractions = (*it).second->male_connectivity[ss];
+                std::vector<std::vector<variable> >& female_fractions = (*it).second->female_connectivity[ss];
+                std::vector<std::vector<variable> >& rercruit_fractions = (*it).second->recruit_connectivity[ss];
                 //should be square
-                for (int i = 0; i < male_probabilities.size(); i++) {
+                for (int i = 0; i < male_fractions.size(); i++) {
                     AreaPopulationInfo<REAL_T>& male_info_from = this->males[(i + 1)];
                     AreaPopulationInfo<REAL_T>& female_info_from = this->females[(i + 1)];
-                    for (int j = 0; j < male_probabilities.size(); j++) {
+                    for (int j = 0; j < male_fractions.size(); j++) {
                         AreaPopulationInfo<REAL_T>& male_info_to = this->males[(j + 1)];
                         AreaPopulationInfo<REAL_T>& female_info_to = this->females[(j + 1)];
 
@@ -1010,8 +1011,8 @@ namespace mas {
 
                         if (i != j) {
 
-                            variable tempm = rercruit_probabilities[i][j] * male_info_from.recruitment[year * this->seasons + (season - 1)];
-                            variable tempf = rercruit_probabilities[i][j] * female_info_from.recruitment[year * this->seasons + (season - 1)];
+                            variable tempm = rercruit_fractions[i][j] * male_info_from.recruitment[year * this->seasons + (season - 1)];
+                            variable tempf = rercruit_fractions[i][j] * female_info_from.recruitment[year * this->seasons + (season - 1)];
 
                             male_info_to.redistributed_recruits[year * this->seasons + (season - 1)] += tempm;
                             female_info_to.redistributed_recruits[year * this->seasons + (season - 1)] += tempf;
@@ -1019,16 +1020,16 @@ namespace mas {
 
                             for (int a = 0; a < this->ages; a++) {
                                 male_info_from.emigrants[year * this->seasons * this->ages + (season - 1) * this->ages + a] +=
-                                        male_probabilities[i][j] * male_info_from.N[year * this->seasons * this->ages + (season - 1) * this->ages + a];
+                                        male_fractions[i][j] * male_info_from.N[year * this->seasons * this->ages + (season - 1) * this->ages + a];
 
                                 male_info_to.imigrants[year * this->seasons * this->ages + (season - 1) * this->ages + a] +=
-                                        male_probabilities[i][j] * male_info_from.N[year * this->seasons * this->ages + (season - 1) * this->ages + a];
+                                        male_fractions[i][j] * male_info_from.N[year * this->seasons * this->ages + (season - 1) * this->ages + a];
 
                                 female_info_from.emigrants[year * this->seasons * this->ages + (season - 1) * this->ages + a] +=
-                                        female_probabilities[i][j] * female_info_from.N[year * this->seasons * this->ages + (season - 1) * this->ages + a];
+                                        female_fractions[i][j] * female_info_from.N[year * this->seasons * this->ages + (season - 1) * this->ages + a];
 
                                 female_info_to.imigrants[year * this->seasons * this->ages + (season - 1) * this->ages + a] +=
-                                        female_probabilities[i][j] * female_info_from.N[year * this->seasons * this->ages + (season - 1) * this->ages + a];
+                                        female_fractions[i][j] * female_info_from.N[year * this->seasons * this->ages + (season - 1) * this->ages + a];
                             }
 
                         }

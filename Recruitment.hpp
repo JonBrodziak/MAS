@@ -141,7 +141,7 @@ namespace mas {
             //                    (s * (static_cast<REAL_T> (5.0) * h
             //                    - static_cast<REAL_T> (1.0))));
             variable rr;// = (sigma_r*4.0 * R0 * h * s) / ((S0 * (1.0 - h)) + (s * (5.0 * h - 1.0)));
-            rr =sigma_r*4.0*h*R0*s/(S0*(1.0-h)+s*(5.0*h-1.0));
+            rr =4.0*h*R0*s/(S0*(1.0-h)+s*(5.0*h-1.0));
 //            std::cout << rr << "\n";
             return rr;
         }

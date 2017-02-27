@@ -50,8 +50,9 @@ namespace mas {
 
         virtual const variable Evaluate(const variable& age) = 0;
 
-       inline const variable getWeight(const int& sex, const variable& length) {
-            return sex == 0 ? alpha_f * atl::pow(length, beta_f) : alpha_m * atl::pow(length, beta_m);
+        inline const variable getWeight(const int& sex, const variable& length) {
+            variable ret = sex == 0 ? alpha_f * atl::pow(length, beta_f) : alpha_m * atl::pow(length, beta_m);
+            return ret < static_cast<REAL_T> (0.0) ? static_cast<REAL_T> (0.0) : ret;
         }
 
         virtual const std::string Name() {
@@ -67,7 +68,8 @@ namespace mas {
         variable l_inf;
 
         const variable Evaluate(const variable& age) {
-            return l_inf * (static_cast<REAL_T> (1.0) - atl::exp(-k * (age - this->a_min)));
+            variable ret = l_inf * (static_cast<REAL_T> (1.0) - atl::exp(-k * (age - this->a_min)));
+            return ret < static_cast<REAL_T> (0.0) ? static_cast<REAL_T> (0.0) : ret;
         }
 
         virtual const std::string Name() {
@@ -92,8 +94,9 @@ namespace mas {
         variable c;
 
         const variable Evaluate(const variable& age) {
-            return lmin + (lmax - lmin)*((static_cast<REAL_T> (1.0) -
+            variable ret = lmin + (lmax - lmin)*((static_cast<REAL_T> (1.0) -
                     (atl::pow(c, age - this->a_min))) / (static_cast<REAL_T> (1.0) - atl::pow(c, this->a_max - this->a_min)));
+            return ret < static_cast<REAL_T> (0.0) ? static_cast<REAL_T> (0.0) : ret;
         }
 
         virtual const std::string Name() {
@@ -120,10 +123,11 @@ namespace mas {
         variable lmax;
 
         const variable Evaluate(const variable& age) {
-            return atl::pow((lmin + (lmax - lmin))*
+            variable ret = atl::pow((lmin + (lmax - lmin))*
                     ((static_cast<REAL_T> (1.0) - atl::exp(-alpha * (age - this->a_min))) /
                     (static_cast<REAL_T> (1.0) - atl::exp(-alpha * (this->a_max - this->a_min)))),
                     static_cast<REAL_T> (1.0) / beta);
+            return ret < static_cast<REAL_T> (0.0) ? static_cast<REAL_T> (0.0) : ret;
         }
 
         virtual const std::string Name() {
@@ -149,9 +153,10 @@ namespace mas {
         variable lmax;
 
         virtual const variable Evaluate(const variable& age) {
-            return lmin * atl::exp(atl::log(lmax / lmin)*
+            variable ret = lmin * atl::exp(atl::log(lmax / lmin)*
                     ((static_cast<REAL_T> (1.0) - atl::exp(-alpha * (age - this->a_min))) /
                     (static_cast<REAL_T> (1.0) - atl::exp(-alpha * (this->a_max - this->a_min)))));
+            return ret < static_cast<REAL_T> (0.0) ? static_cast<REAL_T> (0.0) : ret;
         }
 
         virtual const std::string Name() {
@@ -177,10 +182,11 @@ namespace mas {
         variable lmax;
 
         const variable Evaluate(const variable& age) {
-            return atl::pow((lmin + (lmax - lmin))*
+            variable ret = atl::pow((lmin + (lmax - lmin))*
                     ((static_cast<REAL_T> (1.0) - (age - this->a_min)) /
                     (static_cast<REAL_T> (1.0) - (this->a_max - this->a_min))),
                     static_cast<REAL_T> (1.0) / beta);
+            return ret < static_cast<REAL_T> (0.0) ? static_cast<REAL_T> (0.0) : ret;
         }
 
         virtual const std::string Name() {
@@ -207,9 +213,10 @@ namespace mas {
         variable lmax;
 
         const variable Evaluate(const variable& age) {
-            return lmin * atl::exp(atl::log(lmax / lmin)*
+            variable ret = lmin * atl::exp(atl::log(lmax / lmin)*
                     ((static_cast<REAL_T> (1.0) - (age - this->a_min)) /
                     (static_cast<REAL_T> (1.0) - (this->a_max - this->a_min))));
+            return ret < static_cast<REAL_T> (0.0) ? static_cast<REAL_T> (0.0) : ret;
         }
 
         virtual const std::string Name() {
